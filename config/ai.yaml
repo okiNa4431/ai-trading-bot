@@ -1,0 +1,11 @@
+# Local guardrails, NOT an account-specific entitlement. Verify limits in AI Studio.
+model: gemini-2.5-flash
+approved_free_models: [gemini-2.5-flash]
+max_input_tokens_equivalent: 16000
+max_output_tokens: 2048
+timeout_seconds: 45
+retries: 0
+daily_request_limit: 5
+monthly_request_limit: 100
+max_requests_per_run: 1
+max_response_bytes: 32768

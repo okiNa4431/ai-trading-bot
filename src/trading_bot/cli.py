@@ -9,7 +9,7 @@ from pathlib import Path
 import yaml
 from pydantic import ValidationError
 
-from trading_bot import paper_cli
+from trading_bot import ai_cli, paper_cli
 from trading_bot.config import load_settings, load_universe
 from trading_bot.provider import YahooFinanceProvider
 from trading_bot.service import collect
@@ -28,6 +28,7 @@ def main(argv: list[str] | None = None) -> int:
         command.add_argument("--interval", choices=["1d", "1h"])
     commands.add_parser("status")
     paper_cli.add_parser(commands)
+    ai_cli.add_parser(commands)
     args = parser.parse_args(argv)
     try:
         settings = load_settings(args.settings)
@@ -40,6 +41,8 @@ def main(argv: list[str] | None = None) -> int:
         logging.getLogger("curl_cffi").setLevel(logging.CRITICAL)
         if args.command == "paper":
             return paper_cli.run(args)
+        if args.command in ("screen", "ai"):
+            return ai_cli.run(args)
         store = ParquetStore(settings.storage_dir)
         if args.command == "status":
             print("symbol\tmarket\tinterval\tcount\toldest\tlatest")

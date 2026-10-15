@@ -11,7 +11,15 @@ from pydantic import BaseModel
 
 from trading_bot.portfolio.models import Account, Currency, Position
 
-TABLES = {"orders", "executions", "fx_exchanges", "cash_ledger", "valuations"}
+TABLES = {
+    "orders",
+    "executions",
+    "fx_exchanges",
+    "cash_ledger",
+    "valuations",
+    "decisions",
+    "api_usage",
+}
 
 
 class Session(Protocol):
@@ -93,9 +101,11 @@ class SQLiteSession:
         ]
 
     def put(self, table: str, key: str, value: BaseModel) -> None:
-        # Only orders change state. Executions and ledger events are append-only.
+        # Orders / AI workflow records change state; executions and cash events are append-only.
         suffix = (
-            " ON CONFLICT(id) DO UPDATE SET payload=excluded.payload" if table == "orders" else ""
+            " ON CONFLICT(id) DO UPDATE SET payload=excluded.payload"
+            if table in {"orders", "decisions", "api_usage"}
+            else ""
         )
         self.connection.execute(
             f"INSERT INTO {self.table(table)}(id,payload) VALUES(?,?){suffix}",

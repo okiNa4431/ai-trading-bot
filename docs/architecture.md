@@ -105,3 +105,83 @@ yfinanceのOHLCVは執行可能な気配値ではなく、仮想約定は実市�
 取引所カレンダーは[pandas_market_calendars](https://pandas-market-calendars.readthedocs.io/en/stable/calendars.html)、GitHub Pages構成は[Viteの公式手順](https://vite.dev/guide/static-deploy.html)を参照しています。
 
 価格の時刻price_atと取得・観測可能時刻available_atを分離しています。一括取得で全バーのfetched_atが同じでも最新の価格時刻を選び、古い価格を再取得しただけで鮮度を更新しません。
+
+# Phase 3アーキテクチャ
+
+## フローと責務
+
+```text
+Parquet (1d / 1h) → causal confirmed filter → indicators → weighted screen
+                                                        + held symbols
+                                                               ↓
+SQLite account / pending orders → point-in-time JPY valuation → DecisionContext
+                                                               ↓
+                         TradingStrategy (mock default / explicit Gemini)
+                                                               ↓
+                strict JSON + semantic validation → OrderPlanner (dry-run default)
+                                                               ↓ explicit submit only
+              atomic saved-plan verification + PaperBroker.place_order (PENDING)
+```
+
+screening/はデータ処理・指標・候補選定、strategy/はプロバイダー契約・公式SDK通信・構造化応答検証、orchestration/は口座評価・数量計画・明示的登録を担当します。AIはquantityを返さず、ニュース検索やコード実行のツールも与えません。Phase 2のexecuteは呼びません。
+
+## 指標の定義
+
+評価時刻as_ofまでに確定し、fetched_at <= as_ofで取得済みのバーだけを利用します。取得時に未確定だったバーも拒否します。市場の窓はPhase 2のwindowを再利用し、休日・昼休み・夏時間・早引けを扱います。後日取得したデータで当時利用できたように振る舞うことはありません。
+
+日足の終値をC、出来高をVとします。最低21確定日足・2確定時間足が必要です。
+
+- 直近1時間: 直近確定1h終値 / 直前確定1h終値 − 1。開始時刻差が正確に1時間でなければ計算不能とし、休場をまたぐ変化を1時間と偽りません。
+- 直近1日: 最新確定日足終値 / 前確定取引日終値 − 1（暦日でなく取引日間）。
+- SMA5/20: 最新5/20確定取引日終値の単純平均。
+- RSI14: 日次差分から上昇幅・下落幅を作り、最初の14差分の平均を初期値にWilder更新 `(旧平均×13 + 新値)/14`。RSI=100−100/(1+平均上昇/平均下落)。両者0なら50、下落だけ0なら100。
+- ATR14: TR=max(high−low, |high−前close|, |low−前close|)。前closeのある日から14TR平均を初期値に同じWilder更新。
+- 相対出来高: 最新日足V / その前20日足Vの平均。分母0は計算不能。最新V=0はそれだけで無効にしません。
+- ボラティリティ: 最新20日次単純リターンの標本標準偏差(ddof=1)×sqrt(252)。
+- 平均売買代金: 最新20日足のclose×volumeの平均。JPY/USDネイティブ通貨。
+
+SMA・RSI・ATRは未調整系列です。日次/時間足の急変や、最新日足から時間足への不連続がmax_price_jump（既定35%）を超えると除外します。値は補正しません。日足の最大経過は既定7日、時間足は1日です。
+
+## スコアと候補
+
+clip(x)=max(−1,min(1,x))。
+
+| 要因 | 正規化式 |
+| --- | --- |
+| trend | clip((最新日足close/SMA20−1)/0.1) |
+| momentum | clip(日次return/0.05) |
+| volume | clip((相対出来高−1)/2) |
+| liquidity | clip(log10(max(平均売買代金/市場閾値,1e−12))/3) |
+| volatility | clip(1−年率volatility20) |
+| quality | clip(1−2×時間足経過秒/許容経過秒) |
+
+市場閾値は既定JP=1億JPY、US=1千万USD。スコアは重み付き和÷重み合計で、既定重みは順に0.25/0.20/0.15/0.15/0.15/0.10です。これは研究用仮説で、利益を実証した戦略ではありません。降順・同点はsymbol昇順で上位top_k（5〜10）を選び、その市場の保有銘柄を上限外でも追加します。指標不能の保有銘柄は理由付き・HOLD専用で残します。他市場の保有も総資産評価には必ず含めます。
+
+## AI契約・権限・費用
+
+DecisionContextは特徴量、候補スコア、観測/取得時刻・データ源、通貨別残高、保有・取得原価、含み損益、JPY総資産、各比率、FXとリスク条件を持ちます。入力ハッシュはランダムな評価IDを除いて計算します。モデルはconfig/ai.yamlだけで指定し、明示した無料枠確認済みモデル以外を拒否します。無料枠の実際の適用や課金はGoogle側のアカウント設定に依存し、アプリは課金状態を変更しません。
+
+TradingStrategyはdecide(context)->DecisionResult。mockはHOLDを返し通信しません。Geminiはgoogle-genaiのDeveloper APIを固定し、SDK内リトライ・自動関数呼出しを無効化します。ツール・外部検索・有料フォールバックはありません。APIキーは明示したgemini操作の時だけ.envまたは環境変数から読み、環境変数が優先です。
+
+入力はシステム指示・JSON特徴量・JSONスキーマのUTF-8バイト数に1024を加えた保守的トークン相当値で制限します。count_tokensの別API通信はしません。出力トークン、出力バイト数、タイムアウト、アプリ内リトライ、日次/月次/判断IDごとの最大リクエストを制限します。API前に予約し、失敗/タイムアウトも枠を消費します。サーバーの429では停止します。
+
+応答はJSON重複キーを含め厳密にパースし、Pydanticと文脈検証を行います。未知/重複/欠落銘柄、余計なフィールド、無効action、0〜0.10外のweight、現在比率と矛盾するBUY/SELLを拒否します。HOLDのweightは無視し、未保有SELLのweight=0は注文を作りません。理由文は未信頼の参考情報で、注文権限を持ちません。
+
+## 数量と登録
+
+目標JPY額=target_weight×判断時の総資産。目標と現在評価額の差を価格・FX・単位で割り、株数を切り下げます。SELLでも小さな超過を単元へ切り上げて過剰に売りません。
+BUYは二分探索で手数料・スリッページ反映後に目標比率、10%・80%・現金20%を守る最大単元数を決めます。既存PENDING BUYと新規BUYの見積資金・持高を累積予約し、同じsymbolのPENDING注文があれば重複計画しません。PENDING/新規SELLの代金は買付余力へ加算しません。ドル残高不足時にJPYを勝手に両替しません。
+
+registerは明示オプションだけです。保存した口座・未約定注文・ルールのハッシュを現状態と比較し、保存済みAI判断から計画を再検証します。候補株価・FXの鮮度も登録時に再確認します。呼出元が変更したmodel_copyでなくDBの保存済み計画が正本です。ネイティブPaperBrokerを同じSQLiteトランザクションへ束縛して注文登録と判断の登録済み状態を一括保存します。例外なら全登録をrollbackします。
+注文時刻は判断のas_ofでなく**実際の登録時刻**です。API待ち時間中に既に観測された価格で遡及約定しないようにします。注文IDは判断ID・symbol・sideから決定論的に生成し、同一判断の並行登録も一度だけです。約定では既存PaperBrokerの後続バー/リスク検査が再度働きます。
+
+## 永続化・Secret・Workflow
+
+既存SQLiteへdecisionsとapi_usageを非破壊追加します。決定のRUNNING claim、API枠予約、保存結果、注文登録は短いトランザクションで、ネットワーク中はDBロックを保持しません。判断IDが既に処理中なら重複呼出しを拒否し、成功結果を再利用します。失敗・中断したIDを勝手に再送しません。
+記録は入力時刻・ハッシュ/スナップショット、モデル、promptバージョン、応答・判断・計画、登録結果、使用量、エラー、状態です。SDKエラー本文はログに出さず、キーの反射出力もredactします。SDK由来トークン数が不明ならnullとし0と捏造しません。
+
+手動Workflowは保護されたmainのSHAをcheckoutし、contents:readだけを与えます。実APIステップだけSecretを受け取り、mockや通常CIは受け取りません。2銘柄の実データ＋一時100万円口座でdry-run固定・実API最大1回・リトライ0。注文/約定/公開artifactは禁止し、Summaryだけ表示します。API枠・SQLite口座はActions実行間で継承されず、継続運用正本やグローバル利用量の証明にはしません。
+
+## Phase 4へ
+
+Supabaseで口座・判断・利用量を永続化してから継続運用を設計してください。定期実行、オルカン実比較、実資金注文、ニュース検索、AIによるコード自動変更はPhase 3に含めません。Webは準備状況だけを公開し、手動テスト結果を継続的な運用実績と混同しません。

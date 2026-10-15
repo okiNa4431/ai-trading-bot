@@ -4,6 +4,7 @@ import socket
 
 import pytest
 import yfinance as yf
+from google import genai
 
 
 @pytest.fixture(autouse=True)
@@ -15,3 +16,4 @@ def block_network(monkeypatch):
     monkeypatch.setattr(socket.socket, "connect", forbidden)
     monkeypatch.setattr(socket, "create_connection", forbidden)
     monkeypatch.setattr(yf, "Ticker", forbidden)
+    monkeypatch.setattr(genai, "Client", forbidden)

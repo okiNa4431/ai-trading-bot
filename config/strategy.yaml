@@ -1,0 +1,13 @@
+top_k: 5
+max_hourly_age_seconds: 86400
+max_daily_age_seconds: 604800
+max_price_jump: 0.35
+liquidity_jpy: 100000000
+liquidity_usd: 10000000
+weights:
+  trend: 0.25
+  momentum: 0.20
+  volume: 0.15
+  liquidity: 0.15
+  volatility: 0.15
+  quality: 0.10

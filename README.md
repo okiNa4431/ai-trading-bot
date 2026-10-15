@@ -1,6 +1,6 @@
 # AI vs オルカン — AI Trading Bot
 
-Geminiが日本株・米国株を仮想売買するポートフォリオと、オルカンへの一括投資の成績比較を最終目標とします。Phase 1の市場データ基盤に加え、Phase 2で仮想口座・売買エンジン・SQLite保存・簡易Webページを実装しました。AI判断や実資金の注文は行いません。現在は仮想運用準備中です。
+Geminiが日本株・米国株を仮想売買するポートフォリオと、オルカンへの一括投資の成績比較を最終目標とします。Phase 1の市場データ基盤、Phase 2の仮想口座・売買エンジンに加え、Phase 3で定量スクリーニング・Gemini判断・注文計画を実装しました。既定はmock / dry-runで、実資金の注文や定期売買は行いません。現在は仮想運用準備中です。
 
 ## 環境構築
 
@@ -166,3 +166,78 @@ SQLiteはローカル運用専用です。Actionsには売買を実行する定�
 取引所カレンダーとデータベンダーのバー形式には差があり得るため、将来のデータ源切替時には再検証が必要です。ライブラリ由来の非推奨警告も現在残っています。
 
 Phase 2の変更ファイル・テスト・CI・公開結果は [Phase 2実装報告](docs/phase2-report.md) に記録しています。
+
+## Phase 3：定量スクリーニングとGemini判断
+
+既存の市場データ・仮想口座を再利用し、特徴量→候補選定→構造化AI判断→注文計画を実装しました。既定は**mock + dry-run**です。Geminiは数量決定・為替交換・約定の権限を持ちません。
+
+```powershell
+uv sync --locked
+uv run trading-bot fetch --market JP --interval 1d
+uv run trading-bot fetch --market JP --interval 1h
+uv run trading-bot screen --market JP
+uv run trading-bot screen --market US
+uv run trading-bot paper init
+uv run trading-bot ai decide --market JP --dry-run
+uv run trading-bot ai decide --market US --dry-run
+uv run trading-bot ai history
+uv run trading-bot ai usage
+```
+
+screenには保存済みの1d・1hが必要です。ai decideには初期化済みの仮想口座が必要です。データ不足や、保有株・USD現金の評価に必要な価格/為替が不足する場合、正常な総資産を捏造せず停止します。`screen` 単体では口座未初期化でも分析できます。
+`--at` はUTCオフセット付きの判断時刻を指定できます。その時刻までに確定・取得されていないバーは使いません。後で取得した履歴から過去の観測状態を再構成するバックテスト機能はありません。
+
+### Geminiへの明示的な接続
+
+[Google公式モデル情報](https://ai.google.dev/gemini-api/docs/models/gemini-2.5-flash)と[料金表](https://ai.google.dev/gemini-api/docs/pricing)を2026-10-15に確認し、初期モデルを `gemini-2.5-flash` としています。公式SDK `google-genai` のDeveloper API、構造化JSONを使用します。モデルIDは `config/ai.yaml` で変更できます。
+
+```powershell
+uv run trading-bot ai decide --market JP --provider gemini --dry-run --decision-id my-analysis
+```
+
+ローカルでは環境変数 `GEMINI_API_KEY` または `.env` を使用します。既存の環境変数を優先し、mockでは.env読込もAPIキーも不要です。GitHub Actionsでは登録済みSecretを利用するので再入力は不要です。キーはソース・設定・出力へ書かないでください。
+
+実APIへの接続と注文登録は独立した許可です。Gemini通信が成功しただけでは注文を登録しません。
+保存済みの同じ判断を確認したうえで登録する場合は次のようにします。
+
+```powershell
+uv run trading-bot ai decide --market JP --provider gemini --decision-id my-analysis --submit-orders
+```
+
+成功済みの同じIDではAIを再呼出しせず、保存済み計画を利用します。口座・未約定注文・ルールが変わった場合やデータが古くなった場合は登録を拒否し、新しい判断を求めます。同一IDの登録は冪等で、注文はPENDINGとなるだけです。約定はPhase 2のpaper executeで別途実行します。`--dry-run` と `--submit-orders` の併用はできません。
+モデルや市場・判断時刻を変えて同じIDを流用することはできません。失敗した判断の自動再送もしないため、原因を解決した後に新しいIDで実行してください。
+
+### 指標・スコア・注文数量
+
+詳細な式は [設計文書](docs/architecture.md) に記載しています。SMA5/20、Wilder RSI14/ATR14、日次/時間足リターン、相対出来高、年率換算ボラティリティ、平均売買代金を計算します。
+最低21日足・2時間足が必要です。時間足は直近2本が1時間間隔であることを要求し、間隔が不規則な場合に1時間の変化率を捏造しません。再サンプリングは行いません。
+不自然な未調整価格の不連続は除外し、指標不能な保有銘柄はHOLD専用の評価対象として残します。保有株の不連続で評価自体が信頼できない場合はAI前で停止します。
+
+設定は `config/strategy.yaml`。6要因の仮説的スコアで各市場上位5〜10銘柄を選び、その市場の保有銘柄を上限外でも追加します。全保有銘柄は市場をまたいでもポートフォリオ評価へ含めます。重みは収益性が実証されたものではありません。銘柄数の拡張はuniverse.yamlだけで可能です。
+
+OrderPlannerは目標の**取引後比率**を株数へ切り下げ、日本株単元、米国整数株、スリッページ・手数料・通貨別現金を検査します。既存PENDING BUYと新しいBUYの予算を累積予約し、未約定SELLの売却代金や自動FXを買付余力に含めません。実際の後続価格による約定時にもPaperBrokerのリスク検査が働きます。
+HOLDでは注文せず、未保有SELL、単元未満、予算不足、FX不足などは理由を表示します。
+
+### APIの費用・制限
+
+`config/ai.yaml` の日次・月次・実行単位の上限はローカルの安全上限で、AI Studioのアカウント別無料枠を表す保証値ではありません。実際のアカウントの無料枠・課金設定はAI Studio側で確認してください。同じモデルでも課金済みプロジェクトでは課金が発生し得るため、アプリだけで無料を保証できません。
+
+- SDK内部リトライを無効化し、アプリのリトライも上限付きです。既定はリトライ0・1実行1リクエスト。
+- タイムアウトや429もリクエスト予約数に含めます。有料モデルへの自動切替、Vertexへの自動移行、課金設定変更はしません。
+- 入力は生OHLCVでなく特徴量です。UTF-8バイト数＋システム指示・スキーマ＋余裕を保守的なトークン相当上限として検査します。追加のcount_tokens通信は行いません。
+- 出力トークン・出力バイト数・タイムアウトも制限します。入力/出力/思考/総トークンはSDKから返された数値を記録し、取得できない値はnullです。
+- JSON・未知/重複銘柄・無効アクション・範囲外/矛盾する目標比率を拒否します。不正出力を再整形して強引に注文にはしません。
+- 判断・入力ハッシュ/スナップショット・応答・計画・登録結果・エラー・使用量は同じローカルSQLiteの別テーブルへ保存します。秘密値をエラーメッセージや保存応答へ出さないようにします。
+
+### GitHub Actions：手動接続テスト
+
+Actions → **Test Gemini decision** → **Run workflow**。
+`market=JP/US`、`mode=mock/gemini` を選びます。既定はJP/mockです。最初にmockを成功させてからgeminiを選んでください。
+保護されたmainの確定コミットだけをcheckoutし、実APIステップだけに `GEMINI_API_KEY` Secretを渡します。通常CI・mockへSecretを渡しません。push / pull_request / cronでGeminiを呼びません。
+
+手動テストは対象市場の2銘柄、90日の日足・7日の時間足をPhase 1で取得し、一時口座100万円で分析します。**最大1回の実API呼出し、dry-run固定、注文登録・約定禁止**です。結果はActions Summaryに候補数、判断、BUY/SELL/HOLD件数、注文計画/見送り理由、トークン、状態を表示します。Parquet・SQLite・秘密情報のartifactは作りません。
+ActionsのDBは使い捨てで、日次/月次カウンターも実行間では継承されません。永続した利用上限と口座状態は将来のSupabase導入後に扱います。今回のActionsでは1実行1呼出しとGoogle側の制限を併用します。継続運用の正本にはしません。
+
+mainが未保護の場合、Secretを扱うWorkflowは実行しません。リポジトリのmain保護設定を有効にしてから使用してください。APIキーを表示・再入力する必要はありません。
+
+Phase 3でも定期売買・実証券会社接続・Supabase・オルカン実比較は行いません。公開Webは運用準備中の案内だけで、手動テストの出力を継続運用実績として掲載しません。
