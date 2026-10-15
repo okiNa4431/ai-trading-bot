@@ -64,7 +64,7 @@ Yahoo Finance/yfinanceにはレート制限、期間制限、データ遅延・�
 返却バーを再サンプリングしません。時間足は開始1時間後、日足は現地翌日まで待つ保守的な確定判定です。取引所カレンダーによる欠損検査、配当・分割補正、長期停止後の古い欠損の自動補完は今後の課題です。
 強制終了後に `.write.lock` が残る場合は、実行中の書込みがないことを確認してから手動除去してください。
 
-Phase 2以降にGemini、PaperBroker、ポートフォリオ・為替・オルカン比較、Supabase永続化、GitHub Pagesを検討します。[設計文書](docs/architecture.md)を参照してください。
+Phase 2でPaperBroker・ポートフォリオ・為替管理・GitHub Pagesを実装しました。今後はGemini判断・オルカン実データ比較・Supabase永続化を検討します。[設計文書](docs/architecture.md)を参照してください。
 
 ソフトウェアは [MIT License](LICENSE) です。価格データの権利は含みません。
 
@@ -142,7 +142,7 @@ uv run mypy src
 
 ## GitHub Pages / Web
 
-公開URL予定: https://okiNa4431.github.io/ai-trading-bot/
+公開URL: https://okina4431.github.io/ai-trading-bot/
 React・TypeScript・Vite・Tailwind CSSの案内ページです。初期仮想資金や開発段階を掲載し、架空の実績は表示しません。SQLiteや口座履歴をWebへ公開しません。
 Node.js 24を使用し、`web/package-lock.json` をコミットします。
 
@@ -164,3 +164,5 @@ GitHubの Settings → Pages → Build and deployment → Sourceを **GitHub Act
 SQLiteはローカル運用専用です。Actionsには売買を実行する定期Workflowを設けず、実行間のSQLite永続化を想定しません。
 配当・株式分割は未対応です。未調整価格を使った長期シミュレーションの正確な運用成績は保証しません。Gemini判断、スクリーニング、オルカン実データ比較、Supabase、ログイン、PWA、実証券会社APIは対象外です。
 取引所カレンダーとデータベンダーのバー形式には差があり得るため、将来のデータ源切替時には再検証が必要です。ライブラリ由来の非推奨警告も現在残っています。
+
+Phase 2の変更ファイル・テスト・CI・公開結果は [Phase 2実装報告](docs/phase2-report.md) に記録しています。

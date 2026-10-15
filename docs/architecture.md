@@ -39,7 +39,7 @@ Actionsの3日間artifactは永続保存ではありません。実行ごとに�
 
 ## 将来の拡張
 
-Geminiへ渡す入力は検証済み履歴から別サービスで作成する予定です。PaperBrokerは注文・約定・手数料・残高管理の境界として設計します。Supabaseは永続保存、GitHub Pagesは公開可能な集計表示を担う予定です。現在は未実装で空ファイルも作っていません。
+Geminiへ渡す入力は検証済み履歴から別サービスで作成する予定です。PaperBrokerとGitHub PagesはPhase 2で実装しました（詳細は後半）。Supabaseによる永続保存と運用集計のWeb表示は未実装です。
 
 実売買への移行時はMarketDataProviderを契約済みデータ源へ置換し、実ブローカー、取引所カレンダー、株式分割・配当、為替、監査記録、注文冪等性、リスク上限・停止機構を追加します。未調整価格だけで損益を計算しないでください。
 
@@ -103,3 +103,5 @@ CIはWindows/UbuntuのPythonテストとUbuntuの型チェック・本番ビル�
 Geminiは観測可能な時刻で切った価格と評価を入力し、注文要求をBrokerへ渡す層として追加できます。Supabase移行時はPortfolioRepositoryとトランザクション契約を実装します。LiveBroker移行時は実気配・約定イベント・取引単位・注文冪等性・認証・リスク停止機構を別途検証する必要があります。
 yfinanceのOHLCVは執行可能な気配値ではなく、仮想約定は実市場と異なります。配当・株式分割は未対応であり、未調整価格による長期成績の正確性を保証しません。
 取引所カレンダーは[pandas_market_calendars](https://pandas-market-calendars.readthedocs.io/en/stable/calendars.html)、GitHub Pages構成は[Viteの公式手順](https://vite.dev/guide/static-deploy.html)を参照しています。
+
+価格の時刻price_atと取得・観測可能時刻available_atを分離しています。一括取得で全バーのfetched_atが同じでも最新の価格時刻を選び、古い価格を再取得しただけで鮮度を更新しません。
