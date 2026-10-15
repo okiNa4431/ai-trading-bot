@@ -189,7 +189,7 @@ screenには保存済みの1d・1hが必要です。ai decideには初期化済�
 
 ### Geminiへの明示的な接続
 
-[Google公式モデル情報](https://ai.google.dev/gemini-api/docs/models/gemini-2.5-flash)と[料金表](https://ai.google.dev/gemini-api/docs/pricing)を2026-10-15に確認し、初期モデルを `gemini-2.5-flash` としています。公式SDK `google-genai` のDeveloper API、構造化JSONを使用します。モデルIDは `config/ai.yaml` で変更できます。
+[Google公式モデル情報](https://ai.google.dev/gemini-api/docs/models/gemini-3.5-flash-lite)と[料金表](https://ai.google.dev/gemini-api/docs/pricing)を2026-10-15に確認し、初期モデルを `gemini-3.5-flash-lite`、thinking levelを `minimal` としています。最初の候補 `gemini-2.5-flash` は実接続で404となりました。[公式の利用制限](https://ai.google.dev/gemini-api/docs/deprecations)を確認し、新規プロジェクト向けの無料枠対応モデルへ設定を明示的に変更しました。実行時の自動フォールバックはありません。公式SDK `google-genai` のDeveloper API、構造化JSONを使用します。モデルIDとthinking levelは `config/ai.yaml` で変更できます。
 
 ```powershell
 uv run trading-bot ai decide --market JP --provider gemini --dry-run --decision-id my-analysis

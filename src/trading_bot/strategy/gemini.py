@@ -77,7 +77,9 @@ class GeminiTradingStrategy:
                             response_mime_type="application/json",
                             response_json_schema=schema,
                             max_output_tokens=self.settings.max_output_tokens,
-                            thinking_config=types.ThinkingConfig(thinking_budget=0),
+                            thinking_config=types.ThinkingConfig(
+                                thinking_level=types.ThinkingLevel(self.settings.thinking_level)
+                            ),
                             automatic_function_calling=types.AutomaticFunctionCallingConfig(
                                 disable=True
                             ),

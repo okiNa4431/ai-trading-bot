@@ -29,24 +29,30 @@ def confirmed(
     seen = set()
     for original in bars:
         try:
-            bar = PriceBar.model_validate(original.model_dump())
-        except ValueError as exc:
-            raise FeatureUnavailable("invalid OHLCV") from exc
-        if (bar.symbol, bar.market, bar.currency, bar.interval) != (
+            timestamp = utc(original.timestamp)
+            fetched = utc(original.fetched_at)
+        except (ValueError, AttributeError) as exc:
+            raise FeatureUnavailable("invalid or missing observation timestamp") from exc
+        # Unknown-at-as_of rows must not even influence quality/exclusion decisions.
+        if timestamp > as_of or fetched > as_of:
+            continue
+        if (original.symbol, original.market, original.currency, original.interval) != (
             instrument.symbol,
             instrument.market,
             instrument.currency,
             interval,
         ):
             raise FeatureUnavailable("OHLCV metadata mismatch")
+        span = window(original)
+        if span is None or span[1] > as_of or fetched < span[1]:
+            continue
+        try:
+            bar = PriceBar.model_validate(original.model_dump())
+        except ValueError as exc:
+            raise FeatureUnavailable("invalid OHLCV") from exc
         if bar.timestamp in seen:
             raise FeatureUnavailable("duplicate OHLCV timestamp")
         seen.add(bar.timestamp)
-        span = window(bar)
-        if span is None:
-            continue
-        if span[1] > as_of or bar.fetched_at > as_of or bar.fetched_at < span[1]:
-            continue
         result.append((bar, span[1]))
     return sorted(result, key=lambda pair: pair[0].timestamp)
 

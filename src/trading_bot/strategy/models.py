@@ -12,6 +12,7 @@ from trading_bot.screening.models import ScreeningResult
 class AISettings(Contract):
     model: str = Field(min_length=1)
     approved_free_models: list[str] = Field(min_length=1)
+    thinking_level: Literal["minimal", "low", "medium", "high"] = "minimal"
     max_input_tokens_equivalent: int = Field(default=16000, gt=0, le=1000000)
     max_output_tokens: int = Field(default=2048, ge=128, le=32768)
     timeout_seconds: float = Field(default=45, gt=0, le=120)

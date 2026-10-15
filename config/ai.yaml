@@ -1,6 +1,7 @@
 # Local guardrails, NOT an account-specific entitlement. Verify limits in AI Studio.
-model: gemini-2.5-flash
-approved_free_models: [gemini-2.5-flash]
+model: gemini-3.5-flash-lite
+approved_free_models: [gemini-3.5-flash-lite]
+thinking_level: minimal
 max_input_tokens_equivalent: 16000
 max_output_tokens: 2048
 timeout_seconds: 45

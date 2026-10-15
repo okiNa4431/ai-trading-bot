@@ -107,3 +107,23 @@ def test_market_holiday_is_not_fabricated():
         update={"timestamp": NOW.replace(month=1, day=1), "fetched_at": NOW}
     )
     assert confirmed([holiday], JP, "1h", NOW) == []
+
+
+def test_unknown_future_bad_data_cannot_affect_past_quality_or_features():
+    data = histories()
+    baseline = features(data)
+    future_bad = data["1d"][-1].model_copy(
+        update={"fetched_at": NOW + timedelta(days=1), "close": float("nan")}
+    )
+    data["1d"].append(future_bad)
+    assert features(data) == baseline
+    data = histories()
+    future_bad = data["1h"][-1].model_copy(
+        update={
+            "timestamp": NOW + timedelta(hours=1),
+            "fetched_at": NOW + timedelta(hours=2),
+            "high": -100,
+        }
+    )
+    data["1h"].append(future_bad)
+    assert features(data) == baseline

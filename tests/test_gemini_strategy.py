@@ -49,6 +49,7 @@ def test_structured_response_tokens_and_sdk_options(setup_ai):
     assert constructor.call_args.kwargs["vertexai"] is False
     config = client.models.generate_content.call_args.kwargs["config"]
     assert config.max_output_tokens == 2048
+    assert config.thinking_config.thinking_level.value == "MINIMAL"
     assert config.automatic_function_calling.disable
     assert client.close.call_count == 1
     usage = engine.decisions.usage()[0]
