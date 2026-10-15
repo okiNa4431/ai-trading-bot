@@ -325,6 +325,7 @@ class PaperBroker:
                 currency=order.currency,
                 price=reference,
                 available_at=opened if mode == "historical" else observed,
+                price_at=opened,
             )
             try:
                 updated = apply_execution(account, execution, position)

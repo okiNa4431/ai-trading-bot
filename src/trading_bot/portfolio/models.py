@@ -66,7 +66,13 @@ class Mark(Contract):
     currency: Currency
     price: Decimal = Field(gt=0)
     available_at: datetime
+    price_at: datetime | None = None
     _timestamp = field_validator("available_at")(utc)
+
+    @field_validator("price_at")
+    @classmethod
+    def price_time(cls, value: datetime | None) -> datetime | None:
+        return utc(value) if value is not None else None
 
 
 class Position(Contract):

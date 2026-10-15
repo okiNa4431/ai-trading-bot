@@ -725,3 +725,35 @@ def test_complete_paper_cli_jp_us_fx_execute_and_value(tmp_path, capsys):
     assert restored.get_balance().realized_pnl["JPY"] == D("9930")
     assert len(restored.get_executions()) == 3
     assert "SIMULATION" in capsys.readouterr().out
+
+
+def test_paper_marks_pick_latest_bar_even_when_fetch_times_match():
+    fetched = T + timedelta(hours=3)
+    data = {
+        JP.symbol: [bar(300, T, fetched=fetched), bar(400, T + timedelta(hours=1), fetched=fetched)]
+    }
+    marks = known_marks([JP], data, fetched, "paper")
+    assert marks[JP.symbol].price == D(400)
+    assert marks[JP.symbol].price_at == T + timedelta(hours=2)
+    assert marks[JP.symbol].available_at == fetched
+
+
+def test_refetching_old_bar_does_not_make_stale_price_fresh(broker):
+    fill(broker)
+    as_of = T + timedelta(days=3)
+    marks = known_marks([JP], {JP.symbol: [bar(500, T, fetched=as_of)]}, as_of, "paper")
+    with pytest.raises(ValueError, match="stale"):
+        broker.value(marks, None, as_of)
+
+
+def test_percentage_commission_and_adverse_rounding(tmp_path):
+    instance = PaperBroker(
+        SQLiteRepository(tmp_path / "fee.sqlite3"), TradingRules(commission_rate=D("0.005"))
+    )
+    instance.initialize(T - timedelta(days=1))
+    assert fill(instance, price=300).status == "FILLED"
+    assert instance.get_executions()[0].commission == D(151)
+    assert instance.get_positions()[0].average_cost == D("301.81")
+    assert fill(instance, price=400, side="SELL", at=T + timedelta(hours=1)).status == "FILLED"
+    assert instance.get_executions()[1].commission == D(200)
+    assert instance.get_balance().realized_pnl["JPY"] == D(9579)

@@ -111,11 +111,12 @@ def known_marks(
             if available > as_of:
                 continue
             current = marks.get(bar.symbol)
-            if current is None or current.available_at < available:
+            if current is None or (current.price_at or current.available_at) < span[1]:
                 marks[bar.symbol] = Mark(
                     symbol=bar.symbol,
                     currency=bar.currency,
                     price=Decimal(str(bar.close)),
                     available_at=available,
+                    price_at=span[1],
                 )
     return marks

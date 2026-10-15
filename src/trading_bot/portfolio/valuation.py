@@ -57,8 +57,14 @@ def value_portfolio(
         mark = Mark.model_validate(mark.model_dump())
         if mark.symbol != symbol or mark.currency != position.instrument.currency:
             raise ValueError(f"price metadata mismatch for {symbol}")
-        age = (as_of - mark.available_at).total_seconds()
-        if age < 0 or age > rules.max_price_age_seconds:
+        price_at = mark.price_at or mark.available_at
+        age = (as_of - price_at).total_seconds()
+        if (
+            mark.available_at > as_of
+            or price_at > mark.available_at
+            or age < 0
+            or age > rules.max_price_age_seconds
+        ):
             raise ValuationUnavailable(f"future or stale price for {symbol}")
         used_marks.append(mark)
         native = mark.price * position.quantity
