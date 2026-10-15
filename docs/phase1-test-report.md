@@ -18,9 +18,9 @@
 | 異常データ検出 | PASS | 欠損、NaN/Inf、負値、不正OHLC、時刻、重複、銘柄、空データ |
 | CLI | PASS | 指定5操作を実通信で実行。異常終了コードもモックで確認 |
 | 障害耐性 | PASS | タイムアウト、429、接続障害、部分失敗、割込み、権限拒否、破損ファイル |
-| GitHub Actions CI | 未実施 | Workflow YAML・起動条件・コマンドはローカル検証 |
-| GitHub Actions手動取得 | 未実施 | GitHub APIで登録Workflow数0を確認 |
-| Linux実行 | 未実施 | WSL未導入。パス処理とUbuntu用Workflowを静的確認 |
+| GitHub Actions CI | PASS | Windows・Ubuntuとも69テスト、Ruff、mypy成功 |
+| GitHub Actions手動取得 | PASS | ALL市場の日足・時間足、各20銘柄取得とartifact保存成功 |
+| Linux実行 | PASS | GitHub ActionsのUbuntu runnerでCI・実取得成功 |
 
 ### 実取得結果（UTC）
 
@@ -96,8 +96,8 @@ pyproject.toml、uv.lock、既存テストの検証条件、既存Git設定は�
 
 ## D. 残存課題・環境制約
 
-- GitHub上の実行は未検証です。リモートに登録済みWorkflowがなく、未コミットの今回の実装をGitHubへpushしていません。反映後にCIと手動取得の実行確認が必要です。
-- Linux環境の実行は未検証です。WSLは導入されていません。Windows実行、pathlibによるパス処理、Ubuntuを含むCI定義までは確認しました。
+- 追検証でGitHub上の実行を確認しました。2026-10-15、ユーザーの明示許可を受けてmainへpushしました。
+- ローカルWSLは未導入ですが、GitHub ActionsのUbuntuとWindowsの両環境でCIが成功しています。
 - yfinance/NumPy由来のDeprecationWarningがありますが、今回の実取得は成功しています。ライブラリ更新時に再検証してください。
 - 日足は市場現地の翌日0時、時間足は開始1時間後という保守的な確定判定です。日本の短い最終バーなどで反映が遅れる場合があります。
 - 取引所カレンダーによる厳密な欠損判定は未実装。長いギャップは警告します。
@@ -106,8 +106,21 @@ pyproject.toml、uv.lock、既存テストの検証条件、既存Git設定は�
 
 ## E. 最終判定
 
-**CONDITIONAL PASS：軽微な未解決事項がある。**
+**PASS：Phase 2に進める。**
 
 ローカルの全テスト、実通信、保存・更新・異常系は成功し、今回発見した不具合は修正済みです。
-Phase 2の設計・開発に進む土台は整っていますが、GitHub ActionsとLinuxでの実行確認を残しています。
+GitHub ActionsとLinuxでの実行確認も完了しました。Phase 2の設計・開発に進む土台は整っています。
 Phase 2の損益計算には未調整価格の株式分割・配当と為替の扱いを追加する必要があります。
+
+
+## GitHub Actions追検証（2026-10-15）
+
+対象コードのコミット: `6fa3940006c3f967045536ff554fbf50d7fa7cb0`。
+
+- [CI: Windows / Ubuntu](https://github.com/okiNa4431/ai-trading-bot/actions/runs/38735653371): 両OSで69テスト・Ruff・mypy成功。
+- [時間足の手動取得](https://github.com/okiNa4431/ai-trading-bot/actions/runs/38735646791): completed=20 failed=0。
+- [日足の手動取得](https://github.com/okiNa4431/ai-trading-bot/actions/runs/38735677136): completed=20 failed=0。
+- artifactをダウンロードしてParquetStoreで全ファイルを読込検証。時間足20ファイル・2,800行、日足20ファイル・9,870行。
+- artifactは設定どおり3日保持。実データはリポジトリへコミットしていません。
+- pushによるCI起動とworkflow_dispatchによる手動起動を確認。pull_requestイベント自体の実起動は未実施です。
+- 使用中のActionsにはNode.jsランタイムの非推奨警告がありますが、今回の全ジョブは成功しています。
