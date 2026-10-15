@@ -1,0 +1,56 @@
+name: Fetch market data
+on:
+  workflow_dispatch:
+    inputs:
+      market:
+        type: choice
+        options: [ALL, JP, US]
+        default: ALL
+        required: true
+      interval:
+        type: choice
+        options: [1d, 1h]
+        default: 1d
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: fetch-market-data
+  cancel-in-progress: false
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.13.1'
+      - run: uv python install 3.12
+      - run: uv sync --locked
+      - name: Fetch and validate
+        env:
+          MARKET: ${{ inputs.market }}
+          INTERVAL: ${{ inputs.interval }}
+        shell: bash
+        run: |
+          set -o pipefail
+          uv run trading-bot fetch --market "$MARKET" --interval "$INTERVAL" 2>&1 | tee fetch.log
+      - name: Summary
+        if: always()
+        shell: bash
+        run: |
+          echo '### Market data results' >> "$GITHUB_STEP_SUMMARY"
+          echo '```text' >> "$GITHUB_STEP_SUMMARY"
+          if [ -f fetch.log ]; then tail -60 fetch.log >> "$GITHUB_STEP_SUMMARY"; fi
+          uv run trading-bot status >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: market-data-${{ inputs.market }}-${{ inputs.interval }}
+          path: |
+            data/market/**/*.parquet
+            fetch.log
+          retention-days: 3
+          if-no-files-found: warn

@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling==1.27.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ai-trading-bot"
+version = "0.1.0"
+description = "Validated raw market data for AI vs All Country"
+requires-python = ">=3.12,<3.13"
+dependencies = ["yfinance>=0.2.65,<1", "pandas>=2.2,<3", "numpy>=2,<3", "pyarrow>=19,<24", "pydantic>=2.10,<3", "PyYAML>=6,<7", "tzdata>=2025.1"]
+
+[project.scripts]
+trading-bot = "trading_bot.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8,<10", "ruff>=0.11,<1", "mypy>=1.15,<2", "pandas-stubs>=2.2,<3", "types-PyYAML>=6,<7"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/trading_bot"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+
+[[tool.mypy.overrides]]
+module = ["yfinance.*", "pyarrow.*"]
+ignore_missing_imports = true

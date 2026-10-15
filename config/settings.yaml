@@ -1,0 +1,10 @@
+provider: yahoo
+intervals: [1d, 1h]
+daily_days: 730
+hourly_days: 30
+storage_dir: data/market
+http_timeout: 20
+retries: 2
+request_interval: 1.0
+overlap_bars: 5
+log_level: INFO
