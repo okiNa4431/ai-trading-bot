@@ -2,12 +2,14 @@
 
 import argparse
 import logging
+import sqlite3
 import time
 from pathlib import Path
 
 import yaml
 from pydantic import ValidationError
 
+from trading_bot import paper_cli
 from trading_bot.config import load_settings, load_universe
 from trading_bot.provider import YahooFinanceProvider
 from trading_bot.service import collect
@@ -25,6 +27,7 @@ def main(argv: list[str] | None = None) -> int:
         command.add_argument("--symbol", help="one configured Yahoo symbol")
         command.add_argument("--interval", choices=["1d", "1h"])
     commands.add_parser("status")
+    paper_cli.add_parser(commands)
     args = parser.parse_args(argv)
     try:
         settings = load_settings(args.settings)
@@ -35,6 +38,8 @@ def main(argv: list[str] | None = None) -> int:
         # Prevent upstream debug logging of HTTP headers/cookies.
         logging.getLogger("yfinance").setLevel(logging.CRITICAL)
         logging.getLogger("curl_cffi").setLevel(logging.CRITICAL)
+        if args.command == "paper":
+            return paper_cli.run(args)
         store = ParquetStore(settings.storage_dir)
         if args.command == "status":
             print("symbol\tmarket\tinterval\tcount\toldest\tlatest")
@@ -78,7 +83,7 @@ def main(argv: list[str] | None = None) -> int:
         location = f" at line {mark.line + 1}, column {mark.column + 1}" if mark else ""
         print(f"Error: invalid YAML{location}")
         return 2
-    except (OSError, ValueError) as exc:
+    except (OSError, ValueError, sqlite3.Error) as exc:
         print(f"Error: {type(exc).__name__}: {exc}")
         return 2
 

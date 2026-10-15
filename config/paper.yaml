@@ -1,0 +1,12 @@
+# Simulation conditions. No real orders or automatic FX conversion.
+slippage: '0.001'
+commission_rate: '0'
+commission_jpy: '0'
+commission_usd: '0'
+fx_cost: '0.0025'
+max_symbol_ratio: '0.10'
+max_stock_ratio: '0.80'
+min_cash_ratio: '0.20'
+max_fx_age_seconds: 3600
+max_price_age_seconds: 86400
+lot_sizes: {}

@@ -14,3 +14,13 @@ data/
 *.egg-info/
 dist/
 build/
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+*.db
+*.db-*
+web/node_modules/
+web/dist/
+web/test-results/
+web/playwright-report/
