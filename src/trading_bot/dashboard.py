@@ -200,6 +200,7 @@ def public_document(
             if usage and all(r.estimated_cost_usd is not None for r in usage)
             else None,
             "reserved": sum(r.status == "RESERVED" for r in usage),
+            "estimate_basis": "standard_paid_equivalent_not_actual_bill",
         },
         warnings=list(dict.fromkeys(warnings)),
     )

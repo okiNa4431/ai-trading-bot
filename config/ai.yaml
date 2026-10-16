@@ -10,3 +10,7 @@ daily_request_limit: 5
 monthly_request_limit: 100
 max_requests_per_run: 1
 max_response_bytes: 32768
+# Standard paid-equivalent estimate ONLY; this is not a bill or proof of free-tier status.
+# https://ai.google.dev/gemini-api/docs/pricing (verified 2026-10-16)
+input_usd_per_million: '0.30'
+output_usd_per_million: '2.50'

@@ -21,9 +21,13 @@ class AISettings(Contract):
     monthly_request_limit: int = Field(default=100, ge=0)
     max_requests_per_run: int = Field(default=1, ge=1, le=5)
     max_response_bytes: int = Field(default=32768, ge=1024, le=1048576)
+    input_usd_per_million: Decimal | None = Field(default=None, ge=0)
+    output_usd_per_million: Decimal | None = Field(default=None, ge=0)
 
     @model_validator(mode="after")
     def approved(self) -> "AISettings":
+        if (self.input_usd_per_million is None) != (self.output_usd_per_million is None):
+            raise ValueError("both standard paid-equivalent price rates must be set together")
         if self.model not in self.approved_free_models:
             raise ValueError(
                 "model must be explicitly approved after checking free-tier availability"

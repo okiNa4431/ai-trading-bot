@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import time
+from decimal import Decimal
 from pathlib import Path
 
 import httpx
@@ -127,6 +128,20 @@ class GeminiTradingStrategy:
                         total_tokens=metadata.total_token_count,
                         thought_tokens=metadata.thoughts_token_count,
                     )
+                    input_tokens = metadata.prompt_token_count
+                    total_tokens = metadata.total_token_count
+                    if (
+                        input_tokens is not None
+                        and total_tokens is not None
+                        and total_tokens >= input_tokens
+                        and self.settings.input_usd_per_million is not None
+                        and self.settings.output_usd_per_million is not None
+                    ):
+                        updates["estimated_cost_usd"] = (
+                            Decimal(input_tokens) * self.settings.input_usd_per_million
+                            + Decimal(total_tokens - input_tokens)
+                            * self.settings.output_usd_per_million
+                        ) / Decimal(1000000)
                 self.repository.save_usage(usage.model_copy(update=updates))
                 self.last_response = redact(response.text or "")
                 if len(self.last_response.encode("utf-8")) > self.settings.max_response_bytes:

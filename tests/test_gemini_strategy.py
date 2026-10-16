@@ -54,6 +54,9 @@ def test_structured_response_tokens_and_sdk_options(setup_ai):
     assert client.close.call_count == 1
     usage = engine.decisions.usage()[0]
     assert (usage.input_tokens, usage.output_tokens, usage.total_tokens) == (123, 45, 168)
+    from decimal import Decimal
+
+    assert usage.estimated_cost_usd == Decimal("0.0001494")
 
 
 @pytest.mark.parametrize(

@@ -108,7 +108,7 @@ export function Dashboard(){
    ['モデル',Array.isArray(document?.usage.models)?document.usage.models.join(', '):'—'],
    ['判断回数',document?.usage.decision_count??0],['API通信回数',document?.usage.requests??0],
    ['入力トークン',document?.usage.input_tokens??'不明'],['出力トークン',document?.usage.output_tokens??'不明'],
-   ['合計トークン',document?.usage.total_tokens??'不明'],['推定費用 USD',document?.usage.estimated_cost_usd??'未確認'],
-  ].map(([label,value])=><div key={String(label)}><dt>{String(label)}</dt><dd>{String(value)}</dd></div>)}</dl><p className="muted">使用量は永続保存された予約・失敗も含みます。無料枠と実際の課金はGoogle側の設定に依存します。</p></section>}
+   ['合計トークン',document?.usage.total_tokens??'不明'],['標準有料相当の推定 USD',document?.usage.estimated_cost_usd??'未確認'],
+  ].map(([label,value])=><div key={String(label)}><dt>{String(label)}</dt><dd>{String(value)}</dd></div>)}</dl><p className="muted">使用量は永続保存された予約・失敗も含みます。標準有料相当額は実際の請求額ではありません。無料枠と実際の課金はGoogle側の設定に依存します。</p></section>}
  </section>
 }
