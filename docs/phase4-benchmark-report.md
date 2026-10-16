@@ -25,7 +25,7 @@
 - SHA-256: `16535a2bb2c3c6ba9c515dcbc48745fb0c975dfa8de1faa504f212556fb3a184`。
 - CSV列は基準日、生の基準価額、分配金再投資基準価額、税引前分配金、純資産総額。生の基準価額を1万口当たりJPYとして利用し、再投資価額で代用しない。信託報酬の二重控除はしない。
 - 原本には個別の実公表時刻がない。正確な時刻は未検証。`publication_time_basis=observed_by`、`published_at=fetched_at` とし、その観測時刻までには公表済みという保守的な境界を保存する。18:30を捏造しない。
-- 最終ローカル検算の観測境界は2026-10-17 00:18:03 JST。既存の初回観測時刻は再取込で変更しない。
+- 保存した検算JSONの観測境界は2026-10-17 00:18:03 JST。既存の初回観測時刻は再取込で変更しない。
 - 実SQLite取込は1回目1,939件、2回目も最終保存件数1,939件。新規の検証用DBだけを使用し、仮想口座も初期化していない。
 
 ## 申込受付日と適用基準価額日
@@ -65,7 +65,20 @@
 
 ## 検証結果
 
-ローカルの `uv sync --locked`、Ruff、format、mypy（42ソース）、全pytest、Webビルドとブラウザ13件を実行した。PostgreSQL専用23件は通常ローカル実行ではskipし、実PostgreSQLを持つGitHub Actionsで実行する。最終結果と実行リンクはCI完了後に追記する。
+| 検証 | 結果 |
+| --- | --- |
+| `uv sync --locked` | PASS、65パッケージ、依存追加なし |
+| ローカル全pytest -v | PASS、295成功・23skip（PostgreSQL専用） |
+| Ruff / format / mypy | PASS、mypy 42ソース |
+| Webビルド / ブラウザ | PASS、13件 |
+| PGlite SQL実行 | PASS、migration・CAS・rollback・権限分離 |
+| 公式実CSVの全件検証・SQLite保存・再取込 | PASS、1,939件を維持 |
+| 実NAVの回顧的な100万円比較 | PASS、結果は非公開ローカルのみ |
+| 継続口座の比較初期化 | 未実施、未来の適用NAVを待つため |
+
+[実装コミット4237841のCI](https://github.com/okiNa4431/ai-trading-bot/actions/runs/38923326354)は全4ジョブ成功。Windows/Ubuntu各295件成功・23skip、実PostgreSQL専用23件成功、Web13件成功を実ログから確認した。ユニークなPythonテスト318件（従来275＋追加43）を全て実行した。ネットワークを禁止した合成CSVテストであり、実NAVやSecretをCIへ渡していない。
+
+市場カレンダー/NumPy依存のDeprecationWarningは通常ジョブ1,613件残る。今回の実NAV検証失敗とは区別し、無効なデータを補正して解消していない。
 
 ## 残存条件
 
