@@ -236,3 +236,28 @@ def test_unavailable_db_never_creates_fallback(tmp_path):
     with pytest.raises(ConnectionError):
         op.claim("runner", {})
     assert list(tmp_path.iterdir()) == []
+
+
+@pytest.mark.parametrize("market", ["JP", "US"])
+def test_workflow_fixture_input_sequence_offline(tmp_path, monkeypatch, market):
+    import scripts.phase5_fixture as module
+
+    repo = SQLiteRepository(tmp_path / "fixture.db")
+    runs = []
+
+    class FixtureOperation(MemoryOperation):
+        def __init__(self, api, account, key):
+            super().__init__(repo, key)
+
+        def read(self):
+            return {"runs": runs}
+
+        def step(self, stage, state="RUNNING", **outcome):
+            super().step(stage, state, **outcome)
+            if state == "SUCCEEDED":
+                runs.append({"run_id": self.run_id, "state": state})
+
+    monkeypatch.setattr(module, "Operation", FixtureOperation)
+    results = [module.fixture(None, market, step, tmp_path / str(step)) for step in range(1, 6)]
+    assert [r["executions"] for r in results] == [0, 1, 1, 1, 2]
+    assert [r["pending"] for r in results] == [1, 0, 0, 1, 0]

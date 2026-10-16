@@ -71,7 +71,9 @@ def fixture(api, market, step, directory):
             ],
         )
     if step == 5:
-        start = start.replace(day=16, hour=0) if market == "JP" else start.replace(hour=16)
+        start = (
+            start.replace(day=16, hour=0, minute=0) if market == "JP" else start.replace(hour=16)
+        )
         store.save(
             instrument,
             "1h",
