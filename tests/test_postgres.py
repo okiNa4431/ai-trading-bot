@@ -220,3 +220,46 @@ def test_actual_pg_terminal_order_cannot_reopen(repo):
         with repo.transaction() as tx:
             tx.put("orders", "cancel", closed.model_copy(update={"status": "PENDING"}))
     assert b.get_order("cancel").status == "CANCELLED"
+
+
+@pytest.mark.parametrize("boundary", ["day", "month"])
+def test_actual_pg_utc_quota_boundary_does_not_refund_current_period(repo, uri, boundary):
+    d = claim(repo, "boundary")
+    settings = ai_settings(
+        daily_request_limit=1 if boundary == "day" else 100,
+        monthly_request_limit=1 if boundary == "month" else 100,
+        max_requests_per_run=2,
+    )
+    first = d.reserve("boundary", settings)
+    with pytest.raises(psycopg.Error):
+        d.reserve("boundary", settings)
+    with psycopg.connect(uri) as c:
+        # Owner-only fixture mutation; NOT a runtime API capable of refunding reservations.
+        expression = (
+            "date_trunc('day',now() at time zone 'UTC') - interval '1 second'"
+            if boundary == "day"
+            else ("date_trunc('month',now() at time zone 'UTC') - interval '1 second'")
+        )
+        c.execute(
+            sql.SQL(
+                "update bot_private.records set payload=jsonb_set(payload,'{at}',"
+                "to_jsonb((({}) at time zone 'UTC')::text)) where kind='api_usage' and key=%s"
+            ).format(sql.SQL(expression)),
+            (first.request_id,),
+        )
+    second = d.reserve("boundary", settings)
+    assert second.request_id != first.request_id
+    assert len(d.usage()) == 2
+    assert all(r.status == "RESERVED" for r in d.usage())
+
+
+def test_actual_pg_shared_project_quota_includes_other_accounts(repo):
+    other = SupabaseRepository(repo.api, "test-other-account", test=True)
+    PaperBroker(other).initialize(T)
+    first = claim(repo, "first-account")
+    second = claim(other, "second-account")
+    settings = ai_settings(daily_request_limit=1, monthly_request_limit=1)
+    first.reserve("first-account", settings)
+    with pytest.raises(psycopg.Error):
+        second.reserve("second-account", settings)
+    assert len(first.usage()) == 1 and second.usage() == []

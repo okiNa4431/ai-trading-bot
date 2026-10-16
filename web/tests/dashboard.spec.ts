@@ -67,3 +67,13 @@ test('AI text is rendered as text, no script execution or fabricated fills',asyn
  expect(await page.locator('.decision-item img').count()).toBe(0)
  await expect(page.getByText('見送り：HOLD: no order')).toBeVisible()
 })
+test('invalid holding currency is rejected before rendering financial values',async({page})=>{
+ await page.route('**/runtime-config.json',r=>r.fulfill({json:{url:'https://public-example.invalid',key:'sb_publishable_test'}}))
+ await page.route('https://public-example.invalid/**',r=>r.fulfill({json:[{document:{...document,
+  holdings:[{symbol:'TEST',name:'invalid',currency:'secret-not-a-currency',quantity:1,average_cost:'1',market_value_jpy:'1',unrealized_pnl:'0',ratio:'.1',at:document.updated_at}]}}]}))
+ await page.goto('./')
+ await expect(page.getByRole('alert')).toBeVisible()
+ await page.getByRole('button',{name:'保有銘柄',exact:true}).click()
+ await expect(page.getByText('保有銘柄はありません。',{exact:true})).toBeVisible()
+ await expect(page.locator('body')).not.toContainText('secret-not-a-currency')
+})

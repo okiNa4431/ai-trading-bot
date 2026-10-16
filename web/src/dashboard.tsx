@@ -19,6 +19,18 @@ function validate(input:unknown):Document {
  if(d.series.length>5000 || d.series.some(s=>!Number.isFinite(Date.parse(s.at)) ||
    ![s.bot_jpy,s.bot_return].every(v=>v!==null&&Number.isFinite(Number(v))) ||
    ![s.benchmark_jpy,s.benchmark_return].every(v=>v===null||Number.isFinite(Number(v))))) throw Error('invalid series')
+ const isRow=(r:unknown):r is Row=>Boolean(r&&typeof r==='object'&&!Array.isArray(r))
+ const numeric=(v:unknown)=>typeof v==='string'&&v.trim()!==''&&Number.isFinite(Number(v))
+ const currency=(v:unknown)=>v==='JPY'||v==='USD'
+ const stamp=(v:unknown)=>typeof v==='string'&&Number.isFinite(Date.parse(v))
+ if(d.holdings.length>300||d.trades.length>100||d.decisions.length>100||
+  d.holdings.some(r=>!isRow(r)||typeof r.symbol!=='string'||typeof r.name!=='string'||!currency(r.currency)||
+   !Number.isInteger(r.quantity)||Number(r.quantity)<0||![r.average_cost,r.market_value_jpy,r.unrealized_pnl,r.ratio].every(numeric)||!stamp(r.at))||
+  d.trades.some(r=>!isRow(r)||!['BUY','SELL'].includes(String(r.side))||!currency(r.currency)||
+   ![r.price,r.commission,r.realized_pnl].every(numeric)||!stamp(r.at)||typeof r.reason!=='string')||
+  d.decisions.some(r=>!isRow(r)||!stamp(r.at)||!Array.isArray(r.items)||r.items.length>300||
+   r.items.some((v:unknown)=>!isRow(v)||typeof v.symbol!=='string'||!['BUY','SELL','HOLD'].includes(String(v.action))||
+    typeof v.reason!=='string'||(v.skipped!==null&&v.skipped!==undefined&&typeof v.skipped!=='string')))) throw Error('invalid public records')
  return d
 }
 async function read():Promise<Document|null>{
