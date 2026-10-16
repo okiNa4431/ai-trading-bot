@@ -1,0 +1,36 @@
+name: Phase 4 persistence smoke
+on:
+  workflow_dispatch:
+    inputs:
+      account:
+        description: Isolated persistent test account (test- prefix required)
+        default: test-phase4-smoke
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: phase4-persistence-smoke
+  cancel-in-progress: false
+jobs:
+  smoke:
+    if: github.ref == 'refs/heads/main' && github.ref_protected
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.13.1'
+      - run: uv python install 3.12
+      - run: uv sync --locked
+      - name: Persistent isolated test, never calls Gemini
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+          TEST_ACCOUNT: ${{ inputs.account }}
+        run: uv run python scripts/phase4_smoke.py --account "$TEST_ACCOUNT"

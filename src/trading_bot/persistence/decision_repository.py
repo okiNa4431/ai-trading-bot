@@ -1,14 +1,20 @@
 """Decision claims and quota reservations use short transactions, never a network lock."""
 
 from datetime import UTC, datetime
+from typing import Protocol, runtime_checkable
 from uuid import uuid4
 
-from trading_bot.persistence.sqlite_repository import SQLiteRepository
+from trading_bot.persistence.sqlite_repository import PortfolioRepository
 from trading_bot.strategy.models import AISettings, APIUsage, DecisionRun
 
 
+@runtime_checkable
+class SharedQuotaRepository(Protocol):
+    def reserve_api(self, decision_id: str, settings: AISettings) -> APIUsage: ...
+
+
 class DecisionRepository:
-    def __init__(self, repository: SQLiteRepository) -> None:
+    def __init__(self, repository: PortfolioRepository) -> None:
         self.repository = repository
 
     def get(self, key: str) -> DecisionRun | None:
@@ -48,6 +54,8 @@ class DecisionRepository:
             return [r for r in records if decision_id is None or r.decision_id == decision_id]
 
     def reserve(self, decision_id: str, settings: AISettings) -> APIUsage:
+        if isinstance(self.repository, SharedQuotaRepository):
+            return self.repository.reserve_api(decision_id, settings)
         now = datetime.now(UTC)
         with self.repository.transaction() as tx:
             rows = [APIUsage.model_validate_json(s) for s in tx.records("api_usage")]

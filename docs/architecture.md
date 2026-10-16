@@ -185,3 +185,34 @@ registerは明示オプションだけです。保存した口座・未約定注
 ## Phase 4へ
 
 Supabaseで口座・判断・利用量を永続化してから継続運用を設計してください。定期実行、オルカン実比較、実資金注文、ニュース検索、AIによるコード自動変更はPhase 3に含めません。Webは準備状況だけを公開し、手動テスト結果を継続的な運用実績と混同しません。
+
+
+# Phase 4: 永続化と公開境界
+
+```text
+Disposable market quotes → existing DecisionEngine / PaperBroker / Decimal ledger
+                                         ↕ Session contract (unchanged accounting)
+                      SQLiteRepository (development) / SupabaseRepository (persistent)
+                                                               ↕
+                             bot_read → buffered transaction → bot_commit CAS RPC
+                                                               ↓
+                     advisory lock + account version + ledger/positions/FK checks
+                                                               ↓
+                            PostgreSQL bot_private (source of truth)
+                                                               ↓ explicit publish
+                               allowlisted public DTO → bot_dashboard + SELECT RLS
+                                                               ↓
+                                    GitHub Pages read-only dashboard
+```
+
+SupabaseRepositoryは会計処理を複製しない。1回のread RPCで口座・全イベント・versionを一貫取得し、既存PythonロジックがSessionへ書き込む。commit RPCは全writer共通のadvisory lockと口座行ロックを取得し、versionを比較して1トランザクションで反映する。競合時は40001で全体を拒否し、途中のREST更新は一切ない。最終書込みだけを自動リトライせず、操作全体の明示的再試行を要求する。
+
+RPC内で初期資金・作成日時の不変性、時刻逆行、状態遷移、追記専用イベント、現金台帳と残高、約定と保有株数/原価、注文/約定対応を検証する。NUMERIC列・Decimalを維持する。数量/リスク計算は既存PaperBrokerが同じtransaction Session上で行い、判断登録もBoundRepositoryにより同じcommitへ含める。ネットワーク中の不確定失敗では、最新状態を調べてから同じidempotency keyで操作を再試行する。
+
+API予約は同じglobal advisory lockで**全口座共通**の日/月上限を確認し、UTCサーバー時刻を記録してから通信する。予約完了時もaccount versionを進める。実行間で共有し、失敗・中断で枠を返さず、削除で帳消しにしない。API使用量は不明値null、推定費用も実課金/アカウントtierが未確認ならnull。Data APIキーはDDL管理認証として利用しない。
+
+NAVの公表・観測日時、適用日、出所を保存する。オルカン比較は運用開始日時一致、明示した翌営業日以降の適用NAV、1万口価格から整数口数と端数現金を計算する。基準価額の自動取得/再公開の許諾が未確認のため、手動CSVを採用し、公開許可がないNAVの派生比較値も非公開にする。各スナップショットは正確な基準時刻で一意、訂正前を別追記履歴へ保存する。
+
+公開専用テーブルには許可した派生情報だけを出し、内部JSON・取引ID・ハッシュ・生NAV/株価・内部エラーは出さない。匿名/認証済み利用者の内部schema/RPC権限と公開テーブルの書込み権限を剥奪する。Secretを持つ処理だけが安全なDTOをversion付きで公開する。Pagesへ渡すのは環境変数由来のURL/Publishable Keyだけで、ブラウザに書込み機能はない。
+
+小規模の現段階では全writer直列化・口座イベント一括読込を採用し、複雑な分散会計は導入しない。イベント増加時のページング/アーカイブ、NAV訂正・分配金、バックアップ運用、実データの権利確認は継続運用前の課題。cronは追加せず、Phase 4の通常継続Workflowはdry-run固定である。

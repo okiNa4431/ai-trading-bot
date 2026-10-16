@@ -110,6 +110,7 @@ class APIUsage(Contract):
     output_tokens: int | None = None
     total_tokens: int | None = None
     thought_tokens: int | None = None
+    estimated_cost_usd: Decimal | None = None
     error: str | None = None
     http_status: int | None = None
 

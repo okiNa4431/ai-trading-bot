@@ -241,3 +241,77 @@ ActionsのDBは使い捨てで、日次/月次カウンターも実行間では�
 mainが未保護の場合、Secretを扱うWorkflowは実行しません。リポジトリのmain保護設定を有効にしてから使用してください。APIキーを表示・再入力する必要はありません。
 
 Phase 3でも定期売買・実証券会社接続・Supabase・オルカン実比較は行いません。公開Webは運用準備中の案内だけで、手動テストの出力を継続運用実績として掲載しません。
+
+
+# Phase 4: Supabase永続化・比較・公開ダッシュボード
+
+Supabaseを継続口座の正本とし、SQLiteは開発・オフラインテスト用として維持します。
+定期実行・実証券会社への注文はありません。`persistent-decision.yml` は手動・dry-run固定です。
+
+## 初回migration（SQL Editorで一度だけ）
+
+登録済みの `SUPABASE_URL` / `SUPABASE_SECRET_KEY` / `SUPABASE_PUBLISHABLE_KEY` はData API用で、SQL管理接続の認証情報ではありません。キーの再入力は不要です。
+Supabase Dashboardの対象プロジェクト → SQL Editorで、**`supabase/bootstrap.sql` 全体**を一度実行してください。これは `supabase/migrations/` から生成され、単一トランザクションで適用されます。既存口座を削除・リセットしません。
+
+Actionsから適用したい場合だけ、所有者権限のPostgreSQL接続URIを `SUPABASE_DB_URL` Secretへ設定し、`Migrate Supabase` を手動実行します（接続パスワード、pooler/DBホスト、ユーザー、DB名を含むURIが必要）。未設定なら適用せず終了します。Data API SecretをDBパスワードとして流用しません。URIやSecretをログへ表示しません。
+
+## 手動Workflow
+
+1. `Phase 4 persistence smoke` を同じ `test-phase4-smoke` で2回実行。隔離した合成データ専用口座にのみ注文・約定を作り、残高・履歴・使用枠・再接続・二重約定防止・RLSを確認します。本番相当口座は触りません。
+2. `Persistent manual decision` を `JP / mock` で実行。`paper-live` がなければ初回100万円を作り、あればそのまま使います。実株価2銘柄を取得し、判断履歴と評価を永続保存します。
+3. 同じWorkflowを再実行。口座作成時刻・残高・以前の判断・API使用量が維持されます。`gemini` の選択時だけGemini Secretを使い、最大1通信・リトライ0。予約はSupabaseの全口座共通枠に先に保存します。
+4. 公開専用テーブルへ安全な派生情報だけを反映し、Pagesから読みます。公開APIは読み取りだけです。Secretを渡さないmockと通常CIは実Geminiを呼びません。
+
+実APIの予約はUTC暦日・暦月単位。エラー・中断予約も消費したままで、自動返金しません。テスト口座の予約も同じプロジェクトの共有枠へ含めます。テスト口座削除で予約が消えて枠が戻るのを防ぐため、API予約が残るテスト口座は削除を拒否します。
+
+## CLI
+
+引数は各操作の後に指定します。Supabase利用時は.envまたは環境変数を読みます。SQLite利用時は従来のDBを破壊しません。
+
+```text
+uv run trading-bot db status --backend supabase
+uv run trading-bot db initialize --backend supabase
+uv run trading-bot db verify --backend supabase
+uv run trading-bot benchmark update --backend supabase --csv /path/to/official-nav.csv
+uv run trading-bot benchmark initialize --backend supabase --purchase-date 2026-10-19
+uv run trading-bot benchmark status --backend supabase
+uv run trading-bot portfolio snapshot --backend supabase
+uv run trading-bot portfolio performance --backend supabase
+uv run trading-bot dashboard publish --backend supabase
+uv run trading-bot operate --backend supabase --market JP --provider mock
+```
+
+status / verify / benchmark status / portfolio performanceは読み取り専用。initialize / update / snapshot / publish / operateは書き込みです。`db initialize` は初回のみ資金を作り、初期化済み口座を変更しません。operateは保存済み市場データを使い、注文を登録しません。Actions版は先に実データを取得します。
+
+隔離する場合は `--account test-my-check --test-account` を両方指定します。通常口座の削除操作はありません。テスト口座だけ `db delete-test --backend supabase --account test-my-check --test-account --confirm-account test-my-check` で削除できます（使用枠履歴がある場合は監査のため保存）。SQLiteは `--backend sqlite --db data/paper/dev.sqlite3` のパスごとに分離します。モデル内の従来の `account_id=paper` は維持し、Supabaseの外部スコープキーで口座を分離します。
+
+## オルカンの実基準価額
+
+対象はeMAXIS Slim 全世界株式（オール・カントリー）、運用会社コード253425です。ETF2559や指数を代替しません。
+[運用会社の商品ページ](https://www.am.mufg.jp/fund/253425.html)は検証時403で、自動取得・公開再配布の許諾を確認できませんでした。アクセス制限を回避せず、自動取得は未実装です。手動CSVプロバイダーと交換可能な契約を用意しています。
+
+CSVはUTF-8、次のヘッダーを指定します。数値のサンプルはテスト専用であり、実際の基準価額ではありません。実データをコード・Gitへ含めません。
+
+```text
+fund_id,nav_date,nav_jpy,published_at,source_url,distribution_jpy,derivative_publication_allowed
+```
+
+- fund_idは253425、nav_jpyは**1万口あたりJPY**。published_atは確認した公表時刻をタイムゾーン付きで指定し、fetched_atは取込時に記録します。
+- source_urlは運用会社のHTTPS正式URL。HTMLスクレイピングはしません。日付・数値・公表時刻・重複を検証し、ファイル全体が正常な場合だけ取り込みます。
+- derivative_publication_allowedは明示的な `true` / `false`。公開権限を確認できていなければfalse。falseでは比較派生値もWebへ出しません。単にフラグを変えても権利を取得したことにはなりません。
+- 初回購入は口座開始翌営業日以降の**明示した適用基準価額日**を指定します。販売会社の締切・海外休場に基づく適用日を運用者が確認してください。該当日がなければ前日の価格で購入したことにしません。
+- 整数口数=floor(100万円×10000÷適用基準価額)、未投資端数は現金。信託報酬は公表NAVに反映済みとして二重控除せず、購入手数料0・税引前・追加投資なし・売却なしです。
+- 分配金がある場合は専用台帳実装前に比較を停止します。データ訂正は黙って上書きせず拒否し、監査付き訂正操作を今後追加します。
+- 比較は同じJST評価日の、公表・取得とも評価時刻以前のNAVだけを使用します。未更新なら比較値null・不完全と記録します。前回NAVを新しい確定値として保存しません。
+
+## 評価・公開・復旧
+
+スナップショットは口座＋UTC基準時刻で一意、日次表示はJST各日の最後の評価。訂正には理由が必要で、以前の全スナップショットを別レコードへ残します。JPY/USDの確定/含み損益・売買コストは通貨別に表示し、歴史的コストを現在FXで混ぜません。勝率は売却約定単位（損益>0）の割合で、勝敗のない時はnull。年率リターン・Sharpeは期間/頻度が未検証のため未表示です。
+
+DB内部はbot_privateスキーマ＋RLS＋権限剥奪。service_roleも内部テーブルへ直接書かず、所有者権限の狭いRPCだけ実行します。匿名/認証済み利用者は公開専用 `bot_dashboard` のSELECTだけが可能です。公開テーブルは内部テーブルの所有者権限ビューではありません。
+
+PagesはURLとPublishable Keyだけを環境変数から生成し、Secret Key・Geminiキー・DB URIをビルドへ渡しません。公開設定ファイルはGit対象外。Webは公開テーブルへのGETだけを行い、欠損・通信障害・未運用を区別します。API返却本文の内部エラーは表示しません。
+
+バックアップはDB所有者がSupabase公式のdump手順で取得し、暗号化して非公開保存してください。Freeプランのバックアップ/PITRを前提にしません。復旧は別プロジェクトへスキーマ→内部データ→シーケンスを復元し、`db verify`・注文/約定件数・使用枠・口座作成日時を照合してから接続先を切り替えます。未完了のRUNNING判断やRESERVED枠を勝手に再送・削除しません。通常Workflowに全DBリセットはありません。
+
+無料枠は[Supabase公式](https://supabase.com/docs/guides/platform/billing-on-supabase)のDB500MB、[転送量](https://supabase.com/docs/guides/platform/manage-your-usage/egress)の非キャッシュ5GB/月等（2026-10-16確認）。[GitHub Actions](https://docs.github.com/en/actions/concepts/billing-and-usage)は公開リポジトリの標準ホストrunnerを利用します。ダッシュボードでDB容量・転送量・Googleの実利用量を監視してください。Botの制限は課金0円の保証ではなく、プラン変更・有料モデルへの自動切り替えはありません。

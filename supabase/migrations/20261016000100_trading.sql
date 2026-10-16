@@ -1,0 +1,246 @@
+-- Run as database owner, not with a Data API key. No existing application data is deleted.
+create schema if not exists bot_private;
+revoke all on schema bot_private from public, anon, authenticated;
+
+create table if not exists bot_private.accounts (
+  id text primary key check (id ~ '^[a-z][a-z0-9-]{2,63}$'),
+  is_test boolean not null,
+  version bigint not null default 0 check (version >= 0),
+  value jsonb,
+  initial_jpy numeric check (initial_jpy = 1000000),
+  created_at timestamptz,
+  last_event_at timestamptz,
+  status text not null default 'PREPARING' check (status in ('PREPARING','ACTIVE','PAUSED')),
+  check (is_test = (id like 'test-%'))
+);
+create table if not exists bot_private.balances (
+  account_id text references bot_private.accounts(id) on delete cascade,
+  currency text check (currency in ('JPY','USD')),
+  amount numeric not null check (amount >= 0 and amount <> 'NaN'::numeric),
+  primary key(account_id,currency),
+  check (amount = trunc(amount, case when currency='JPY' then 0 else 2 end))
+);
+create table if not exists bot_private.positions (
+  account_id text references bot_private.accounts(id) on delete cascade,
+  symbol text,
+  market text not null check (market in ('JP','US')),
+  currency text not null check (currency in ('JPY','USD')),
+  quantity bigint not null check (quantity >= 0),
+  average_cost numeric not null check (average_cost >= 0 and average_cost <> 'NaN'::numeric),
+  cost_basis numeric not null check (cost_basis >= 0 and cost_basis <> 'NaN'::numeric),
+  updated_at timestamptz not null,
+  primary key(account_id,symbol),
+  check ((market='JP') = (currency='JPY'))
+);
+-- Event payloads preserve the existing Pydantic contracts without duplicating accounting.
+-- Financial fields are also NUMERIC, never IEEE float. Prices are NOT exposed publicly.
+create table if not exists bot_private.records (
+  account_id text references bot_private.accounts(id) on delete cascade,
+  kind text check (kind in ('orders','executions','fx_exchanges','cash_ledger','valuations',
+    'decisions','api_usage','benchmark_prices','benchmark_investments','snapshots',
+    'snapshot_revisions','dashboard')),
+  key text not null check (length(key) between 1 and 256),
+  payload jsonb not null check (jsonb_typeof(payload)='object'),
+  seq bigint generated always as identity unique,
+  amount numeric generated always as ((payload->>'amount')::numeric) stored,
+  price numeric generated always as ((payload->>'price')::numeric) stored,
+  notional numeric generated always as ((payload->>'notional')::numeric) stored,
+  commission numeric generated always as ((payload->>'commission')::numeric) stored,
+  usd_jpy numeric generated always as ((payload->>'usd_jpy')::numeric) stored,
+  nav_jpy numeric generated always as ((payload->>'nav_jpy')::numeric) stored,
+  total_jpy numeric generated always as ((payload->>'total_jpy')::numeric) stored,
+  source_amount numeric generated always as ((payload->>'source_amount')::numeric) stored,
+  received_amount numeric generated always as ((payload->>'received_amount')::numeric) stored,
+  realized_pnl numeric generated always as (
+    case when kind='executions' then (payload->>'realized_pnl')::numeric end) stored,
+  quantity bigint generated always as ((payload->>'quantity')::bigint) stored,
+  order_id text generated always as (case when kind='executions' then payload->>'order_id' end) stored,
+  order_kind text generated always as (case when kind='executions' then 'orders' end) stored,
+  primary key(account_id,kind,key),
+  foreign key(account_id,order_kind,order_id) references bot_private.records(account_id,kind,key)
+    deferrable initially deferred,
+  check (price is null or (price > 0 and price <> 'NaN'::numeric)),
+  check (notional is null or (notional >= 0 and notional <> 'NaN'::numeric)),
+  check (commission is null or (commission >= 0 and commission <> 'NaN'::numeric)),
+  check (usd_jpy is null or (usd_jpy > 0 and usd_jpy <> 'NaN'::numeric)),
+  check (quantity is null or quantity > 0),
+  check (kind not in ('orders','executions') or payload ?& array['symbol','side','quantity','currency']),
+  check (kind <> 'orders' or (payload ?& array['status','order_id','requested_at'] and payload->>'status' in ('PENDING','FILLED','REJECTED','CANCELLED')
+    and payload->>'side' in ('BUY','SELL') and payload->>'order_id'=key)),
+  check (kind <> 'api_usage' or (payload ?& array['status','request_id','at','model','decision_id']
+    and payload->>'status' in ('RESERVED','SUCCESS','ERROR'))),
+  check (kind <> 'decisions' or payload->>'status' in ('RUNNING','SUCCESS','REGISTERED','FAILED')),
+  check (kind <> 'cash_ledger' or (payload->>'balance_after')::numeric >= 0)
+);
+create index if not exists bot_usage on bot_private.records(kind,(payload->>'at'))
+  where kind='api_usage';
+alter table bot_private.accounts enable row level security;
+alter table bot_private.balances enable row level security;
+alter table bot_private.positions enable row level security;
+alter table bot_private.records enable row level security;
+revoke all on all tables in schema bot_private from public,anon,authenticated,service_role;
+
+create or replace function public.bot_read(p_account text) returns jsonb
+language sql stable security definer set search_path = '' as $$
+  select jsonb_build_object(
+    'version',coalesce((select version from bot_private.accounts where id=p_account),0),
+    'account',(select value from bot_private.accounts where id=p_account),
+    'records',coalesce((select jsonb_agg(jsonb_build_object('kind',kind,'key',key,'payload',payload)
+      order by seq) from bot_private.records where account_id=p_account),'[]'::jsonb))
+$$;
+
+create or replace function public.bot_commit(
+  p_account text, p_test boolean, p_version bigint, p_value jsonb, p_writes jsonb
+) returns bigint language plpgsql security definer set search_path = '' as $$
+declare a bot_private.accounts; item jsonb; old jsonb; v jsonb; c text; q numeric;
+begin
+  -- A small research bot: serialize writers globally, then compare account version.
+  -- Quota reservations acquire the SAME lock; no cross-account quota races/deadlocks.
+  perform pg_advisory_xact_lock(490016001);
+  insert into bot_private.accounts(id,is_test) values(p_account,p_test) on conflict do nothing;
+  select * into a from bot_private.accounts where id=p_account for update;
+  if a.version <> p_version then
+    raise exception using errcode='40001', message='version conflict';
+  end if;
+  if a.is_test <> p_test or p_value is null or jsonb_typeof(p_writes)<>'array' then
+    raise exception 'invalid account scope or state';
+  end if;
+  if a.value is not null and (
+    a.value->'created_at' is distinct from p_value->'created_at' or
+    a.value->'initial_jpy' is distinct from p_value->'initial_jpy' or
+    coalesce((p_value->>'last_event_at')::timestamptz,(p_value->>'created_at')::timestamptz)
+      < coalesce(a.last_event_at,a.created_at)
+  ) then raise exception 'account reset or time reversal forbidden'; end if;
+  if (p_value->>'initial_jpy')::numeric <> 1000000 or p_value->>'account_id'<>'paper' then
+    raise exception 'invalid initial capital';
+  end if;
+  for item in select * from jsonb_array_elements(p_writes) loop
+    v := item->'payload';
+    select payload into old from bot_private.records
+      where account_id=p_account and kind=item->>'kind' and key=item->>'key';
+    if old is not null then
+      if item->>'kind' not in ('orders','decisions','api_usage','snapshots','dashboard') then
+        raise exception 'append-only event';
+      end if;
+      if item->>'kind'='orders' and (
+        (old-'status'-'reason') is distinct from (v-'status'-'reason') or
+        (old->>'status'<>'PENDING' and old is distinct from v)
+      ) then raise exception 'illegal order transition'; end if;
+      if item->>'kind'='decisions' and (
+        (old->>'status' in ('FAILED','REGISTERED') and old is distinct from v) or
+        (old->>'status'='SUCCESS' and v->>'status' not in ('SUCCESS','REGISTERED'))
+      ) then raise exception 'illegal decision transition'; end if;
+      if item->>'kind'='api_usage' and (
+        old->>'status'<>'RESERVED' or
+        (old->>'at')::timestamptz <> (v->>'at')::timestamptz or
+        (old-'at'-'status'-'input_tokens'-'output_tokens'-'total_tokens'-'thought_tokens'-'error'
+          -'http_status'-'estimated_cost_usd') is distinct from
+        (v-'at'-'status'-'input_tokens'-'output_tokens'-'total_tokens'-'thought_tokens'-'error'
+          -'http_status'-'estimated_cost_usd')
+      ) then raise exception 'illegal quota transition'; end if;
+    elsif item->>'kind'='api_usage' then
+      raise exception 'use quota reservation RPC';
+    end if;
+    insert into bot_private.records(account_id,kind,key,payload)
+      values(p_account,item->>'kind',item->>'key',v)
+      on conflict(account_id,kind,key) do update set payload=excluded.payload;
+  end loop;
+  delete from bot_private.balances where account_id=p_account;
+  foreach c in array array['JPY','USD'] loop
+    q := (p_value->'balances'->>c)::numeric;
+    if q is null then raise exception 'missing currency'; end if;
+    -- Reconcile the common Python ledger inside the very same DB transaction.
+    if q <> coalesce((select sum(amount) from bot_private.records
+      where account_id=p_account and kind='cash_ledger' and payload->>'currency'=c),0) then
+      raise exception 'cash ledger does not reconcile';
+    end if;
+    insert into bot_private.balances values(p_account,c,q);
+  end loop;
+  delete from bot_private.positions where account_id=p_account;
+  for item in select value from jsonb_each(p_value->'positions') loop
+    q := coalesce((select sum(case when payload->>'side'='BUY' then quantity else -quantity end)
+      from bot_private.records where account_id=p_account and kind='executions'
+        and payload->>'symbol'=item->'instrument'->>'symbol'),0);
+    if q <> (item->>'quantity')::bigint then raise exception 'position does not reconcile'; end if;
+    insert into bot_private.positions values(p_account,item->'instrument'->>'symbol',
+      item->'instrument'->>'market',item->'instrument'->>'currency',(item->>'quantity')::bigint,
+      (item->>'average_cost')::numeric,(item->>'cost_basis')::numeric,now());
+  end loop;
+  if exists(select 1 from (
+    select payload->>'symbol' symbol,
+      sum(case when payload->>'side'='BUY' then quantity else -quantity end) shares,
+      sum(case when payload->>'side'='BUY' then notional+commission
+          else -(notional-commission-(payload->>'realized_pnl')::numeric) end) basis
+    from bot_private.records where account_id=p_account and kind='executions'
+    group by payload->>'symbol'
+  ) e left join bot_private.positions p on p.account_id=p_account and p.symbol=e.symbol
+    where e.shares<>coalesce(p.quantity,0) or e.basis<>coalesce(p.cost_basis,0)) then
+    raise exception 'execution positions or cost basis do not reconcile';
+  end if;
+  if exists(select 1 from bot_private.records e left join bot_private.records o
+    on o.account_id=e.account_id and o.kind='orders' and o.key=e.order_id
+    where e.account_id=p_account and e.kind='executions' and
+    (o.key is null or o.payload->>'status'<>'FILLED' or e.quantity<>o.quantity
+      or e.payload->>'side'<>o.payload->>'side' or e.payload->>'symbol'<>o.payload->>'symbol'))
+  or exists(select 1 from bot_private.records o where o.account_id=p_account and o.kind='orders'
+    and o.payload->>'status'='FILLED' and not exists(select 1 from bot_private.records e
+      where e.account_id=p_account and e.kind='executions' and e.order_id=o.key)) then
+    raise exception 'order execution mismatch';
+  end if;
+  update bot_private.accounts set value=p_value, version=version+1,
+    initial_jpy=(p_value->>'initial_jpy')::numeric,created_at=(p_value->>'created_at')::timestamptz,
+    last_event_at=(p_value->>'last_event_at')::timestamptz where id=p_account;
+  return a.version+1;
+end $$;
+
+create or replace function public.bot_reserve_api(
+  p_account text,p_decision text,p_request text,p_model text,
+  p_day_limit integer,p_month_limit integer,p_run_limit integer
+) returns jsonb language plpgsql security definer set search_path = '' as $$
+declare day_count bigint; month_count bigint; run_count bigint; v jsonb; t timestamptz:=now();
+begin
+  perform pg_advisory_xact_lock(490016001);
+  if not exists(select 1 from bot_private.records where account_id=p_account
+    and kind='decisions' and key=p_decision and payload->>'status'='RUNNING') then
+    raise exception 'running decision required';
+  end if;
+  select count(*) filter(where (payload->>'at')::timestamptz >=
+      date_trunc('day',t at time zone 'UTC') at time zone 'UTC'), count(*)
+    into day_count,month_count from bot_private.records
+    where kind='api_usage' and (payload->>'at')::timestamptz >=
+      date_trunc('month',t at time zone 'UTC') at time zone 'UTC';
+  select count(*) into run_count from bot_private.records where account_id=p_account
+    and kind='api_usage' and payload->>'decision_id'=p_decision;
+  if p_day_limit<0 or p_month_limit<0 or p_run_limit not between 1 and 5 or
+    day_count>=p_day_limit or month_count>=p_month_limit or run_count>=p_run_limit then
+    raise exception 'shared API quota exhausted';
+  end if;
+  v:=jsonb_build_object('request_id',p_request,'decision_id',p_decision,'at',t,
+    'model',p_model,'status','RESERVED');
+  insert into bot_private.records(account_id,kind,key,payload) values(p_account,'api_usage',p_request,v);
+  update bot_private.accounts set version=version+1 where id=p_account;
+  return v;
+end $$;
+
+create or replace function public.bot_delete_test(p_account text) returns void
+language plpgsql security definer set search_path = '' as $$
+begin
+  perform pg_advisory_xact_lock(490016001);
+  if p_account not like 'test-%' or not exists(select 1 from bot_private.accounts
+    where id=p_account and is_test) then raise exception 'test account required'; end if;
+  -- Retain consumed global quotas even after test deletion (a deletion must not refund API calls).
+  if exists(select 1 from bot_private.records where account_id=p_account and kind='api_usage') then
+    raise exception 'quota-bearing test accounts must be retained for audit';
+  end if;
+  delete from bot_private.accounts where id=p_account and is_test;
+end $$;
+
+revoke all on function public.bot_read(text) from public,anon,authenticated;
+revoke all on function public.bot_commit(text,boolean,bigint,jsonb,jsonb) from public,anon,authenticated;
+revoke all on function public.bot_reserve_api(text,text,text,text,integer,integer,integer)
+  from public,anon,authenticated;
+revoke all on function public.bot_delete_test(text) from public,anon,authenticated;
+grant execute on function public.bot_read(text),
+  public.bot_commit(text,boolean,bigint,jsonb,jsonb),
+  public.bot_reserve_api(text,text,text,text,integer,integer,integer),
+  public.bot_delete_test(text) to service_role;

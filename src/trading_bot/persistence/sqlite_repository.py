@@ -19,6 +19,11 @@ TABLES = {
     "valuations",
     "decisions",
     "api_usage",
+    "benchmark_prices",
+    "benchmark_investments",
+    "snapshots",
+    "snapshot_revisions",
+    "dashboard",
 }
 
 
@@ -104,7 +109,7 @@ class SQLiteSession:
         # Orders / AI workflow records change state; executions and cash events are append-only.
         suffix = (
             " ON CONFLICT(id) DO UPDATE SET payload=excluded.payload"
-            if table in {"orders", "decisions", "api_usage"}
+            if table in {"orders", "decisions", "api_usage", "snapshots", "dashboard"}
             else ""
         )
         self.connection.execute(

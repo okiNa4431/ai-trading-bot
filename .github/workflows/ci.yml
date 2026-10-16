@@ -3,6 +3,31 @@ on: [push, pull_request]
 permissions:
   contents: read
 jobs:
+  postgres:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: phase4_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: local-ci-only
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.13.1'
+      - run: uv python install 3.12
+      - run: uv sync --locked
+      - run: uv run pytest tests/test_postgres.py -v
+        env:
+          TEST_DATABASE_URL: postgresql://postgres:local-ci-only@127.0.0.1:5432/phase4_test
   checks:
     strategy:
       matrix:
