@@ -122,7 +122,9 @@ def test_integer_fund_units_leave_cash_residual(repo):
 def test_missing_purchase_nav_never_uses_previous_day(repo):
     import_nav(repo, Provider(nav()))
     with pytest.raises(ValueError, match="missing"):
-        initialize_benchmark(repo, date(2026, 10, 7), AT + timedelta(days=1))
+        initialize_benchmark(
+            repo, date(2026, 10, 7), AT + timedelta(days=1), accepted_on=date(2026, 10, 6)
+        )
     with pytest.raises(ValueError, match="follow"):
         initialize_benchmark(repo, date(2026, 10, 5), AT)
 
@@ -131,9 +133,12 @@ def test_same_valuation_day_and_publication_are_required(repo):
     import_nav(repo, Provider(nav()))
     investment = initialize_benchmark(repo, date(2026, 10, 6), AT)
     account = PaperBroker(repo).get_balance()
-    for when in [AT - timedelta(hours=2), AT + timedelta(days=1)]:
+    for when, expected in [
+        (AT - timedelta(hours=2), "benchmark_investment_not_available_at_evaluation"),
+        (AT + timedelta(days=1), "benchmark_same_date_nav_unavailable"),
+    ]:
         value, _, warning = benchmark_value(investment, [nav()], account, when)
-        assert value is None and warning == "benchmark_same_date_nav_unavailable"
+        assert value is None and warning == expected
     assert benchmark_value(None, [], account, AT)[0] is None
 
 
@@ -234,6 +239,29 @@ def test_authorized_derived_benchmark_can_be_public(repo):
     account = PaperBroker(repo).get_balance()
     snapshot(repo, value_portfolio(account, {}, None, AT, PaperBroker(repo).rules), AT)
     assert build_document(repo, AT).summary["benchmark_jpy"] == "1000000"
+
+
+def test_authorizing_latest_nav_does_not_authorize_purchase_nav(repo):
+    import_nav(repo, Provider(nav()))
+    initialize_benchmark(repo, date(2026, 10, 6), AT)
+    later = AT + timedelta(days=1)
+    import_nav(
+        repo,
+        Provider(
+            nav(
+                nav_date=date(2026, 10, 7),
+                published_at=later,
+                fetched_at=later,
+                derivative_publication_allowed=True,
+            )
+        ),
+    )
+    broker = PaperBroker(repo)
+    snapshot(repo, value_portfolio(broker.get_balance(), {}, None, later, broker.rules), later)
+    document = build_document(repo, later)
+    for key in ["benchmark_jpy", "benchmark_return", "excess_return", "excess_pnl_jpy"]:
+        assert document.summary[key] is None
+    assert document.series[0]["benchmark_jpy"] is None
 
 
 def test_snapshot_rejects_arbitrary_tampered_or_future_valuation(repo):

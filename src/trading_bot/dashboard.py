@@ -88,7 +88,12 @@ def public_document(
             fx_at=latest.valuation.fx.timestamp.isoformat() if latest.valuation.fx else None,
         )
     # Disclosure is opt-in per imported NAV; no raw NAVs or OHLCV are public.
-    publish_benchmark = bool(latest and latest.nav and latest.nav.derivative_publication_allowed)
+    publish_benchmark = bool(
+        latest
+        and latest.benchmark_publication_allowed
+        and latest.nav
+        and latest.nav.derivative_publication_allowed
+    )
     if not publish_benchmark:
         summary.update(
             benchmark_jpy=None, benchmark_return=None, excess_return=None, excess_pnl_jpy=None
@@ -100,10 +105,16 @@ def public_document(
             "bot_jpy": str(s.bot_jpy),
             "bot_return": str(s.bot_return),
             "benchmark_jpy": str(s.benchmark_jpy)
-            if s.benchmark_jpy is not None and s.nav and s.nav.derivative_publication_allowed
+            if s.benchmark_jpy is not None
+            and s.benchmark_publication_allowed
+            and s.nav
+            and s.nav.derivative_publication_allowed
             else None,
             "benchmark_return": str(s.benchmark_return)
-            if s.benchmark_return is not None and s.nav and s.nav.derivative_publication_allowed
+            if s.benchmark_return is not None
+            and s.benchmark_publication_allowed
+            and s.nav
+            and s.nav.derivative_publication_allowed
             else None,
             "complete": s.complete,
             "warnings": s.warnings,

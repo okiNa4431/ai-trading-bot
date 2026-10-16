@@ -24,6 +24,7 @@ class Snapshot(Contract):
     nav: NAV | None
     complete: bool
     warnings: list[str]
+    benchmark_publication_allowed: bool = False
 
 
 class SnapshotRevision(Contract):
@@ -83,6 +84,12 @@ def snapshot(
             excess_return=bot_return - benchmark_return if benchmark_return is not None else None,
             valuation=valuation,
             nav=nav,
+            benchmark_publication_allowed=bool(
+                investment
+                and investment.nav.derivative_publication_allowed
+                and nav
+                and nav.derivative_publication_allowed
+            ),
             complete=warning is None and not valuation.breaches,
             warnings=([warning] if warning else []) + valuation.breaches,
         )

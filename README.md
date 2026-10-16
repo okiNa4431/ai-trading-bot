@@ -273,7 +273,7 @@ uv run trading-bot db status --backend supabase
 uv run trading-bot db initialize --backend supabase
 uv run trading-bot db verify --backend supabase
 uv run trading-bot benchmark update --backend supabase --csv /path/to/official-nav.csv
-uv run trading-bot benchmark initialize --backend supabase --purchase-date 2026-10-19
+uv run trading-bot benchmark initialize --backend supabase --accepted-on YYYY-MM-DD --purchase-date YYYY-MM-DD --application-calendar /private/reviewed-calendar.json
 uv run trading-bot benchmark status --backend supabase
 uv run trading-bot portfolio snapshot --backend supabase
 uv run trading-bot portfolio performance --backend supabase
@@ -288,9 +288,24 @@ status / verify / benchmark status / portfolio performanceは読み取り専用�
 ## オルカンの実基準価額
 
 対象はeMAXIS Slim 全世界株式（オール・カントリー）、運用会社コード253425です。ETF2559や指数を代替しません。
-[運用会社の商品ページ](https://www.am.mufg.jp/fund/253425.html)は検証時403で、自動取得・公開再配布の許諾を確認できませんでした。アクセス制限を回避せず、自動取得は未実装です。手動CSVプロバイダーと交換可能な契約を用意しています。
+[運用会社の商品ページ](https://www.am.mufg.jp/fund/253425.html)の「設定来データ」から、公式のCP932 CSVを取得できます。2026-10-17の通常HTTP取得は成功しました（調査用Web経路では403）。認証回避は行いません。[サイト利用条件](https://www.am.mufg.jp/use.html)第7項は無断使用・複製・改変を禁止しており、継続自動取得・クラウド保存・派生値の公衆公開を包括的に許す記載は確認できません。自動取得・定期取得は有効にせず、所有者の非公開ローカル検算に限定しました。商用利用・共有・Supabaseへの実NAV転送は別途条件を確認してください。
 
-CSVはUTF-8、次のヘッダーを指定します。数値のサンプルはテスト専用であり、実際の基準価額ではありません。実データをコード・Gitへ含めません。
+公式ダウンロードファイルを変換せずに取り込む場合：
+
+```text
+uv run trading-bot benchmark update --csv data/benchmark/253425.csv --csv-format mufg --db data/benchmark/private.sqlite3
+uv run trading-bot benchmark compare --csv data/benchmark/253425.csv --csv-format mufg --started-at 2026-10-05T00:00:00+00:00 --accepted-on 2026-10-05 --purchase-date 2026-10-06 --valuation-date 2026-10-16 --application-calendar data/benchmark/reviewed-calendar.json
+```
+
+`compare` は実CSVによる**回顧的な現金保有シナリオとの計算検証**で、継続口座・AI成績・スナップショットを書き換えません。表示結果も非公開情報です。初期資金双方100万円、整数口、端数現金、購入手数料0・税引前で計算します。全日付を検証し、分配金・欠落日があれば拒否します。CIのCSVはすべて合成値で、実データは `data/` 配下のみです。
+
+CSVには実際の公表時刻がないため `publication_time_basis=observed_by` とし、`published_at=fetched_at=取込時刻` を保守的な可用時刻として保存します。これは実公表時刻ではありません。[通常18時30分頃という案内](https://faq1.am.mufg.jp/answer/660f62c3fe5ca95281bcf0db/)を各日の実公表時刻に置き換えません。原本SHA-256・公式URL・基準日・1万口単位・生NAVを保存し、再投資NAVを代用しません。再取込では既存の初回観測を維持し、値の訂正は拒否します。
+
+`reviewed-calendar.json` は所有者が公式商品ページの「お申込み不可日」、最新目論見書、販売会社の締切を照合して作成します。形式は `valid_from` / `valid_to`（ISO日付）、`closed_dates`（海外・販売会社の申込不可日）、`shortened_dates`（11:30締切日、通常は空配列）、`cutoff_jst`（通常 `15:30:00`、販売会社が早ければその時刻）、`source_url`（公式URL）、`observed_at`（タイムゾーン付き確認時刻）。日本の休業日は別途検証します。カレンダーの範囲不足・締切後・海外休業日を拒否し、最初に申込可能な日の翌国内営業日を適用NAV日とします。JPX売買停止を投信休業日と混同しません。
+
+継続口座は2026-10-16 23:36 JST開始です。公式カレンダー（2026-10-16基準）では10月19日も香港休業で申込不可のため、原則締切に従う仮想比較では10月20日受付・10月21日NAVが最初の候補です。販売会社の条件を再確認し、該当する実NAVが公表・取得されるまで購入を初期化しません。過去日での遡及購入は行いません。
+
+従来の正規化CSV形式はUTF-8、次のヘッダーを指定します。数値のサンプルはテスト専用であり、実際の基準価額ではありません。実データをコード・Gitへ含めません。
 
 ```text
 fund_id,nav_date,nav_jpy,published_at,source_url,distribution_jpy,derivative_publication_allowed
@@ -299,7 +314,7 @@ fund_id,nav_date,nav_jpy,published_at,source_url,distribution_jpy,derivative_pub
 - fund_idは253425、nav_jpyは**1万口あたりJPY**。published_atは確認した公表時刻をタイムゾーン付きで指定し、fetched_atは取込時に記録します。
 - source_urlは運用会社のHTTPS正式URL。HTMLスクレイピングはしません。日付・数値・公表時刻・重複を検証し、ファイル全体が正常な場合だけ取り込みます。
 - derivative_publication_allowedは明示的な `true` / `false`。公開権限を確認できていなければfalse。falseでは比較派生値もWebへ出しません。単にフラグを変えても権利を取得したことにはなりません。
-- 初回購入は口座開始翌営業日以降の**明示した適用基準価額日**を指定します。販売会社の締切・海外休場に基づく適用日を運用者が確認してください。該当日がなければ前日の価格で購入したことにしません。
+- 初回購入にはレビュー済みの申込カレンダー・受付日・適用NAV日を指定します。原則15:30締切と海外休場に加え、販売会社の異なる締切も確認してください。該当NAVがなければ前日の価格で購入したことにしません。
 - 整数口数=floor(100万円×10000÷適用基準価額)、未投資端数は現金。信託報酬は公表NAVに反映済みとして二重控除せず、購入手数料0・税引前・追加投資なし・売却なしです。
 - 分配金がある場合は専用台帳実装前に比較を停止します。データ訂正は黙って上書きせず拒否し、監査付き訂正操作を今後追加します。
 - 比較は同じJST評価日の、公表・取得とも評価時刻以前のNAVだけを使用します。未更新なら比較値null・不完全と記録します。前回NAVを新しい確定値として保存しません。

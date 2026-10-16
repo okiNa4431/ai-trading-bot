@@ -11,11 +11,17 @@ from typing import cast
 
 import yaml
 
-from trading_bot.benchmark import ManualCSVProvider, import_nav, initialize_benchmark
+from trading_bot.benchmark import (
+    ApplicationCalendar,
+    ManualCSVProvider,
+    import_nav,
+    initialize_benchmark,
+)
 from trading_bot.broker.execution import known_marks
 from trading_bot.broker.paper import PaperBroker
 from trading_bot.config import Market, load_settings, load_universe
 from trading_bot.dashboard import publish
+from trading_bot.official_nav import OfficialCSVProvider, compare_historical_nav
 from trading_bot.orchestration.engine import DecisionEngine
 from trading_bot.performance import Snapshot, performance, snapshot
 from trading_bot.persistence.decision_repository import DecisionRepository
@@ -38,7 +44,7 @@ def options(command: argparse.ArgumentParser) -> None:
 def add_parser(commands: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
     for name, actions in {
         "db": ["status", "verify", "initialize", "delete-test"],
-        "benchmark": ["initialize", "update", "status"],
+        "benchmark": ["initialize", "update", "status", "compare"],
         "portfolio": ["snapshot", "performance"],
         "dashboard": ["publish"],
     }.items():
@@ -49,8 +55,19 @@ def add_parser(commands: argparse._SubParsersAction[argparse.ArgumentParser]) ->
             options(command)
             if name == "benchmark" and action == "initialize":
                 command.add_argument("--purchase-date", type=date.fromisoformat, required=True)
-            if name == "benchmark" and action == "update":
+                command.add_argument("--accepted-on", type=date.fromisoformat, required=True)
+                command.add_argument("--application-calendar", type=Path, required=True)
+            if name == "benchmark" and action in ("update", "compare"):
                 command.add_argument("--csv", type=Path, required=True)
+                command.add_argument(
+                    "--csv-format", choices=["normalized", "mufg"], default="normalized"
+                )
+            if name == "benchmark" and action == "compare":
+                command.add_argument("--application-calendar", type=Path, required=True)
+                command.add_argument("--started-at", type=datetime.fromisoformat, required=True)
+                command.add_argument("--accepted-on", type=date.fromisoformat, required=True)
+                command.add_argument("--purchase-date", type=date.fromisoformat, required=True)
+                command.add_argument("--valuation-date", type=date.fromisoformat, required=True)
             if name == "db" and action == "delete-test":
                 command.add_argument("--confirm-account", required=True)
             if name == "portfolio" and action == "snapshot":
@@ -104,6 +121,23 @@ def verify(repository: PortfolioRepository) -> dict[str, object]:
 
 
 def run(args: argparse.Namespace) -> int:
+    if args.command == "benchmark" and args.phase4_action == "compare":
+        if args.csv_format != "mufg" or args.backend != "sqlite":
+            raise ValueError(
+                "retrospective comparison requires local official CSV; no live DB writes"
+            )
+        comparison = compare_historical_nav(
+            OfficialCSVProvider(args.csv, datetime.now(UTC)).observations(),
+            started_at=args.started_at,
+            accepted_on=args.accepted_on,
+            purchase_date=args.purchase_date,
+            valuation_date=args.valuation_date,
+            application_calendar=ApplicationCalendar.model_validate_json(
+                args.application_calendar.read_text(encoding="utf-8")
+            ),
+        )
+        print(comparison.model_dump_json())
+        return 0
     repo = repository(args)
     broker = PaperBroker(repo)
     now = datetime.now(UTC)
@@ -127,9 +161,22 @@ def run(args: argparse.Namespace) -> int:
                 }
     elif args.command == "benchmark":
         if action == "update":
-            result = {"imported": import_nav(repo, ManualCSVProvider(args.csv, now))}
+            provider = (
+                OfficialCSVProvider(args.csv, now)
+                if args.csv_format == "mufg"
+                else ManualCSVProvider(args.csv, now)
+            )
+            result = {"imported": import_nav(repo, provider)}
         elif action == "initialize":
-            result = initialize_benchmark(repo, args.purchase_date, now).model_dump(mode="json")
+            result = initialize_benchmark(
+                repo,
+                args.purchase_date,
+                now,
+                accepted_on=args.accepted_on,
+                application_calendar=ApplicationCalendar.model_validate_json(
+                    args.application_calendar.read_text(encoding="utf-8")
+                ),
+            ).model_dump(mode="json")
         else:
             with repo.transaction() as tx:
                 result = {
