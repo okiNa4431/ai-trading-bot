@@ -1,0 +1,72 @@
+name: Phase 5 manual reconcile
+on:
+  workflow_dispatch:
+    inputs:
+      account:
+        type: string
+        default: test-phase5-manual
+        required: true
+      run_id:
+        type: string
+        default: inspect
+      reason:
+        type: string
+        default: ''
+      apply_review:
+        type: boolean
+        default: false
+      resume:
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: phase5-test-writer
+  cancel-in-progress: false
+jobs:
+  inspect:
+    if: github.ref == 'refs/heads/main' && github.ref_protected && !inputs.apply_review
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.13.1'
+      - run: uv python install 3.12
+      - run: uv sync --locked
+      - env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          ACCOUNT: ${{ inputs.account }}
+        run: uv run python scripts/paper_cycle.py --mode reconcile --account "$ACCOUNT"
+  reviewed_recovery:
+    if: github.ref == 'refs/heads/main' && github.ref_protected && inputs.apply_review && vars.PHASE5_RECOVERY_APPROVED == 'true'
+    environment: phase5-recovery
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.13.1'
+      - run: uv python install 3.12
+      - run: uv sync --locked
+      - env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          PHASE5_RECOVERY_APPROVED: ${{ vars.PHASE5_RECOVERY_APPROVED }}
+          ACCOUNT: ${{ inputs.account }}
+          RUN_ID: ${{ inputs.run_id }}
+          REASON: ${{ inputs.reason }}
+          RESUME: ${{ inputs.resume }}
+        run: |
+          args=(--mode reconcile --account "$ACCOUNT" --run-id "$RUN_ID" --reason "$REASON" --apply-review)
+          if [ "$RESUME" = true ]; then args+=(--resume); fi
+          uv run python scripts/paper_cycle.py "${args[@]}"

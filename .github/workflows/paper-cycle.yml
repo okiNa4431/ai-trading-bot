@@ -1,0 +1,73 @@
+name: Phase 5 manual test cycle
+on:
+  workflow_dispatch:
+    inputs:
+      account:
+        type: string
+        default: test-phase5-manual
+        required: true
+      market:
+        type: choice
+        options: [JP, US]
+        default: JP
+      mode:
+        type: choice
+        options: [cycle, fixture]
+        default: cycle
+      kind:
+        type: choice
+        options: [observe, decision, execute]
+        default: observe
+      provider:
+        type: choice
+        options: [mock, gemini]
+        default: mock
+      mock_action:
+        type: choice
+        options: [HOLD, BUY, SELL]
+        default: HOLD
+      submit:
+        type: boolean
+        default: false
+      fixture_step:
+        description: Synthetic replay only, separate Workflow runs 1 BUY, 2 fill, 3 HOLD, 4 SELL, 5 fill
+        type: choice
+        options: ['1', '2', '3', '4', '5']
+        default: '1'
+permissions:
+  contents: read
+concurrency:
+  group: phase5-test-writer
+  cancel-in-progress: false
+jobs:
+  cycle:
+    if: github.ref == 'refs/heads/main' && github.ref_protected
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.13.1'
+      - run: uv python install 3.12
+      - run: uv sync --locked
+      - name: Isolated manual operation
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          GEMINI_API_KEY: ${{ inputs.provider == 'gemini' && inputs.mode == 'cycle' && inputs.kind == 'decision' && secrets.GEMINI_API_KEY || '' }}
+          ACCOUNT: ${{ inputs.account }}
+          MARKET: ${{ inputs.market }}
+          MODE: ${{ inputs.mode }}
+          KIND: ${{ inputs.kind }}
+          PROVIDER: ${{ inputs.provider }}
+          MOCK_ACTION: ${{ inputs.mock_action }}
+          SUBMIT: ${{ inputs.submit }}
+          FIXTURE_STEP: ${{ inputs.fixture_step }}
+        run: |
+          args=(--mode "$MODE" --account "$ACCOUNT" --market "$MARKET" --kind "$KIND" --provider "$PROVIDER" --mock-action "$MOCK_ACTION" --fixture-step "$FIXTURE_STEP")
+          if [ "$SUBMIT" = true ]; then args+=(--submit); fi
+          uv run python scripts/paper_cycle.py "${args[@]}"
