@@ -4,16 +4,18 @@ from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import Literal
+from zoneinfo import ZoneInfo
 
-from trading_bot.broker.execution import known_marks
+from trading_bot.broker.execution import known_marks, session
 from trading_bot.broker.paper import PaperBroker
 from trading_bot.config import Instrument, Market
+from trading_bot.models import PriceBar
 from trading_bot.operations import Operation
 from trading_bot.orchestration.engine import DecisionEngine
 from trading_bot.performance import snapshot
 from trading_bot.persistence.decision_repository import DecisionRepository
 from trading_bot.phase4_cli import verify
-from trading_bot.portfolio.models import FXRate
+from trading_bot.portfolio.models import FXRate, Order
 from trading_bot.portfolio.valuation import validate_fx, value_portfolio
 from trading_bot.screening.models import ScreeningSettings
 from trading_bot.storage import ParquetStore
@@ -45,6 +47,34 @@ class TestProposal:
         )
 
 
+def require_execution_coverage(order: Order, bars: list[PriceBar], at: datetime) -> None:
+    """Missing first future bars must not turn into a more convenient later fill."""
+    zone = ZoneInfo("Asia/Tokyo" if order.market == "JP" else "America/New_York")
+    day = order.requested_at.astimezone(zone).date()
+    last = at.astimezone(zone).date()
+    starts = {b.timestamp for b in bars}
+    while day <= last:
+        times = session(order.market, day.isoformat())
+        if times:
+            segments = [(times["market_open"], times["market_close"])]
+            if "break_start" in times:
+                segments = [
+                    (times["market_open"], times["break_start"]),
+                    (times["break_end"], times["market_close"]),
+                ]
+            for opening, closing in segments:
+                stamp = opening
+                while stamp < closing:
+                    if (
+                        order.requested_at < stamp
+                        and stamp + timedelta(hours=1) <= at
+                        and stamp not in starts
+                    ):
+                        raise ValueError("missing required future execution bar")
+                    stamp += timedelta(hours=1)
+        day += timedelta(days=1)
+
+
 def run_cycle(
     operation: Operation,
     store: ParquetStore,
@@ -61,6 +91,7 @@ def run_cycle(
     clock: Callable[[], datetime] = lambda: datetime.now(UTC),
     initialization_at: datetime | None = None,
     historical_replay: bool = False,
+    fund_jpy: Decimal = Decimal(0),
 ) -> dict[str, object]:
     metadata: dict[str, object] = {
         "market": market,
@@ -69,6 +100,7 @@ def run_cycle(
         "provider": provider,
         "settings": settings.model_dump(mode="json"),
         "historical_replay": historical_replay,
+        "fund_jpy": str(fund_jpy),
         "mock_action": getattr(strategy, "action", None),
     }
     if not operation.claim(owner, metadata):
@@ -103,21 +135,26 @@ def run_cycle(
                     continue
                 if at - order.requested_at > timedelta(days=7):
                     raise ValueError("pending order expired; reviewed cancellation required")
+                require_execution_coverage(order, data.get(order.symbol, []), at)
                 broker.execute(
                     order.order_id,
                     data,
                     fx,
                     at,
-                    mode="historical" if historical_replay else "paper",
+                    mode="paper",
                 )
         operation.step(4)
         record = None
         if kind == "decision":
             # USD funding is an explicit test setting: fixed upper bound, real rate and ledger.
-            if submit and market == "US" and broker.get_balance().balances["USD"] == 0:
+            if fund_jpy and (not submit or market != "US" or fund_jpy != Decimal("100000")):
+                raise ValueError("only explicit 100000 JPY test funding is supported")
+            if fund_jpy:
+                if broker.get_balance().balances["USD"] != 0:
+                    raise ValueError("explicit initial test funding already exists")
                 if fx is None:
                     raise ValueError("fresh FX required for explicit test funding")
-                broker.exchange("JPY", Decimal("100000"), fx, at, operation.run_id + ":fund")
+                broker.exchange("JPY", fund_jpy, fx, at, operation.run_id + ":fund")
             engine = DecisionEngine(
                 store,
                 broker,
@@ -143,7 +180,7 @@ def run_cycle(
             record = engine.register(record)
         operation.step(6)
         account = broker.get_balance()
-        marks = known_marks(instruments, data, at, "historical" if historical_replay else "paper")
+        marks = known_marks(instruments, data, at, "paper")
         valuation = value_portfolio(account, marks, fx, at, broker.rules)
         value = snapshot(operation.repository, valuation, at)
         operation.step(7)

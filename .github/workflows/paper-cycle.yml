@@ -29,6 +29,11 @@ on:
       submit:
         type: boolean
         default: false
+      fund_jpy:
+        description: Explicit initial virtual JPY to USD exchange for US test only
+        type: choice
+        options: ['0', '100000']
+        default: '0'
       fixture_step:
         description: Synthetic replay only, separate Workflow runs 1 BUY, 2 fill, 3 HOLD, 4 SELL, 5 fill
         type: choice
@@ -67,7 +72,8 @@ jobs:
           MOCK_ACTION: ${{ inputs.mock_action }}
           SUBMIT: ${{ inputs.submit }}
           FIXTURE_STEP: ${{ inputs.fixture_step }}
+          FUND_JPY: ${{ inputs.fund_jpy }}
         run: |
-          args=(--mode "$MODE" --account "$ACCOUNT" --market "$MARKET" --kind "$KIND" --provider "$PROVIDER" --mock-action "$MOCK_ACTION" --fixture-step "$FIXTURE_STEP")
+          args=(--mode "$MODE" --account "$ACCOUNT" --market "$MARKET" --kind "$KIND" --provider "$PROVIDER" --mock-action "$MOCK_ACTION" --fixture-step "$FIXTURE_STEP" --fund-jpy "$FUND_JPY")
           if [ "$SUBMIT" = true ]; then args+=(--submit); fi
           uv run python scripts/paper_cycle.py "${args[@]}"

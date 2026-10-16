@@ -2,6 +2,7 @@
 
 import sys
 from datetime import timedelta
+from decimal import Decimal
 from pathlib import Path
 
 from trading_bot.cycle import TestProposal, run_cycle
@@ -33,7 +34,7 @@ def fixture(api, market, step, directory):
         2: fill,
         3: fill + timedelta(minutes=1),
         4: fill + timedelta(minutes=2),
-        5: fill.replace(day=16, hour=1 if market == "JP" else 15),
+        5: fill.replace(day=16, hour=1) if market == "JP" else fill.replace(hour=17),
     }[step]
     if step >= 2:
         store.save(
@@ -70,7 +71,7 @@ def fixture(api, market, step, directory):
             ],
         )
     if step == 5:
-        start = start.replace(day=16, hour=0 if market == "JP" else 13)
+        start = start.replace(day=16, hour=0) if market == "JP" else start.replace(hour=16)
         store.save(
             instrument,
             "1h",
@@ -111,4 +112,5 @@ def fixture(api, market, step, directory):
         clock=lambda: clock,
         initialization_at=NOW - timedelta(days=30),
         historical_replay=True,
+        fund_jpy=Decimal("100000") if market == "US" and step == 1 else Decimal(0),
     )

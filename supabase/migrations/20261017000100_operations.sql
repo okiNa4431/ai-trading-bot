@@ -207,3 +207,22 @@ grant execute on function public.bot_operation_claim(text,text,text,jsonb,intege
  public.bot_operation_commit(text,text,bigint,boolean,bigint,jsonb,jsonb),
  public.bot_operation_reserve(text,text,bigint,text,text,text,integer,integer,integer),
  public.bot_operation_data(text,text,bigint,text,jsonb) to service_role;
+
+-- Only a boolean leaves the server; source account/history/usage payloads stay private.
+create or replace function public.bot_operation_preserved() returns boolean
+language sql stable security definer set search_path='' as $$
+ select not exists(select 1 from bot_private.phase5_before_accounts b
+   left join bot_private.accounts a on a.id=b.id where to_jsonb(a) is distinct from to_jsonb(b))
+ and not exists(select 1 from bot_private.phase5_before_records b
+   left join bot_private.records a on (a.account_id,a.kind,a.key)=(b.account_id,b.kind,b.key)
+   where to_jsonb(a) is distinct from to_jsonb(b))
+ and not exists(select 1 from bot_private.phase5_before_balances b
+   left join bot_private.balances a on (a.account_id,a.currency)=(b.account_id,b.currency)
+   where to_jsonb(a) is distinct from to_jsonb(b))
+ and not exists(select 1 from bot_private.phase5_before_positions b
+   left join bot_private.positions a on (a.account_id,a.symbol)=(b.account_id,b.symbol)
+   where to_jsonb(a) is distinct from to_jsonb(b))
+$$;
+revoke all on function public.bot_operation_preserved() from public,anon,authenticated;
+grant execute on function public.bot_operation_preserved() to service_role;
+notify pgrst,'reload schema';

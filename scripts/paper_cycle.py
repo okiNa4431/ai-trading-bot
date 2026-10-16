@@ -5,6 +5,7 @@ import json
 import os
 import tempfile
 from datetime import UTC, datetime
+from decimal import Decimal
 from pathlib import Path
 
 import yaml
@@ -33,6 +34,9 @@ def main():
     parser.add_argument("--provider", choices=["mock", "gemini"], default="mock")
     parser.add_argument("--mock-action", choices=["HOLD", "BUY", "SELL"], default="HOLD")
     parser.add_argument("--submit", action="store_true")
+    parser.add_argument(
+        "--fund-jpy", type=Decimal, choices=[Decimal(0), Decimal("100000")], default=Decimal(0)
+    )
     parser.add_argument("--fixture-step", type=int, choices=range(1, 6), default=1)
     parser.add_argument("--run-id", default="inspect")
     parser.add_argument("--reason")
@@ -88,6 +92,7 @@ def main():
                     "verified": verify(op.repository)["verified"] if initialized else None,
                     "scheduled": False,
                     "public_promotion": False,
+                    "pre_migration_data_preserved": api.rpc("bot_operation_preserved", {}),
                 }
             )
         )
@@ -170,6 +175,7 @@ def main():
             owner=os.environ.get("GITHUB_RUN_ID", "manual"),
             submit=args.submit,
             provider=args.provider,
+            fund_jpy=args.fund_jpy,
             prepare=prepare,
             strategy=TestProposal(args.mock_action) if args.provider == "mock" else None,
         )
