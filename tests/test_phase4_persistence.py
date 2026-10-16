@@ -1,5 +1,5 @@
 import json
-from datetime import timedelta
+from datetime import timedelta, timezone
 from decimal import Decimal
 
 import httpx
@@ -18,7 +18,7 @@ from trading_bot.persistence.supabase_repository import (
     SupabaseRepository,
 )
 from trading_bot.phase4_cli import verify
-from trading_bot.strategy.models import DecisionRun
+from trading_bot.strategy.models import APIUsage, DecisionRun
 from trading_bot.strategy.security import redact
 
 
@@ -190,3 +190,31 @@ def test_local_phase4_cli_init_status_verify_and_empty_performance(tmp_path, cap
         value = json.loads(capsys.readouterr().out)
         assert isinstance(value, dict)
     assert main(["db", "delete-test", "--db", path, "--confirm-account", "paper-live"]) == 2
+
+
+def test_usage_observation_times_are_aware_and_normalized_to_utc():
+    usage = APIUsage(
+        request_id="time",
+        decision_id="test",
+        model="mock",
+        at=T.astimezone(timezone(timedelta(hours=9))),
+    )
+    assert usage.at == T and usage.at.utcoffset() == timedelta(0)
+    with pytest.raises(ValueError):
+        APIUsage(request_id="time", decision_id="test", model="mock", at=T.replace(tzinfo=None))
+
+
+def test_all_hosted_real_ai_workflows_require_shared_supabase_quota():
+    from pathlib import Path
+
+    import yaml
+
+    for path in ["test-gemini.yml", "persistent-decision.yml"]:
+        workflow = yaml.load(Path(".github/workflows", path).read_text(), Loader=yaml.BaseLoader)
+        assert set(workflow["on"]) == {"workflow_dispatch"}
+        for job in workflow["jobs"].values():
+            for step in job["steps"]:
+                env = step.get("env", {})
+                if "GEMINI_API_KEY" in env:
+                    assert {"SUPABASE_URL", "SUPABASE_SECRET_KEY"} <= set(env)
+                    assert "inputs.mode == 'gemini'" in step["if"]

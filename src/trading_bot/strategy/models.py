@@ -2,10 +2,18 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Literal
 
-from pydantic import Field, model_validator
+from pydantic import Field, field_validator, model_validator
 
 from trading_bot.config import Market
-from trading_bot.portfolio.models import Account, Contract, FXRate, Order, TradingRules, Valuation
+from trading_bot.portfolio.models import (
+    Account,
+    Contract,
+    FXRate,
+    Order,
+    TradingRules,
+    Valuation,
+    utc,
+)
 from trading_bot.screening.models import ScreeningResult
 
 
@@ -108,6 +116,7 @@ class APIUsage(Contract):
     request_id: str
     decision_id: str
     at: datetime
+    _at = field_validator("at")(utc)
     model: str
     status: Literal["RESERVED", "SUCCESS", "ERROR"] = "RESERVED"
     input_tokens: int | None = None

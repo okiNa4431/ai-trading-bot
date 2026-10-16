@@ -317,3 +317,5 @@ PagesはURLとPublishable Keyだけを環境変数から生成し、Secret Key�
 無料枠は[Supabase公式](https://supabase.com/docs/guides/platform/billing-on-supabase)のDB500MB、[転送量](https://supabase.com/docs/guides/platform/manage-your-usage/egress)の非キャッシュ5GB/月等（2026-10-16確認）。[GitHub Actions](https://docs.github.com/en/actions/concepts/billing-and-usage)は公開リポジトリの標準ホストrunnerを利用します。ダッシュボードでDB容量・転送量・Googleの実利用量を監視してください。Botの制限は課金0円の保証ではなく、プラン変更・有料モデルへの自動切り替えはありません。
 
 Geminiの推定費用はconfig/ai.yamlの標準有料料金（入力0.30 USD/100万、出力2.50 USD/100万）×SDKの入力・総トークン差からDecimalで計算します。これは無料枠適用後の実請求額ではなく有料換算の参考値です。メタデータ不明ならnull。モデル変更時は公式料金表を確認して単価も変更してください。
+
+Phase 4以降、従来のTest Gemini decisionの実Geminiモードもtest-gemini-smokeという隔離Supabase口座を利用し、共有API枠を経由します。旧SQLiteの使い捨て枠でホスト上の上限を迂回しません。mockは従来どおり通信なしの使い捨てテストです。

@@ -42,4 +42,6 @@ jobs:
         env:
           MARKET: ${{ inputs.market }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
         run: uv run python scripts/test_gemini.py --market "$MARKET" --mode gemini

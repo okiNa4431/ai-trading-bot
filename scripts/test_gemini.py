@@ -16,6 +16,7 @@ from trading_bot.config import load_settings, load_universe
 from trading_bot.orchestration.engine import DecisionEngine
 from trading_bot.persistence.decision_repository import DecisionRepository
 from trading_bot.persistence.sqlite_repository import SQLiteRepository
+from trading_bot.persistence.supabase_repository import SupabaseAPI, SupabaseRepository
 from trading_bot.provider import YahooFinanceProvider
 from trading_bot.screening.models import ScreeningSettings
 from trading_bot.service import collect
@@ -46,7 +47,11 @@ def main() -> int:
             universe = [
                 i for i in load_universe(Path("config/universe.yaml")) if i.market == args.market
             ][:2]
-            repository = SQLiteRepository(base / "disposable.sqlite3")
+            repository = (
+                SupabaseRepository(SupabaseAPI.environment(), "test-gemini-smoke", test=True)
+                if args.mode == "gemini"
+                else SQLiteRepository(base / "disposable.sqlite3")
+            )
             decisions = DecisionRepository(repository)
             broker = PaperBroker(repository)
             initial = broker.initialize(datetime.now(UTC))
@@ -72,7 +77,7 @@ def main() -> int:
             output = summary(record)
             if broker.get_orders() or broker.get_executions() or broker.get_balance() != initial:
                 raise ValueError("smoke test invariant violated: paper account changed")
-            if len(decisions.usage()) > (1 if args.mode == "gemini" else 0):
+            if len(decisions.usage(record.decision_id)) > (1 if args.mode == "gemini" else 0):
                 raise ValueError("smoke test request limit violated")
     except Exception as exc:
         # Never expose arbitrary SDK or filesystem exception messages.

@@ -61,7 +61,7 @@ function App() {
         <ol>
           <li><span className="step">01</span><div><span className="step-state">実装・検証済み</span><h3>市場データ基盤</h3><p>日米株価の取得・検証・保存</p></div><span className="done" aria-label="完了">✓</span></li>
           <li><span className="step">02</span><div><span className="step-state">実装・検証済み</span><h3>仮想口座と売買エンジン</h3><p>残高・約定・損益・リスクの管理</p></div><span className="done" aria-label="完了">✓</span></li>
-          <li><span className="step">03</span><div><span className="step-state">現在の開発フェーズ</span><h3>AI判断エンジン</h3><p>定量スクリーニング・構造化判断・注文計画</p></div><span className="done">✓</span></li><li className="current"><span className="step">04</span><div><span className="step-state">今後の予定</span><h3>運用の永続化と比較</h3><p>継続運用・オルカン比較・結果の公開</p></div></li>
+          <li><span className="step">03</span><div><span className="step-state">実装・検証済み</span><h3>AI判断エンジン</h3><p>定量スクリーニング・構造化判断・注文計画</p></div><span className="done">✓</span></li><li className="current"><span className="step">04</span><div><span className="step-state">現在の開発フェーズ</span><h3>運用の永続化と比較</h3><p>継続運用・オルカン比較・結果の公開</p></div></li>
         </ol>
       </section>
       <section className="closing"><SymbolMark /><p>結論を急がず、実験を重ねる。</p><a href={repository} target="_blank" rel="noreferrer">GitHubで開発を追う ↗</a></section>
