@@ -194,7 +194,8 @@ def test_actual_pg_public_roles_cannot_read_or_write_internal_state(repo, uri, r
 
 def test_actual_pg_public_projection_is_readable_but_tests_cannot_publish(repo, uri):
     state = repo.api.rpc("bot_read", {"p_account": repo.account_id})
-    with pytest.raises(psycopg.Error):
+    # The repository adapter normalizes SQLSTATE 40001 to its public conflict contract.
+    with pytest.raises(RepositoryConflict, match="version conflict"):
         repo.api.rpc(
             "bot_publish",
             {
