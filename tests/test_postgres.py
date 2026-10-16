@@ -243,7 +243,7 @@ def test_actual_pg_utc_quota_boundary_does_not_refund_current_period(repo, uri, 
         c.execute(
             sql.SQL(
                 "update bot_private.records set payload=jsonb_set(payload,'{{at}}',"
-                "to_jsonb((({}) at time zone 'UTC')::text)) where kind='api_usage' and key=%s"
+                "to_jsonb(({}) at time zone 'UTC')) where kind='api_usage' and key=%s"
             ).format(sql.SQL(expression)),
             (first.request_id,),
         )
