@@ -14,6 +14,7 @@ import yaml
 from trading_bot.broker.paper import PaperBroker
 from trading_bot.config import load_settings, load_universe
 from trading_bot.cycle import TestProposal, run_cycle
+from trading_bot.data_access import require_live_market_access
 from trading_bot.market_inputs import YahooInputs, update_inputs
 from trading_bot.operations import Operation, health_summary, market_slot, test_scope
 from trading_bot.persistence.supabase_repository import SupabaseAPI, SupabaseError
@@ -47,6 +48,8 @@ def main():
     parser.add_argument("--resume", action="store_true")
     args = parser.parse_args()
     test_scope(args.account)
+    if args.mode == "cycle":
+        require_live_market_access()
     api = SupabaseAPI.environment()
     if args.mode == "fixture":
         from phase5_fixture import fixture

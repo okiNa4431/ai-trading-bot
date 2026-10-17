@@ -32,6 +32,9 @@ jobs:
           version: '0.13.1'
       - run: uv python install 3.12
       - run: uv sync --locked
+      - name: Real-data Gemini validation paused pending provider rights
+        if: inputs.mode == 'gemini'
+        run: uv run python -c "from trading_bot.data_access import require_live_market_access; require_live_market_access()"
       - name: Mock decision (no Secret)
         if: inputs.mode == 'mock'
         env:

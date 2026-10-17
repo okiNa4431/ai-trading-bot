@@ -270,3 +270,39 @@ def test_private_operation_tables_are_not_directly_accessible(operation, role):
         c.execute(sql.SQL("set role {}").format(sql.Identifier(role)))
         with pytest.raises(psycopg.Error):
             c.execute("select * from bot_private.operation_runs")
+
+
+@pytest.mark.parametrize("market", ["JP", "US"])
+def test_phase55_preparation_preserves_other_scopes_and_never_resets(phase5_uri, market):
+    from trading_bot.preflight import PROTECTED, REAL_ACCOUNTS, inspect_account, prepare_account
+
+    api = PGAPI(phase5_uri)
+    before = {a: api.rpc("bot_read", {"p_account": a}) for a in PROTECTED}
+    at = datetime.now(UTC)
+    result = prepare_account(api, market, "CI-only-preparation", at)
+    assert result["state"] == "PREPARED_NOT_VALIDATED"
+    assert result["protected_scopes_unchanged"] and not result["market_validated"]
+    repo = SupabaseRepository(api, REAL_ACCOUNTS[market], test=True)
+    initial = PaperBroker(repo).get_balance()
+    assert initial.initial_jpy == 1000000 and initial.created_at == at
+    assert (
+        prepare_account(api, market, "second-runner", at + timedelta(days=1))["state"]
+        == "ALREADY_PREPARED"
+    )
+    assert PaperBroker(repo).get_balance() == initial
+    audit = inspect_account(api, market, at + timedelta(seconds=1))
+    assert audit["orders"] == audit["executions"] == audit["api_reservations"] == 0
+    assert not audit["capacity_verified"] and audit["database_total_bytes"] is None
+    assert {a: api.rpc("bot_read", {"p_account": a}) for a in PROTECTED} == before
+
+
+def test_phase55_monitoring_sql_is_read_only_and_reports_global_reservations(phase5_uri):
+    from pathlib import Path
+
+    with psycopg.connect(phase5_uri) as c:
+        # Read-only PostgreSQL transaction rejects mutations, even via accidental functions.
+        c.execute("set transaction read only")
+        c.execute(
+            Path("supabase/phase55-monitoring.sql").read_text(encoding="utf-8"), prepare=False
+        )
+        assert c.fetchone() is not None

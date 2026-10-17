@@ -28,6 +28,8 @@ jobs:
           version: '0.13.1'
       - run: uv python install 3.12
       - run: uv sync --locked
+      - name: Real-market collection paused pending provider rights
+        run: uv run python -c "from trading_bot.data_access import require_live_market_access; require_live_market_access()"
       - name: Fetch and validate
         env:
           MARKET: ${{ inputs.market }}
@@ -45,12 +47,12 @@ jobs:
           if [ -f fetch.log ]; then tail -60 fetch.log >> "$GITHUB_STEP_SUMMARY"; fi
           uv run trading-bot status >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
+      - name: Access-state metadata only
+        if: always()
+        run: echo '{"real_market_access":"DISABLED","source_data_included":false}' > access-state.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: market-data-${{ inputs.market }}-${{ inputs.interval }}
-          path: |
-            data/market/**/*.parquet
-            fetch.log
+          name: access-state
+          path: access-state.json
           retention-days: 3
-          if-no-files-found: warn

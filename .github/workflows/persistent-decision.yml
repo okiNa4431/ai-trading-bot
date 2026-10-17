@@ -32,6 +32,8 @@ jobs:
           version: '0.13.1'
       - run: uv python install 3.12
       - run: uv sync --locked
+      - name: Real-market collection paused pending provider rights
+        run: uv run python -c "from trading_bot.data_access import require_live_market_access; require_live_market_access()"
       - name: Persistent mock (no Gemini Secret)
         if: inputs.mode == 'mock'
         env:

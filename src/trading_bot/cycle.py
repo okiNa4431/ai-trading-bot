@@ -7,7 +7,7 @@ from decimal import Decimal
 from typing import Literal
 from zoneinfo import ZoneInfo
 
-from trading_bot.broker.execution import known_marks, session
+from trading_bot.broker.execution import known_marks, session, window
 from trading_bot.broker.paper import PaperBroker
 from trading_bot.config import Instrument, Market
 from trading_bot.models import PriceBar
@@ -89,6 +89,16 @@ def require_execution_coverage(order: Order, bars: list[PriceBar], at: datetime)
                         raise ValueError("missing required future execution bar")
                     stamp += timedelta(hours=1)
         day += timedelta(days=1)
+    earliest = [
+        span[1]
+        for bar in bars
+        if bar.volume > 0
+        and (span := window(bar)) is not None
+        and order.requested_at < span[0]
+        and span[1] <= at
+    ]
+    if earliest and (at - min(earliest)).total_seconds() > order.costs.max_price_age_seconds:
+        raise ValueError("first future execution bar is stale; reviewed cancellation required")
 
 
 def run_cycle(
