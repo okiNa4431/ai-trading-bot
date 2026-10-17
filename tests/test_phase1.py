@@ -13,6 +13,15 @@ from trading_bot.provider import DataError, YahooFinanceProvider, convert_frame
 from trading_bot.service import collect
 from trading_bot.storage import ParquetStore
 
+
+@pytest.fixture(autouse=True)
+def authorize_only_mock_adapter_transport(monkeypatch):
+    # All Ticker/network access is still blocked by conftest unless a test mocks it.
+    # Exercise the existing adapter contract after a simulated rights check.
+    # The production default pause is tested independently in test_phase55.py.
+    monkeypatch.setattr("trading_bot.provider.require_live_market_access", lambda: None)
+
+
 NOW = datetime(2026, 10, 15, tzinfo=UTC)
 JP = Instrument(symbol="7203.T", market="JP", currency="JPY", display_name="Toyota")
 US = Instrument(symbol="AAPL", market="US", currency="USD", display_name="Apple")

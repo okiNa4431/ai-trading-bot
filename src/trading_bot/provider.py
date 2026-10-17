@@ -11,6 +11,7 @@ import yfinance as yf
 from pydantic import ValidationError
 
 from trading_bot.config import Instrument, Interval, Settings
+from trading_bot.data_access import require_live_market_access
 from trading_bot.models import PriceBar
 
 logger = logging.getLogger(__name__)
@@ -128,6 +129,8 @@ class YahooFinanceProvider:
             or start < datetime.now(UTC) - timedelta(days=60, minutes=1)
         ):
             raise DataError("hourly request exceeds conservative 60-day limit")
+        # Covers direct CLI/library use too, before sleeps or requests.
+        require_live_market_access()
         for attempt in range(self.settings.retries + 1):
             if self.last_request is not None:
                 time.sleep(

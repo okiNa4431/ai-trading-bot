@@ -204,6 +204,7 @@ def test_yahoo_fx_uses_confirmed_quote_time_and_no_synthetic_fallback(monkeypatc
             )
 
     monkeypatch.setattr("trading_bot.market_inputs.yf.Ticker", lambda s: Ticker())
+    monkeypatch.setattr("trading_bot.market_inputs.require_live_market_access", lambda: None)
     observed = YahooInputs().fetch_fx(NOW)
     assert observed.rate.usd_jpy == 150 and observed.rate.timestamp == NOW
     assert observed.observed_at != observed.rate.timestamp

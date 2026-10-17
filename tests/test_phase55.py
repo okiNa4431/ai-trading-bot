@@ -61,6 +61,25 @@ def test_pause_cannot_be_disabled_by_a_workflow_input():
         require_live_market_access()
 
 
+@pytest.mark.parametrize("kind", ["prices", "fx", "actions"])
+def test_yahoo_is_paused_at_the_adapter_boundary_before_any_ticker(kind, monkeypatch):
+    from trading_bot.config import Settings
+    from trading_bot.market_inputs import YahooInputs
+    from trading_bot.provider import YahooFinanceProvider
+
+    def forbidden(*args, **kwargs):
+        pytest.fail("an upstream request was attempted while paused")
+
+    monkeypatch.setattr("yfinance.Ticker", forbidden)
+    with pytest.raises(MarketAccessDisabled):
+        if kind == "prices":
+            YahooFinanceProvider(Settings()).fetch(JP, NOW - timedelta(days=1), NOW, "1h")
+        elif kind == "fx":
+            YahooInputs().fetch_fx(NOW)
+        else:
+            YahooInputs().fetch_actions(JP, NOW)
+
+
 def test_twelve_data_uses_only_confirmed_fx_and_preserves_observation_time():
     result = TwelveDataFXProvider.parse(
         json.dumps(fx_document()).encode(), NOW, NOW + timedelta(seconds=2)

@@ -10,6 +10,7 @@ from pydantic import Field, field_validator, model_validator
 
 from trading_bot.broker.execution import window
 from trading_bot.config import Instrument, Interval
+from trading_bot.data_access import require_live_market_access
 from trading_bot.models import PriceBar
 from trading_bot.operations import Operation, fingerprint
 from trading_bot.portfolio.models import Contract, FXRate, utc
@@ -56,6 +57,7 @@ class YahooInputs:
 
     def fetch_fx(self, at: datetime) -> FXObservation:
         at = utc(at)
+        require_live_market_access()
         frame = yf.Ticker("JPY=X").history(
             period="5d",
             interval="5m",
@@ -81,6 +83,7 @@ class YahooInputs:
         return FXObservation(rate=rate, observed_at=datetime.now(UTC))
 
     def fetch_actions(self, instrument: Instrument, at: datetime) -> list[CorporateAction]:
+        require_live_market_access()
         frame = yf.Ticker(instrument.symbol).history(
             start=utc(at) - timedelta(days=60),
             end=utc(at),

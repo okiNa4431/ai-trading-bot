@@ -12,7 +12,7 @@
 
 | 対象 | 内容 |
 | --- | --- |
-| `data_access.py`、`scripts/paper_cycle.py` | 実データcycleを通信前に拒否。解除入力なし。fixture・health・reconcileを維持 |
+| `data_access.py`、`provider.py`、`market_inputs.py`、`scripts/paper_cycle.py` | 実データcycleだけでなく、直接CLI／Adapterの株価・FX・企業行動も通信前に拒否。解除入力なし。fixture・health・reconcileを維持 |
 | `reference_fx.py` | Twelve Data FX／ECB日次参照の未接続アダプター。ヘッダー認証・サイズ制限・再試行なし・異常値と時刻検証。ECBの日付から新鮮な価格時刻を捏造しない |
 | `preflight.py`、`scripts/phase55.py` | 固定JP／US隔離口座の冪等な準備、読取監査、実カレンダーの候補窓。準備をHOLD成功と呼ばない |
 | `scripts/phase55_monitor.py`、`config/phase55-expectations.json` | 明示した予定の欠落検出・異常終了・スコープ内API予約・Environment保護の読取確認。予定初期空・外部監視未設定を明示 |
@@ -20,12 +20,12 @@
 | 既存`fetch-market-data.yml`、`persistent-decision.yml`、`test-gemini.yml` | 実データの経路に停止ゲート。artifactは停止状態JSONだけ、生データを含めない |
 | `cycle.py` | 最初の後続足が古い場合、都合のよい新しい後続足を選ばず停止 |
 | `supabase/phase55-monitoring.sql` | 所有者向けSELECTのみ。DB総量・世代数・全口座共通API予約。DDLなし |
-| `tests/test_phase55.py`、`tests/test_operations_pg.py` | 取得停止・為替契約・時刻・欠落・承認保護・安全約定・新規準備の非破壊性を追加 |
+| `tests/test_phase55.py`、`tests/test_operations_pg.py`、既存Adapter試験 | 取得停止・為替契約・時刻・欠落・承認保護・安全約定・新規準備の非破壊性を追加。既存Adapter試験は許諾境界だけモック、実通信禁止とデータ検証条件は維持 |
 | Phase 5.5文書・README | 提供元比較・運用チェック・外部backup復旧・残存条件 |
 
 ## テスト
 
-ローカル：381件PASS、41件skip（実PostgreSQL）、29.44秒。Ruff・format・mypy（48ソース）PASS。初回に既存Workflowのartifact契約が失敗したため、生データ公開を戻さず停止状態だけのJSON artifactで修正し、全テストを再実行した。追加PGテストのcursor誤用も修正し、実DBで41件PASSを確認した。監査の保存確認失敗を非0終了にする回帰テストも追加した。最新CI結果は完了後に追記する。
+ローカル：384件PASS、41件skip（実PostgreSQL）、28.88秒。Ruff・format・mypy（48ソース）PASS。初回に既存Workflowのartifact契約が失敗したため、生データ公開を戻さず停止状態だけのJSON artifactで修正し、全テストを再実行した。追加PGテストのcursor誤用も修正し、実DBで41件PASSを確認した。監査の保存確認失敗を非0終了にする回帰テストも追加した。最新CI結果は完了後に追記する。
 
 Phase 5の既存377件とWeb13件を維持する。DB排他・fencing・中断・応答喪失・quota・合成売買を検証し、実相場の成功と取り違えない。
 
@@ -40,6 +40,17 @@ Phase 5の既存377件とWeb13件を維持する。DB排他・fencing・中断�
 
 両実行で `protected_scopes_unchanged: true`、台帳照合成功。対象銘柄・実データ観測時刻・約定時刻・実相場損益はまだ存在せず、取得成功や運用利益として報告しない。
 
+| 追加確認 | Workflow | 実結果 |
+| --- | --- | --- |
+| JP監査 | [39010613071](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39010613071) | 既存データ保持true、未解決0、注文・約定・判断・API予約0 |
+| US監査 | [39010614976](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39010614976) | 同上。新口座の両替も0 |
+| 独立監視 | [39010628172](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39010628172) | 観測成功、readinessはNOT_READY。承認用Environmentは両方未作成、予定未登録、総容量／egress／backup未確認を検出 |
+| JP準備の再実行 | [39010704766](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39010704766) | ALREADY_PREPARED、資金・口座作成日時を再設定せず |
+| 停止中HOLDの拒否試験 | [39010729089](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39010729089) | 期待通りfailure。MarketAccessDisabledで認証・初期化・実データ通信前に拒否。実市場HOLDは未実施 |
+| 異常終了の検知試験 | [39010752861](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39010752861) | 期待通り非0終了。上記拒否runをABNORMAL_WORKFLOW_ENDとして検出。DB未解決0、既存保持trueを再確認。成功扱いで隠さない |
+
+監査の最新スコープJSONは各1425 bytesだったが、DB総容量・過去世代・請求対象転送量ではない。非公開口座残高は初期各100万円・USD0、約定損益0。市場価格・観測・約定の実データは保存していない。Phase 5 fixture口座も金融操作していない。
+
 ## 未実施・未確認
 
 | 項目 | 状態・条件 |
@@ -49,7 +60,7 @@ Phase 5の既存377件とWeb13件を維持する。DB排他・fencing・中断�
 | 実Gemini | 未実施。入力の権利・外部AI送信範囲・残枠確認後、最小1通信から。BUY/SELLを強制しない |
 | DB総量・請求対象egress | 未確認。最新JSONサイズと区別。所有者SQL／Dashboardで実数確認が必要 |
 | 外部バックアップ・復元 | 手順を準備。実DBの暗号化dump／外部復元訓練は未実施 |
-| Environment承認保護 | 読取監視で確認する。未設定を設定済みと表示しない |
+| Environment承認保護 | phase55-validation／phase5-recoveryとも未作成・required reviewersなしと実測。取引有効化前に設定・承認動作の確認が必要 |
 | 外部欠落監視 | 未設定。手動ActionsだけではGitHub全面停止を検知できない |
 
 ## 次の手動実行条件
