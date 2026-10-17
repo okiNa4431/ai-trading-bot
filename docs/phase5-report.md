@@ -48,10 +48,22 @@ USの最終評価は固定150円/USDで1,001,173.50円。両替費用も含む�
 
 ## 実Supabase適用・完了条件
 
-追加migrationは実Supabaseで未適用。[読取専用healthcheck実行39004150204](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39004150204) は `Supabase migration missing; apply tracked SQL in SQL Editor` を検出し、終了コード1で安全停止した。金融mutationは行っていない。Data APIのキーにはDDL権限がないため、所有者によるSQL Editor適用が必要。全体bootstrapではなく追加専用SQLを使う。適用後に最初に読取専用healthcheckを行い、適用前データとの一致がtrueであることを確認する。
+適用前の [healthcheck実行39004150204](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39004150204) はmigration不足を検出し、終了コード1で安全停止した。その後、所有者が追加専用SQLをSQL Editorで実行した。[適用後healthcheck実行39007534885](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39007534885) は成功し、`pre_migration_data_preserved: true`、未解決0件、初期テスト口座未作成を確認した。所有者のDDL操作を除き、適用確認は読取専用である。
 
-実Supabase上の5段階×日米の手動Workflow検証は、この確認後に実施する。単体テスト用のSQLite doubleやCIのPostgreSQL成功を、実Supabaseで完了したことにはしない。既存の実データが維持されたことも、適用後の検証RPCで確認するまで確定扱いにしない。
+実Supabase上の5段階×日米の手動Workflow検証は全段階成功。対象は `test-phase5-fixture-jp/us` のみで、合成価格・固定為替・mock戦略を明示する。単体テスト用SQLiteやCIのPostgreSQLとは別の検証である。実Geminiの使用枠予約や通信は行っていない。
+
+| 段階 | JPの手動実行 | USの手動実行 | 結果（各市場） |
+| --- | --- | --- | --- |
+| BUY登録 | [39007575363](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39007575363) | [39007830857](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39007830857) | 注文1・約定0・PENDING 1 |
+| 後続足でBUY約定 | [39007683023](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39007683023) | [39007866421](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39007866421) | 注文1・約定1・PENDING 0 |
+| HOLD | [39007722018](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39007722018) | [39007902187](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39007902187) | 追加注文なし |
+| SELL登録 | [39007758599](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39007758599) | [39007941471](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39007941471) | 注文2・約定1・PENDING 1 |
+| 後続足でSELL約定 | [39007795190](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39007795190) | [39008022784](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39008022784) | 注文2・約定2・PENDING 0 |
+
+全10実行で `verified: true`、評価作成成功。各段階は別runnerで実行し、Supabaseの状態を次の実行に引き継いだ。
+
+完了した同一実行IDを別Workflowで再起動した [JP 39008076452](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39008076452)、[US 39008099019](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39008099019) は、どちらも `ALREADY_COMPLETED` で正常終了。完了slotを再処理しないことを実サービスでも確認した。
 
 ## 残存条件
 
-現段階で定期運用開始は不可。実Supabaseの追加SQL適用・保存状態維持の確認・隔離口座の複数Workflow統合検証を完了させる必要がある。実相場を使った新規判断から翌営業日の後続足約定までの検証は、市場の実行窓に合わせて別途確認する。復旧Environmentの管理者承認設定、外部バックアップと復旧訓練、総容量監視、実行欠落の外部監視も定期運用前の条件とする。テスト成功だけでscheduleや継続口座への注文を有効化しない。
+現段階で定期運用開始は不可。実相場を使った新規判断から翌営業日の後続足約定までの検証は、市場の実行窓に合わせて別途確認する。復旧Environmentの管理者承認設定、外部バックアップと復旧訓練、総容量監視、実行欠落の外部監視も定期運用前の条件とする。テスト成功だけでscheduleや継続口座への注文を有効化しない。

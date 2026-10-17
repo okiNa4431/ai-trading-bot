@@ -28,3 +28,10 @@ jobs:
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
           ACCOUNT: ${{ inputs.account }}
         run: uv run python scripts/paper_cycle.py --mode health --account "$ACCOUNT"
+      - name: Read-only synthetic fixture balance audit
+        if: startsWith(inputs.account, 'test-phase5-fixture-')
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          ACCOUNT: ${{ inputs.account }}
+        run: uv run trading-bot db status --backend supabase --account "$ACCOUNT" --test-account
