@@ -1,0 +1,8 @@
+# Offline planning only. Not loaded by cycle.py, no activation switch or credentials.
+mode: mock
+market: US
+symbols: [AAPL, MSFT, AMZN, GOOGL, META]
+poll_minutes: 15
+decision_minutes: 60
+# Planning assumption, NOT verified provider latency or a freshness exception.
+latency_minutes: 15
