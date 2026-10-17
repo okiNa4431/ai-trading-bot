@@ -25,11 +25,20 @@
 
 ## テスト
 
-ローカル：378件PASS、41件skip（実PostgreSQL）、28.14秒。Ruff・format・mypy（48ソース）PASS。初回に既存Workflowのartifact契約が失敗したため、生データ公開を戻さず停止状態だけのJSON artifactで修正し、全テストを再実行した。GitHub CIと手動実行結果は実施後に追記する。
+ローカル：381件PASS、41件skip（実PostgreSQL）、29.44秒。Ruff・format・mypy（48ソース）PASS。初回に既存Workflowのartifact契約が失敗したため、生データ公開を戻さず停止状態だけのJSON artifactで修正し、全テストを再実行した。追加PGテストのcursor誤用も修正し、実DBで41件PASSを確認した。監査の保存確認失敗を非0終了にする回帰テストも追加した。最新CI結果は完了後に追記する。
 
 Phase 5の既存377件とWeb13件を維持する。DB排他・fencing・中断・応答喪失・quota・合成売買を検証し、実相場の成功と取り違えない。
 
 新規口座は `test-phase5-real-jp` / `test-phase5-real-us`、初回のみ各100万円・USD0で準備する。prepare時にpaper-liveと既存fixture両口座の読取hashを前後比較し、既存口座を変更しない。実Supabaseの新規migrationは不要。
+
+実Supabaseでの準備：
+
+| 市場 | Workflow | 準備時刻（UTC） | 結果 |
+| --- | --- | --- | --- |
+| JP | [39010447556](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39010447556) | 2026-10-17 06:35:13.592933 | PREPARED_NOT_VALIDATED、注文0・約定0・Gemini0 |
+| US | [39010487522](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39010487522) | 2026-10-17 06:35:52.507839 | PREPARED_NOT_VALIDATED、注文0・約定0・Gemini0 |
+
+両実行で `protected_scopes_unchanged: true`、台帳照合成功。対象銘柄・実データ観測時刻・約定時刻・実相場損益はまだ存在せず、取得成功や運用利益として報告しない。
 
 ## 未実施・未確認
 

@@ -28,7 +28,15 @@ def main():
             else inspect_account(api, args.market, now)
         )
     print(json.dumps(result, ensure_ascii=False))
-    return 1 if result.get("unresolved") or result.get("stopped") else 0
+    return (
+        1
+        if (
+            result.get("unresolved")
+            or result.get("stopped")
+            or result.get("pre_migration_data_preserved") is False
+        )
+        else 0
+    )
 
 
 if __name__ == "__main__":

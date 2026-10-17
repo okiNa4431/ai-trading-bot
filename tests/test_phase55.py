@@ -278,3 +278,32 @@ def test_legacy_real_data_workflows_are_paused_before_data_or_ai_steps():
         if s.get("uses", "").startswith("actions/upload-artifact")
     ]
     assert [s["with"]["path"] for s in artifacts] == ["access-state.json"]
+
+
+@pytest.mark.parametrize("preserved,exit_code", [(True, 0), (False, 1)])
+def test_audit_exit_code_never_treats_preservation_failure_as_success(
+    monkeypatch, preserved, exit_code
+):
+    from scripts import phase55
+
+    monkeypatch.setattr("sys.argv", ["phase55.py", "--market", "JP", "--mode", "audit"])
+    monkeypatch.setattr(phase55.SupabaseAPI, "environment", lambda: object())
+    monkeypatch.setattr(
+        phase55,
+        "inspect_account",
+        lambda *args: {
+            "pre_migration_data_preserved": preserved,
+            "unresolved": 0,
+            "stopped": False,
+        },
+    )
+    assert phase55.main() == exit_code
+
+
+def test_invalid_reference_number_has_a_safe_diagnostic():
+    with pytest.raises(FXSourceError):
+        ECBDailyFXProvider.parse(
+            b'<x><Cube time="2026-10-15"><Cube currency="USD" rate="bad-number"/>'
+            b'<Cube currency="JPY" rate="300"/></Cube></x>',
+            NOW,
+        )

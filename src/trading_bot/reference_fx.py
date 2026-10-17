@@ -181,7 +181,7 @@ class ECBDailyFXProvider:
                 eur_usd=Decimal(rates["USD"]),
                 eur_jpy=Decimal(rates["JPY"]),
             )
-        except (KeyError, ValueError, ElementTree.ParseError):
+        except (KeyError, ValueError, ArithmeticError, ElementTree.ParseError):
             raise FXSourceError("invalid ECB reference data") from None
 
 

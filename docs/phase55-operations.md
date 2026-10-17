@@ -52,6 +52,8 @@ supabase db dump --db-url $env:SUPABASE_DB_URL --data-only --use-copy -f $env:PR
 
 ファイルは管理者が暗号化し、別障害領域へ保管する。checksum・取得時刻・対象DB・CLI版・暗号化鍵管理・保存期限を記録する。取込データのライセンスが定める削除義務はバックアップにも及ぶ可能性があるため、保管許諾を事前確認する。
 
+通常のCLI dumpはSupabase管理下のauth・storage等を除外する。これだけでプロジェクト全体の復元を保証しない。アプリのbot_private/publicの復元対象を明示し、AuthやStorage実体・設定・鍵の別途復旧は[CLI公式仕様](https://supabase.com/docs/reference/cli/supabase-db-dump)に従って確認する。別DBへ復元するときのdefault privilegesも検査し、匿名・認証ユーザーへprivateデータが漏れないことを実測する。
+
 復旧訓練は**別の使い捨てSupabase／PostgreSQL**で行う。対応するroles/schema/dataを公式手順に従って戻し、初期資金・口座作成日時・注文／約定ID・API予約数・データhash・台帳照合・RLS・古いtoken拒否を比較する。復元データから外部通信・注文を自動再開しない。検証できるまで元DBは変更しない。今回DB管理接続URI・保管先・暗号鍵がないため、実DBのdumpと外部復元訓練は未実施。CIのrollback/fencing試験を外部復元成功として数えない。
 
 ## GitHub Environment・企業行動
