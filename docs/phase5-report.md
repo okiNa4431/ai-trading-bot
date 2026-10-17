@@ -31,7 +31,11 @@ DB停止時の別DBへの切替はない。期限切れrunnerのmutationをDBで
 
 既存318 Python・13 Webを維持し、実DBの並列claim、runner停止、lease失効、古いtoken、DB時刻、金融commit応答喪失、API予約応答喪失、RLS、JP／US複数実行売買などを追加した。503／429／timeoutはモックで最小呼出しと枠維持を確認する。
 
-ローカル最終実行：339 passed、38 skipped（実PostgreSQL用）、29.62秒。Ruff・mypy（45ソース）とPGliteによるmigration／CAS／rollback／権限検証もPASS。実PostgreSQLテストはCIで実行し、ローカルでは環境不足によるskipと区別する。最新CI結果は実行完了後に追記する。
+ローカル最終実行：339 passed、38 skipped（実PostgreSQL用）、29.62秒。Ruff・mypy（45ソース）とPGliteによるmigration／CAS／rollback／権限検証もPASS。初回のsandbox内実行は一時ディレクトリの制約で中断し、権限を確保した再実行で上記結果を確認した。
+
+実装コミット `16aaaee` の [CI実行39004143657](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39004143657) は全4ジョブ成功。Windows／Ubuntuの共通339件、PostgreSQL 17の38件、Web 13件がPASS。Pythonの重複を除いた合計は377件（既存318件＋新規59件）。実PostgreSQLは11.55秒、Webは6.2秒。APIの実通信はCIに含めない。
+
+検証中に、合成シナリオの過去注文へ未来のFXを使う不備、JP翌営業日の最初の適格足を00:30 UTCとしていた不備を発見し修正した。paper-modeの時刻検証と欠落足検知を維持し、正しい合成時刻で日米往復を再検証した。検証条件を緩めて通していない。
 
 合成データの期待値（初期100万円）：
 
@@ -44,7 +48,7 @@ USの最終評価は固定150円/USDで1,001,173.50円。両替費用も含む�
 
 ## 実Supabase適用・完了条件
 
-追加migrationの実Supabase適用は未確認。Data APIのキーにはDDL権限がないため、所有者によるSQL Editor適用が必要。全体bootstrapではなく追加専用SQLを使う。適用後に最初に読取専用healthcheckを行い、適用前データとの一致がtrueであることを確認する。
+追加migrationは実Supabaseで未適用。[読取専用healthcheck実行39004150204](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39004150204) は `Supabase migration missing; apply tracked SQL in SQL Editor` を検出し、終了コード1で安全停止した。金融mutationは行っていない。Data APIのキーにはDDL権限がないため、所有者によるSQL Editor適用が必要。全体bootstrapではなく追加専用SQLを使う。適用後に最初に読取専用healthcheckを行い、適用前データとの一致がtrueであることを確認する。
 
 実Supabase上の5段階×日米の手動Workflow検証は、この確認後に実施する。単体テスト用のSQLite doubleやCIのPostgreSQL成功を、実Supabaseで完了したことにはしない。既存の実データが維持されたことも、適用後の検証RPCで確認するまで確定扱いにしない。
 
