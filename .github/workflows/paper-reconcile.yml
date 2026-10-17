@@ -21,9 +21,16 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: phase5-test-writer
+  group: phase5-reviewed-recovery
   cancel-in-progress: false
 jobs:
+  recovery_unavailable:
+    if: inputs.apply_review && vars.PHASE5_RECOVERY_APPROVED != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo 'Recovery is disabled. Configure the protected phase5-recovery environment before enabling administrator review.'
+          exit 1
   inspect:
     if: github.ref == 'refs/heads/main' && github.ref_protected && !inputs.apply_review
     runs-on: ubuntu-latest

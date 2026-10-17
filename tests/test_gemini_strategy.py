@@ -110,6 +110,7 @@ def test_invalid_outputs_fail_closed(setup_ai, mutation):
     [
         (TimeoutError("fake-test-secret"), "timeout"),
         (errors.ClientError(429, {"error": {"message": "fake-test-secret"}}), "rate_limit"),
+        (errors.ServerError(503, {"error": {"message": "fake-test-secret"}}), "api_error"),
     ],
 )
 def test_timeout_and_rate_limit_never_leak_or_fallback(setup_ai, failure, category, caplog):

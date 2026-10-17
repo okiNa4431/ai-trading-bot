@@ -22,6 +22,51 @@ def fingerprint(value: object) -> str:
     return hashlib.sha256(json.dumps(value, sort_keys=True, default=str).encode()).hexdigest()
 
 
+def health_summary(state: dict[str, Any], at: datetime) -> dict[str, object]:
+    at = utc(at)
+    unresolved = [
+        r
+        for r in state["runs"]
+        if r["state"] in ("FAILED", "PARTIAL", "NEEDS_REVIEW")
+        or (r["state"] == "RUNNING" and utc(datetime.fromisoformat(r["lease_until"])) < at)
+    ]
+    ages = []
+    for key, value in state["data"].items():
+        if key.startswith("bars:") and ":1h:" in key and value.get("watermark"):
+            ages.append((at - utc(datetime.fromisoformat(value["watermark"]))).total_seconds())
+    fx = state["data"].get("fx:USDJPY")
+    fx_state = "MISSING"
+    if fx:
+        try:
+            quote = utc(datetime.fromisoformat(fx["rate"]["timestamp"]))
+            observed = utc(datetime.fromisoformat(fx["observed_at"]))
+            age = (at - quote).total_seconds()
+            fx_state = (
+                "FRESH" if 0 <= age <= 3600 and quote <= observed <= at else "STALE_OR_FUTURE"
+            )
+        except (KeyError, ValueError, TypeError):
+            fx_state = "INVALID"
+    return {
+        "stopped": state["stopped"],
+        "runs": len(state["runs"]),
+        "unresolved": len(unresolved),
+        "active": sum(r["state"] == "RUNNING" and r not in unresolved for r in state["runs"]),
+        "last_error_stages": [
+            {
+                "stage": r["stage"],
+                "state": r["state"],
+                "error_code": (r.get("outcome") or {}).get("error_code"),
+            }
+            for r in unresolved[-5:]
+        ],
+        "quote_partitions": len(ages),
+        "oldest_watermark_age_seconds": max(ages) if ages else None,
+        "fx_state": fx_state,
+        "scheduled": False,
+        "public_promotion": False,
+    }
+
+
 def market_slot(
     market: Market, at: datetime, kind: Literal["decision", "execute", "observe"]
 ) -> str:

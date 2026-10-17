@@ -1,5 +1,6 @@
 """Manual test-account cycle. Registration and execution are distinct operations."""
 
+import os
 from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
@@ -30,6 +31,19 @@ class TestProposal:
         self.action = action
 
     def decide(self, context: DecisionContext) -> DecisionResult:
+        fx = context.fx.usd_jpy if context.fx else Decimal(1)
+        affordable = next(
+            (
+                c.instrument.symbol
+                for c in context.screening.candidates
+                if c.features
+                and Decimal(str(c.features.mark.price))
+                * context.rules.lot(c.instrument)
+                * (fx if c.instrument.currency == "USD" else Decimal(1))
+                <= context.account.initial_jpy * Decimal("0.05")
+            ),
+            None,
+        )
         return DecisionResult(
             market=context.market,
             market_summary="Isolated controlled mock proposal",
@@ -37,12 +51,14 @@ class TestProposal:
                 ActionDecision(
                     symbol=c.instrument.symbol,
                     action=self.action
-                    if (self.action != "BUY" or i == 0) and c.features
+                    if (self.action != "BUY" or c.instrument.symbol == affordable) and c.features
                     else "HOLD",
-                    target_weight=0.05 if self.action == "BUY" and i == 0 else 0,
+                    target_weight=0.05
+                    if self.action == "BUY" and c.instrument.symbol == affordable
+                    else 0,
                     reason="Explicit isolated integration mock",
                 )
-                for i, c in enumerate(context.screening.candidates)
+                for c in context.screening.candidates
             ],
         )
 
@@ -93,6 +109,14 @@ def run_cycle(
     historical_replay: bool = False,
     fund_jpy: Decimal = Decimal(0),
 ) -> dict[str, object]:
+    if historical_replay and provider != "mock":
+        raise ValueError("synthetic fixture replay must never call Gemini")
+    if provider == "gemini" and (settings.retries != 0 or settings.max_requests_per_run != 1):
+        raise ValueError("Phase 5 Gemini must use one request and zero retries")
+    if fund_jpy and (
+        kind != "decision" or not submit or market != "US" or fund_jpy != Decimal("100000")
+    ):
+        raise ValueError("explicit test funding requires a submitted US decision")
     metadata: dict[str, object] = {
         "market": market,
         "kind": kind,
@@ -102,15 +126,21 @@ def run_cycle(
         "historical_replay": historical_replay,
         "fund_jpy": str(fund_jpy),
         "mock_action": getattr(strategy, "action", None),
+        "implementation_sha": os.environ.get("GITHUB_SHA", "local"),
+        "instruments": [i.model_dump(mode="json") for i in instruments],
     }
     if not operation.claim(owner, metadata):
         return {"state": "ALREADY_COMPLETED", "run_id": operation.run_id}
     broker = PaperBroker(operation.repository)
     before_executions = 0
+    before_account = None
+    before_orders = 0
     try:
         # Test-only creation, idempotent. Never run against paper-live.
         broker.initialize(initialization_at or clock())
         before_executions = len(broker.get_executions())
+        before_account = broker.get_balance()
+        before_orders = len(broker.get_orders())
         operation.step(1)
         fx = prepare(broker)
         operation.step(2)
@@ -202,7 +232,11 @@ def run_cycle(
         return result
     except Exception as exc:
         try:
-            changed = len(broker.get_executions()) != before_executions
+            changed = (
+                len(broker.get_executions()) != before_executions
+                or len(broker.get_orders()) != before_orders
+                or (before_account is not None and broker.get_balance() != before_account)
+            )
             operation.step(
                 operation.stage,
                 "PARTIAL" if changed else "NEEDS_REVIEW",

@@ -6,17 +6,20 @@ from decimal import Decimal
 from pathlib import Path
 
 from trading_bot.cycle import TestProposal, run_cycle
-from trading_bot.operations import Operation
+from trading_bot.operations import Operation, test_scope
 from trading_bot.portfolio.models import FXRate
 from trading_bot.storage import ParquetStore
 
 
-def fixture(api, market, step, directory):
+def fixture(api, market, step, directory, account=None):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
     from tests.ai_helpers import JP, NOW, US, ai_settings, histories
 
     instrument = JP if market == "JP" else US
-    account = "test-phase5-fixture-" + market.lower()
+    account = account or "test-phase5-fixture-" + market.lower()
+    test_scope(account)
+    if not account.startswith("test-phase5-fixture-" + market.lower()):
+        raise ValueError("synthetic fixtures require a separate per-market fixture account")
     op = Operation(api, account, f"synthetic-fixture:{market}:{step}")
     if step > 1 and not any(
         r["run_id"] == f"synthetic-fixture:{market}:{step - 1}" and r["state"] == "SUCCEEDED"

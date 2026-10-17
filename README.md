@@ -334,3 +334,30 @@ PagesはURLとPublishable Keyだけを環境変数から生成し、Secret Key�
 Geminiの推定費用はconfig/ai.yamlの標準有料料金（入力0.30 USD/100万、出力2.50 USD/100万）×SDKの入力・総トークン差からDecimalで計算します。これは無料枠適用後の実請求額ではなく有料換算の参考値です。メタデータ不明ならnull。モデル変更時は公式料金表を確認して単価も変更してください。
 
 Phase 4以降、従来のTest Gemini decisionの実Geminiモードもtest-gemini-smokeという隔離Supabase口座を利用し、共有API枠を経由します。旧SQLiteの使い捨て枠でホスト上の上限を迂回しません。mockは従来どおり通信なしの使い捨てテストです。
+
+# Phase 5：手動・隔離口座限定
+
+追加SQLは [影響範囲](docs/phase5-migration-impact.md)を確認したうえで、SQL Editorで `supabase/phase5-upgrade.sql` を適用します。既存口座をリセットせず、非公開の適用前コピーを作成します。Data APIキーではDDLを実行できません。
+
+**新Workflowはすべてworkflow_dispatchのみ。cronはありません。** `paper-live` の注文・約定・資金移動は新経路でも旧RPCでもDBが拒否します。Phase 5は `test-phase5-*` だけで動作します。
+
+```text
+gh workflow run paper-healthcheck.yml -f account=test-phase5-manual
+gh workflow run paper-cycle.yml -f mode=cycle -f market=US -f kind=observe
+```
+
+通常の `cycle` は実Yahoo株価とUSD/JPYを使い、市場セッション・実行時間帯外ではSKIPPEDです。初期値はobserve / mock / submit=false。判断はセッション終了75分後から30分以内、約定処理は取引時間と確定足取得を考慮します。日米各2銘柄＋保有/未約定銘柄に限定し、原データは公開せず非公開DBの世代管理付きJSONに保存します。大きいユニバースや定期取得を始める前に容量・転送量と利用条件を再確認してください。
+
+`kind=decision` / `submit=true` でtest口座へ仮想注文を登録します。米株用の初回仮想両替が必要な場合のみ、`fund_jpy=100000` を明示します（初期値0）。`kind=execute` / `submit=true` を**別実行**し、注文時刻後に開始した確定バーで約定します。適格バーがなければPENDINGを維持し、必要なバーが欠落していれば停止します。同じslotの再実行や異なる設定での再利用で新規注文を増やしません。
+
+休場日にも行える合成データの統合検証は、`mode=fixture` で明確に区別します。実市場の運用実績ではありません。
+
+```text
+gh workflow run paper-cycle.yml -f mode=fixture -f market=JP -f fixture_step=1
+```
+
+同じコミットでstepを1→2→3→4→5と、前の成功を確認して別々に起動します。順にBUY登録/PENDING→BUY約定→HOLD→SELL登録/PENDING→SELL約定です。USも同様。初期対象は `test-phase5-fixture-jp` / `test-phase5-fixture-us`。新しい検証系列が必要なら `account=test-phase5-fixture-jp-v2` のような専用口座を明示し、過去の記録は消しません。合成価格・合成FXのみで、Geminiは呼びません。
+
+`paper-reconcile.yml` は初期状態では読取照合だけです。復旧mutationはRepository Variable `PHASE5_RECOVERY_APPROVED=true` と、required reviewersを設定した `phase5-recovery` Environmentを管理者が構成した後に限ります。初期状態では有効化していません。`apply_review=true`、対象run_id、調査理由を指定し、resume=falseで停止、resume=trueで調査済みの試行をSKIPPEDとして閉じて将来の別slotを許可します。古い試行を再送/再約定する操作ではなく、共有API枠も返却しません。
+
+Supabase障害・期限切れ・通信結果不明は別DBへfallbackせず停止。未解決試行は新しいIDでも再実行できません。企業行動は検出して停止する段階であり、分割調整や配当入金の自動会計は行いません。オルカン初回適用NAV待ち・未許諾データの非公開を維持します。

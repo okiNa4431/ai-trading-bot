@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import logging
 import os
 import tempfile
 from datetime import UTC, datetime
@@ -14,8 +15,8 @@ from trading_bot.broker.paper import PaperBroker
 from trading_bot.config import load_settings, load_universe
 from trading_bot.cycle import TestProposal, run_cycle
 from trading_bot.market_inputs import YahooInputs, update_inputs
-from trading_bot.operations import Operation, market_slot, test_scope
-from trading_bot.persistence.supabase_repository import SupabaseAPI
+from trading_bot.operations import Operation, health_summary, market_slot, test_scope
+from trading_bot.persistence.supabase_repository import SupabaseAPI, SupabaseError
 from trading_bot.phase4_cli import verify
 from trading_bot.portfolio.valuation import validate_fx
 from trading_bot.provider import YahooFinanceProvider
@@ -24,6 +25,8 @@ from trading_bot.strategy.models import AISettings
 
 
 def main():
+    for name in ("yfinance", "curl_cffi", "google_genai", "google.genai", "httpx", "httpcore"):
+        logging.getLogger(name).setLevel(logging.CRITICAL)
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--mode", choices=["cycle", "health", "reconcile", "fixture"], default="health"
@@ -49,7 +52,13 @@ def main():
         from phase5_fixture import fixture
 
         with tempfile.TemporaryDirectory() as directory:
-            result = fixture(api, args.market, args.fixture_step, directory)
+            result = fixture(
+                api,
+                args.market,
+                args.fixture_step,
+                directory,
+                account=None if args.account == "test-phase5-manual" else args.account,
+            )
         print(json.dumps(result))
         return 0
     op = Operation(api, args.account, args.run_id)
@@ -75,28 +84,24 @@ def main():
                     "p_stop": not args.resume,
                 },
             )
+            state = op.read()
         now = datetime.now(UTC)
-        unresolved = [
-            r
-            for r in state["runs"]
-            if r["state"] in ("FAILED", "PARTIAL", "NEEDS_REVIEW")
-            or (r["state"] == "RUNNING" and datetime.fromisoformat(r["lease_until"]) < now)
-        ]
+        health = health_summary(state, now)
+        preserved = api.rpc("bot_operation_preserved", {})
         print(
             json.dumps(
                 {
-                    "stopped": state["stopped"],
-                    "runs": len(state["runs"]),
-                    "unresolved": len(unresolved),
+                    **health,
                     "initialized": initialized,
                     "verified": verify(op.repository)["verified"] if initialized else None,
                     "scheduled": False,
                     "public_promotion": False,
-                    "pre_migration_data_preserved": api.rpc("bot_operation_preserved", {}),
+                    "pre_migration_data_preserved": preserved,
+                    "order_authorization": "not_granted_by_healthcheck",
                 }
             )
         )
-        return 1 if unresolved else 0
+        return 1 if health["unresolved"] or state["stopped"] or not preserved else 0
     now = datetime.now(UTC)
     try:
         slot = market_slot(args.market, now, args.kind)
@@ -105,8 +110,11 @@ def main():
         return 0
     op = Operation(api, args.account, slot)
     instruments = [
-        i for i in load_universe(Path("config/universe.yaml")) if i.market == args.market
-    ][:2]
+        i
+        for i in load_universe(Path("config/universe.yaml"))
+        if i.market == args.market
+        and i.symbol in ({"9432.T", "7203.T"} if args.market == "JP" else {"AAPL", "MSFT"})
+    ]
     # Read is allowed before claim; all mutation is fenced after run_cycle claims.
     with op.repository.transaction() as tx:
         account = tx.account() if tx.initialized() else None
@@ -193,6 +201,7 @@ if __name__ == "__main__":
                 {
                     "state": "FAILED_OR_UNKNOWN",
                     "error_code": type(exc).__name__,
+                    "diagnostic": str(exc) if isinstance(exc, SupabaseError) else "",
                     "action": "inspect retained operation; no automatic replay",
                 }
             )

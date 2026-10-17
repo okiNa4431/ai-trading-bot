@@ -2,11 +2,11 @@
 
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
-from typing import Protocol
+from typing import Literal, Protocol
 from zoneinfo import ZoneInfo
 
 import yfinance as yf
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 
 from trading_bot.broker.execution import window
 from trading_bot.config import Instrument, Interval
@@ -22,7 +22,15 @@ class FXObservation(Contract):
     observed_at: datetime
     symbol: str = "JPY=X"
     provider: str = "yahoo"
+    base_currency: Literal["USD"] = "USD"
+    quote_currency: Literal["JPY"] = "JPY"
     _time = field_validator("observed_at")(utc)
+
+    @model_validator(mode="after")
+    def consistent(self) -> "FXObservation":
+        if self.rate.timestamp > self.observed_at or self.rate.source != "observed":
+            raise ValueError("real FX requires a quote observed after its own timestamp")
+        return self
 
 
 class CorporateAction(Contract):
@@ -30,7 +38,7 @@ class CorporateAction(Contract):
     effective_date: date
     split: Decimal = Field(ge=0)
     dividend: Decimal = Field(ge=0)
-    currency: str
+    currency: Literal["JPY", "USD"]
     observed_at: datetime
     _time = field_validator("observed_at")(utc)
 
@@ -120,11 +128,36 @@ def update_inputs(
     Preserve successful symbols when another symbol fails; caller must not trade
     from an incomplete set. Failed action coverage is NOT an empty event list.
     """
+    at = utc(at)
     saved = operation.read()["data"]
     failures = []
     for instrument in instruments:
         try:
+            prior_actions = saved.get("actions:" + instrument.symbol)
+            covered_from = (
+                datetime.fromisoformat(prior_actions["observed_at"])
+                if prior_actions
+                else account_started
+            )
+            if at - utc(covered_from) > timedelta(days=60):
+                raise ValueError("corporate action history gap requires explicit backfill")
             events = actions.fetch_actions(instrument, at)
+            # An unresolved split/dividend must not disappear as the source window rolls.
+            if prior_actions:
+                previous = [CorporateAction.model_validate(r) for r in prior_actions["events"]]
+                unique: dict[tuple[str, date, Decimal, Decimal], CorporateAction] = {}
+                for event in previous + events:
+                    unique.setdefault(
+                        (event.symbol, event.effective_date, event.split, event.dividend), event
+                    )
+                events = list(unique.values())
+            for event in events:
+                CorporateAction.model_validate(event.model_dump())
+                if (event.symbol, event.currency) != (
+                    instrument.symbol,
+                    instrument.currency,
+                ) or event.observed_at > datetime.now(UTC):
+                    raise ValueError("corporate action provenance mismatch")
             operation.data(
                 "actions:" + instrument.symbol,
                 {
@@ -141,9 +174,9 @@ def update_inputs(
                 old = saved.get(key)
                 existing: list[PriceBar] = []
                 if old:
-                    if fingerprint(old["bars"]) != old["sha256"]:
-                        raise ValueError("stored data digest mismatch")
                     existing = [PriceBar.model_validate(r) for r in old["bars"]]
+                    if fingerprint([b.model_dump(mode="json") for b in existing]) != old["sha256"]:
+                        raise ValueError("stored data digest mismatch")
                     store.save(instrument, typed, existing)
                 lookback = timedelta(days=90 if interval == "1d" else 30)
                 start = (

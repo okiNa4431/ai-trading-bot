@@ -42,6 +42,32 @@ class MemoryOperation:
         self.saved[key] = payload
 
 
+def test_unresolved_action_is_retained_after_source_window_rolls(tmp_path):
+    op = MemoryOperation(None, "retained-action")
+    event = CorporateAction(
+        symbol=JP.symbol,
+        effective_date=(NOW - timedelta(days=61)).date(),
+        split=2,
+        dividend=0,
+        currency="JPY",
+        observed_at=NOW - timedelta(days=60),
+    )
+    op.saved["actions:" + JP.symbol] = {
+        "events": [event.model_dump(mode="json")],
+        "observed_at": (NOW - timedelta(days=1)).isoformat(),
+    }
+
+    class Actions:
+        def fetch_actions(self, *args):
+            return []
+
+    with pytest.raises(ValueError):
+        update_inputs(
+            op, ParquetStore(tmp_path), [JP], None, Actions(), NOW, NOW - timedelta(days=90)
+        )
+    assert len(op.saved["actions:" + JP.symbol]["events"]) == 1
+
+
 @pytest.mark.parametrize("account", ["paper-live", "test-other", "test-phase5-", "../paper-live"])
 def test_production_scopes_never_enter_cycle(account):
     with pytest.raises(ValueError):
@@ -261,3 +287,178 @@ def test_workflow_fixture_input_sequence_offline(tmp_path, monkeypatch, market):
     results = [module.fixture(None, market, step, tmp_path / str(step)) for step in range(1, 6)]
     assert [r["executions"] for r in results] == [0, 1, 1, 1, 2]
     assert [r["pending"] for r in results] == [1, 0, 0, 1, 0]
+
+
+@pytest.mark.parametrize(
+    "age,expected",
+    [(0, "FRESH"), (3600, "FRESH"), (3601, "STALE_OR_FUTURE"), (-1, "STALE_OR_FUTURE")],
+)
+def test_health_separates_fx_quote_age_from_download_time(age, expected):
+    from trading_bot.operations import health_summary
+
+    state = {
+        "runs": [],
+        "stopped": False,
+        "data": {
+            "fx:USDJPY": {
+                "rate": {"timestamp": (NOW - timedelta(seconds=age)).isoformat()},
+                "observed_at": NOW.isoformat(),
+            }
+        },
+    }
+    assert health_summary(state, NOW)["fx_state"] == expected
+
+
+def test_health_detects_dead_runner_without_claiming_unknown_success():
+    from trading_bot.operations import health_summary
+
+    state = {
+        "runs": [
+            {
+                "state": "RUNNING",
+                "stage": 4,
+                "outcome": None,
+                "lease_until": (NOW - timedelta(seconds=1)).isoformat(),
+            }
+        ],
+        "stopped": False,
+        "data": {},
+    }
+    summary = health_summary(state, NOW)
+    assert summary["unresolved"] == 1 and summary["active"] == 0
+    assert state["runs"][0]["state"] == "RUNNING"
+
+
+def test_fx_provenance_cannot_use_simulation_or_inverse_currency():
+    from trading_bot.market_inputs import FXObservation
+
+    rate = FXRate(usd_jpy=150, timestamp=NOW, source="fixed-simulation")
+    with pytest.raises(ValueError):
+        FXObservation(rate=rate, observed_at=NOW)
+    rate = rate.model_copy(update={"source": "observed"})
+    with pytest.raises(ValueError):
+        FXObservation(rate=rate, observed_at=NOW - timedelta(seconds=1))
+    with pytest.raises(ValueError):
+        FXObservation(rate=rate, observed_at=NOW, base_currency="JPY", quote_currency="USD")
+
+
+def test_missing_first_future_bar_is_not_replaced_with_later_price():
+    from trading_bot.cycle import require_execution_coverage
+
+    # Use a real contract, but an intentionally empty synthetic history.
+    from trading_bot.portfolio.models import Order, TradingRules
+
+    o = Order(
+        order_id="missing",
+        symbol=JP.symbol,
+        market="JP",
+        currency="JPY",
+        side="BUY",
+        quantity=100,
+        requested_at=NOW,
+        costs=TradingRules(),
+    )
+    with pytest.raises(ValueError, match="missing required"):
+        require_execution_coverage(o, [], NOW.replace(hour=5, minute=35))
+
+
+def test_incremental_inputs_survive_a_fresh_runner_and_preserve_history(tmp_path):
+    op = MemoryOperation(None, "fetch")
+
+    class Actions:
+        def fetch_actions(self, instrument, at):
+            return []
+
+    class Prices:
+        def __init__(self):
+            self.starts = []
+
+        def fetch(self, instrument, start, end, interval):
+            self.starts.append((interval, start))
+            return histories()[interval]
+
+    source = Prices()
+    for name in ["first-runner", "second-runner"]:
+        update_inputs(
+            op,
+            ParquetStore(tmp_path / name),
+            [JP],
+            source,
+            Actions(),
+            NOW,
+            NOW - timedelta(days=30),
+        )
+    key = "bars:JP:7203.T:1d:yahoo:raw"
+    assert len(op.saved[key]["bars"]) == 21
+    assert source.starts[2][1] == histories()["1d"][-5].timestamp
+    op.saved[key]["sha256"] = "tampered"
+    with pytest.raises(ValueError):
+        update_inputs(
+            op,
+            ParquetStore(tmp_path / "corrupt"),
+            [JP],
+            source,
+            Actions(),
+            NOW,
+            NOW - timedelta(days=30),
+        )
+
+
+def test_one_bad_symbol_keeps_other_successful_data_but_blocks_cycle(tmp_path):
+    from tests.ai_helpers import US
+
+    op = MemoryOperation(None, "partial")
+
+    class Actions:
+        def fetch_actions(self, instrument, at):
+            return []
+
+    class Prices:
+        def fetch(self, instrument, start, end, interval):
+            if instrument.market == "US":
+                raise TimeoutError()
+            return histories()[interval]
+
+    with pytest.raises(ValueError):
+        update_inputs(
+            op, ParquetStore(tmp_path), [JP, US], Prices(), Actions(), NOW, NOW - timedelta(days=30)
+        )
+    assert "bars:JP:7203.T:1d:yahoo:raw" in op.saved
+    assert "bars:US:AAPL:1d:yahoo:raw" not in op.saved
+
+
+@pytest.mark.parametrize(
+    "filename", ["paper-cycle.yml", "paper-healthcheck.yml", "paper-reconcile.yml"]
+)
+def test_manual_workflows_cannot_enable_a_schedule(filename):
+    from pathlib import Path
+
+    import yaml
+
+    document = yaml.safe_load((Path(".github/workflows") / filename).read_text(encoding="utf-8"))
+    triggers = document.get("on", document.get(True))
+    assert set(triggers) == {"workflow_dispatch"}
+    assert document["permissions"] == {"contents": "read"}
+    defaults = triggers["workflow_dispatch"]["inputs"]
+    assert defaults["account"]["default"].startswith("test-phase5-")
+    if filename == "paper-cycle.yml":
+        assert defaults["provider"]["default"] == "mock"
+        assert defaults["submit"]["default"] is False
+    if filename == "paper-reconcile.yml":
+        assert defaults["apply_review"]["default"] is False
+        assert document["jobs"]["reviewed_recovery"]["environment"] == "phase5-recovery"
+
+
+def test_phase5_gemini_retry_override_is_rejected_before_database_or_network():
+    with pytest.raises(ValueError, match="one request"):
+        run_cycle(
+            None,
+            None,
+            [],
+            "JP",
+            ai_settings(retries=1),
+            kind="decision",
+            owner="bad",
+            provider="gemini",
+            prepare=lambda b: None,
+        )

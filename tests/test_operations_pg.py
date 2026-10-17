@@ -192,3 +192,81 @@ def test_actual_pg_separate_test_cycle_operations(phase5_uri, tmp_path, market):
     assert outcomes[3]["pending"] == 1
     assert outcomes[4]["executions"] == 2 and outcomes[4]["pending"] == 0
     assert fixture(api, market, 5, tmp_path / "retry")["state"] == "ALREADY_COMPLETED"
+    repo = SupabaseRepository(api, "test-phase5-fixture-" + market.lower(), test=True)
+    account = PaperBroker(repo).get_balance()
+    from decimal import Decimal
+
+    assert all(p.quantity == 0 for p in account.positions.values())
+    if market == "JP":
+        assert account.balances["JPY"] == Decimal("1001898")
+        assert account.realized_pnl["JPY"] == Decimal("1898")
+    else:
+        assert account.balances == {"JPY": Decimal("900000"), "USD": Decimal("674.49")}
+        assert account.realized_pnl["USD"] == Decimal("9.49")
+    print("SYNTHETIC fixture", market, "cash", account.balances, "realized", account.realized_pnl)
+
+
+def test_commit_succeeded_but_response_lost_is_not_replayed(operation):
+    class LostReply(PGAPI):
+        def rpc(self, name, body):
+            result = super().rpc(name, body)
+            if name == "bot_operation_commit":
+                raise TimeoutError("simulated reply loss after committed transaction")
+            return result
+
+    op = Operation(LostReply(operation.api.uri), operation.account, "unknown-commit")
+    op.claim("runner", {})
+    with pytest.raises(TimeoutError):
+        PaperBroker(op.repository).initialize(datetime.now(UTC) - timedelta(days=1))
+    # Read proves the commit occurred. Never create another run / reset the account.
+    assert PaperBroker(op.repository).get_balance().initial_jpy == 1000000
+    with pytest.raises(psycopg.Error):
+        Operation(op.api, op.account, op.run_id).claim("retry", {})
+    with pytest.raises(psycopg.Error):
+        Operation(op.api, op.account, "new-id").claim("retry", {})
+
+
+def test_quota_reserved_but_response_lost_remains_consumed(operation):
+    from tests.ai_helpers import ai_settings
+    from trading_bot.persistence.decision_repository import DecisionRepository
+    from trading_bot.strategy.models import DecisionRun
+
+    op = operation
+    op.claim("runner", {})
+    PaperBroker(op.repository).initialize(datetime.now(UTC) - timedelta(days=1))
+    record = DecisionRun(
+        decision_id="lost-api",
+        market="JP",
+        provider="gemini",
+        model="model",
+        prompt_version="test",
+        input_hash="",
+        account_hash="",
+        as_of=datetime.now(UTC),
+        started_at=datetime.now(UTC),
+    )
+    DecisionRepository(op.repository).claim(record)
+
+    class LostReply(PGAPI):
+        def rpc(self, name, body):
+            result = super().rpc(name, body)
+            if name == "bot_operation_reserve":
+                raise TimeoutError("reserved but reply lost; do not send Gemini")
+            return result
+
+    op.api = LostReply(op.api.uri)
+    with pytest.raises(TimeoutError):
+        op.repository.reserve_api("lost-api", ai_settings())
+    assert len(DecisionRepository(op.repository).usage("lost-api")) == 1
+    with pytest.raises(psycopg.Error):
+        op.repository.reserve_api("lost-api", ai_settings())
+
+
+@pytest.mark.parametrize("role", ["anon", "authenticated", "service_role"])
+def test_private_operation_tables_are_not_directly_accessible(operation, role):
+    from psycopg import sql
+
+    with psycopg.connect(operation.api.uri) as c:
+        c.execute(sql.SQL("set role {}").format(sql.Identifier(role)))
+        with pytest.raises(psycopg.Error):
+            c.execute("select * from bot_private.operation_runs")
