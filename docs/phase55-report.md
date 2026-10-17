@@ -25,7 +25,9 @@
 
 ## テスト
 
-ローカル：384件PASS、41件skip（実PostgreSQL）、28.88秒。Ruff・format・mypy（48ソース）PASS。初回に既存Workflowのartifact契約が失敗したため、生データ公開を戻さず停止状態だけのJSON artifactで修正し、全テストを再実行した。追加PGテストのcursor誤用も修正し、実DBで41件PASSを確認した。監査の保存確認失敗を非0終了にする回帰テストも追加した。最新CI結果は完了後に追記する。
+ローカル：384件PASS、41件skip（実PostgreSQL）、28.88秒。Ruff・format・mypy（48ソース）PASS。初回に既存Workflowのartifact契約が失敗したため、生データ公開を戻さず停止状態だけのJSON artifactで修正し、全テストを再実行した。追加PGテストのcursor誤用も修正し、実DBで41件PASSを確認した。監査の保存確認失敗を非0終了にする回帰テストも追加した。
+
+実装 `974ee60` の [CI 39011031476](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39011031476) はWindows・Ubuntu・PostgreSQL・Webの全4ジョブ成功。Pythonは共通384件＋PostgreSQL41件＝**425件PASS（既存377件＋追加48件）**、Webは13件PASS。API通信はCIに含めず、停止境界をモックで無効化したAdapter単体試験でもconftestが実通信を禁止している。デフォルト停止と上流呼出し0件を別の試験で確認した。
 
 Phase 5の既存377件とWeb13件を維持する。DB排他・fencing・中断・応答喪失・quota・合成売買を検証し、実相場の成功と取り違えない。
 
@@ -39,6 +41,8 @@ Phase 5の既存377件とWeb13件を維持する。DB排他・fencing・中断�
 | US | [39010487522](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39010487522) | 2026-10-17 06:35:52.507839 | PREPARED_NOT_VALIDATED、注文0・約定0・Gemini0 |
 
 両実行で `protected_scopes_unchanged: true`、台帳照合成功。対象銘柄・実データ観測時刻・約定時刻・実相場損益はまだ存在せず、取得成功や運用利益として報告しない。
+
+将来の対象候補は既存設定のJP `9432.T` / `7203.T`、US `AAPL` / `MSFT`。今回これらを実収集したという意味ではない。新Providerの銘柄識別・coverageと実レスポンスの互換性は、許諾と接続有効化後に検証する必要がある。
 
 | 追加確認 | Workflow | 実結果 |
 | --- | --- | --- |
