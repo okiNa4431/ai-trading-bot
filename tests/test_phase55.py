@@ -124,7 +124,7 @@ def test_fx_transport_is_bounded_and_never_logs_upstream_body(status, caplog):
             status, text="secret-upstream-body", headers={"location": "https://other.invalid"}
         )
 
-    with httpx.Client(transport=httpx.MockTransport(response)) as client:
+    with httpx.Client(transport=httpx.MockTransport(response), follow_redirects=True) as client:
         with pytest.raises(FXSourceError) as error:
             get_document(
                 "https://example.invalid",

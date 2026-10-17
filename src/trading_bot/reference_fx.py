@@ -37,7 +37,9 @@ def get_document(
             with httpx.Client(trust_env=False, follow_redirects=False) as owned:
                 return get_document(url, client=owned, headers=headers, params=params)
         # Streaming limit also bounds an unexpected error document.
-        with client.stream("GET", url, headers=headers, params=params, timeout=20) as response:
+        with client.stream(
+            "GET", url, headers=headers, params=params, timeout=20, follow_redirects=False
+        ) as response:
             if response.status_code != 200:
                 raise FXSourceError(f"FX provider rejected request (HTTP {response.status_code})")
             chunks = bytearray()

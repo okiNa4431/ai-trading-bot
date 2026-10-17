@@ -302,7 +302,12 @@ def test_phase55_monitoring_sql_is_read_only_and_reports_global_reservations(pha
     with psycopg.connect(phase5_uri) as c:
         # Read-only PostgreSQL transaction rejects mutations, even via accidental functions.
         c.execute("set transaction read only")
-        c.execute(
+        cursor = c.execute(
             Path("supabase/phase55-monitoring.sql").read_text(encoding="utf-8"), prepare=False
         )
-        assert c.fetchone() is not None
+        size = cursor.fetchone()
+        assert size is not None and size[1] > 0 and size[3] > 0
+        assert cursor.nextset()
+        usage = cursor.fetchone()
+        assert usage is not None and all(value >= 0 for value in usage[1:])
+        assert cursor.nextset() is None
