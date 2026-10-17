@@ -64,6 +64,18 @@ USの最終評価は固定150円/USDで1,001,173.50円。両替費用も含む�
 
 完了した同一実行IDを別Workflowで再起動した [JP 39008076452](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39008076452)、[US 39008099019](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39008099019) は、どちらも `ALREADY_COMPLETED` で正常終了。完了slotを再処理しないことを実サービスでも確認した。
 
+実行commitは全12回とも `5973922`。実装SHAも設定として固定するため、commit変更後に同じslotを再処理しようとすると設定差異として拒否する。変更版を再試験する場合は別のfixture口座を明示し、既存口座をリセットしない。
+
+最終の読取専用監査：
+
+- [JP health＋残高39008145089](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39008145089)：5実行、未解決0、JPY 1,001,898、USD 0、保有0、実現損益JPY 1,898。
+- [US health＋残高39008146437](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39008146437)：5実行、未解決0、JPY 900,000、USD 674.49、保有0、実現損益USD 9.49。
+- 両監査で台帳照合成功、`pre_migration_data_preserved: true`。上記の合成期待値と実Supabaseの残高が一致した。固定為替のテスト入力は実為替の永続観測として登録せず、healthは `fx_state: MISSING` を報告する。リアル市場の売買可否を示す結果ではない。
+- [読取専用照合39008148065](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39008148065)：未解決0、既存データ保持true。管理者停止／再開を実サービスに注入する復旧操作は実施していない。復旧・fencingの障害注入はCIの使い捨てPostgreSQLで行った。
+- [実時刻の休場確認39008149757](https://github.com/okiNa4431/ai-trading-bot/actions/runs/39008149757)：2026-10-17土曜日のJP observeをSKIPPED、注文なし。時刻を偽って実相場注文を作っていない。
+
+**判定：手動・隔離口座の合成データによる永続売買サイクルはPASS。実相場による日米の往復検証は未完了、定期自動運用は開始不可。**
+
 ## 残存条件
 
 現段階で定期運用開始は不可。実相場を使った新規判断から翌営業日の後続足約定までの検証は、市場の実行窓に合わせて別途確認する。復旧Environmentの管理者承認設定、外部バックアップと復旧訓練、総容量監視、実行欠落の外部監視も定期運用前の条件とする。テスト成功だけでscheduleや継続口座への注文を有効化しない。
