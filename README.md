@@ -4,7 +4,7 @@ Geminiが日本株・米国株を仮想売買するポートフォリオと、�
 
 ## Phase 5.5：実市場データ取得は停止中
 
-初期運用候補はUS 5〜10銘柄・15分取得／1時間AI判断です。[設計・無料枠試算](docs/us-hourly-plan.md)と[提供元への問い合わせ下書き](docs/us-hourly-provider-inquiries.md)を追加しました。新構成はmockでのみ検証し、既存のAPI上限・実データ停止・cron無効を維持します。
+初期運用候補はUS 5〜10銘柄・15分取得／1時間AI判断です。[設計・無料枠試算](docs/us-hourly-plan.md)と[提供元への問い合わせ下書き](docs/us-hourly-provider-inquiries.md)を追加しました。新構成はmockでのみ検証します。利用者承認によりBot側のAI上限は8回/日・200回/月へ変更し、実API通信・実データ取得・cronは有効化していません。
 
 利用者の指示により、許諾確認・接続の再審査までは実相場の売買cycle、データ取得Workflow、実データを使うGemini試験を拒否します。環境変数やWorkflow入力で解除できません。合成fixture・CI・読取監査は利用できます。以下の過去の取得例は、現段階での起動許可ではありません。
 

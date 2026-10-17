@@ -9,9 +9,32 @@ from pydantic import ValidationError
 
 from trading_bot.data_access import MarketAccessDisabled, require_live_market_access
 from trading_bot.hourly_plan import FeatureProposal, USHourlyPlan, budget, hourly_features, slots
+from trading_bot.persistence.decision_repository import DecisionRepository
+from trading_bot.persistence.sqlite_repository import SQLiteRepository
+from trading_bot.strategy.models import AISettings
 
 FIVE = ("AAPL", "MSFT", "AMZN", "GOOGL", "META")
 TEN = FIVE + ("NVDA", "TSLA", "JPM", "V", "COST")
+
+
+def test_approved_ai_budget_preserves_existing_reservations(tmp_path):
+    settings = AISettings.model_validate(
+        yaml.safe_load(Path("config/ai.yaml").read_text(encoding="utf-8"))
+    )
+    assert (settings.daily_request_limit, settings.monthly_request_limit) == (8, 200)
+    defaults = AISettings(model=settings.model, approved_free_models=[settings.model])
+    assert defaults.daily_request_limit == 8 and defaults.monthly_request_limit == 200
+    ledger = DecisionRepository(SQLiteRepository(tmp_path / "mock-budget.sqlite3"))
+    for i in range(6):
+        ledger.reserve(f"hour-{i}", settings)
+    # Re-open like another runner: reservations survive; no reset or network call.
+    fresh = DecisionRepository(SQLiteRepository(tmp_path / "mock-budget.sqlite3"))
+    assert len(fresh.usage()) == 6
+    fresh.reserve("optional-close", settings)
+    fresh.reserve("health-reserve", settings)
+    with pytest.raises(ValueError, match="quota exhausted"):
+        fresh.reserve("ninth-call", settings)
+    assert len(fresh.usage()) == 8
 
 
 def test_dormant_configuration():

@@ -6,8 +6,11 @@ max_input_tokens_equivalent: 16000
 max_output_tokens: 2048
 timeout_seconds: 45
 retries: 0
-daily_request_limit: 5
-monthly_request_limit: 100
+# User-reported AI Studio: 15 RPM / 250,000 TPM / 500 RPD (2026-10-17).
+# Conservative internal caps only. Free-tier/billing verification is still required.
+# No permission to activate real calls, real data or scheduled execution.
+daily_request_limit: 8
+monthly_request_limit: 200
 max_requests_per_run: 1
 max_response_bytes: 32768
 # Standard paid-equivalent estimate ONLY; this is not a bill or proof of free-tier status.
