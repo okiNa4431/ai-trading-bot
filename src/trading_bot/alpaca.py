@@ -109,9 +109,36 @@ class AlpacaDailyProvider:
                 raise DataError("missing Alpaca credentials")
         else:
             key, secret = "offline-mock-key", "offline-mock-secret"
+        self._initialize(
+            key,
+            secret,
+            mock_transport,
+            now,
+            pacer,
+            sleep,
+            max_requests,
+            max_pages,
+            retries,
+            "mock" if mock_transport is not None else "real",
+        )
+
+    def _initialize(
+        self,
+        key: str,
+        secret: str,
+        transport: httpx.BaseTransport | None,
+        now: Callable[[], datetime],
+        pacer: RequestPacer | None,
+        sleep: Callable[[float], None],
+        max_requests: int,
+        max_pages: int,
+        retries: int,
+        data_kind: str,
+    ) -> None:
+        """Internal setup shared with the separately authorized read-only research path."""
         self.client = httpx.Client(
             base_url="https://data.alpaca.markets",
-            transport=mock_transport,
+            transport=transport,
             headers={"APCA-API-KEY-ID": key, "APCA-API-SECRET-KEY": secret},
             timeout=20,
             follow_redirects=False,
@@ -120,7 +147,7 @@ class AlpacaDailyProvider:
         self.now, self.sleep = now, sleep
         self.pacer = pacer or LIVE_PACER
         self.max_requests, self.max_pages, self.retries = max_requests, max_pages, retries
-        self.data_kind = "mock" if mock_transport is not None else "real"
+        self.data_kind = data_kind
 
     def close(self) -> None:
         self.client.close()

@@ -4,6 +4,8 @@ Geminiが日本株・米国株を仮想売買するポートフォリオと、�
 
 ## Phase 5.5：実市場データ取得は停止中
 
+Phase 6の[読取専用Workflow・契約確認・初回実行手順](docs/phase6-readonly.md)を準備しました。`alpaca-readonly.yml` はmain・手動・最大20銘柄・一時メモリ処理のみです。アカウント適用契約と初回実行許可が未確認のため、専用設定も `live_enabled: false` のままです。実通信Workflowは今回起動しません。
+
 Alpaca Basicの[接続準備・利用条件・Secrets登録手順](docs/alpaca-preparation.md)を追加しました。日足IEX Providerは実通信ゲートで停止中です。`uv run python scripts/alpaca_mock_probe.py` と手動 `alpaca-mock.yml` は、秘密キー不要のモックHTTPだけで20→100→500→2,000銘柄を検証します。キーの登録は実通信の有効化ではありません。
 
 2026-10-18：初期研究方針をUSスイングへ変更しました。[実装・比較報告](docs/swing-implementation-report.md)を参照してください。2,000銘柄の日次50→15選別、A日次／B条件監視／C毎時を合成データで比較します。Aを基準とし、旧時間足計画は比較・回帰用に維持します。`uv run python scripts/swing_research.py --output data/swing-new-run`で新規隔離研究口座とJSON／Markdownを生成できます。実運用は有効化しません。

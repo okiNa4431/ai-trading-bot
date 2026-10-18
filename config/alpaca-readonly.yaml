@@ -1,0 +1,25 @@
+# Activation requires a separate reviewed change after the owner's contract confirmation.
+live_enabled: false
+contract_reference: ''
+sessions: 221
+symbols:
+  - AAPL
+  - MSFT
+  - AMZN
+  - GOOGL
+  - META
+  - NVDA
+  - JPM
+  - V
+  - MA
+  - WMT
+  - COST
+  - HD
+  - PG
+  - KO
+  - PEP
+  - JNJ
+  - UNH
+  - XOM
+  - CVX
+  - CAT
