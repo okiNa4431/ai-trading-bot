@@ -6,7 +6,7 @@ from decimal import ROUND_CEILING, Decimal
 from typing import Literal
 from uuid import uuid4
 
-from trading_bot.broker.execution import eligible_bar, known_marks
+from trading_bot.broker.execution import eligible_bar, known_marks, window
 from trading_bot.config import Instrument
 from trading_bot.models import PriceBar
 from trading_bot.persistence.sqlite_repository import PortfolioRepository, Session
@@ -96,6 +96,8 @@ class PaperBroker:
         quantity: int,
         requested_at: datetime,
         order_id: str | None = None,
+        *,
+        stop_price: Decimal | None = None,
     ) -> Order:
         order = Order(
             order_id=order_id or str(uuid4()),
@@ -106,6 +108,8 @@ class PaperBroker:
             quantity=quantity,
             requested_at=requested_at,
             costs=self.rules,
+            order_type="STOP" if stop_price is not None else "MARKET",
+            stop_price=stop_price,
         )
         with self.repository.transaction() as tx:
             account = tx.account()
@@ -264,13 +268,18 @@ class PaperBroker:
                 logger.info("order remains PENDING order_id=%s reason=%s", order_id, order.reason)
                 return order
             bar, opened, observed = candidate
-            at = as_of if mode == "paper" else opened
+            intrabar_stop = (
+                order.stop_price is not None and Decimal(str(bar.open)) > order.stop_price
+            )
+            at = as_of if mode == "paper" else observed if intrabar_stop else opened
             if at < (account.last_event_at or account.created_at):
                 raise ValueError("execution predates latest account event")
             reference = Decimal(str(bar.open))
-            price = reference * (
-                1 + order.costs.slippage if order.side == "BUY" else 1 - order.costs.slippage
-            )
+            if order.stop_price is not None:
+                # A gap below a SELL stop fills at the worse open, never at an invented stop price.
+                reference = min(reference, order.stop_price)
+            friction = order.costs.slippage + order.costs.spread / 2
+            price = reference * (1 + friction if order.side == "BUY" else 1 - friction)
             raw_notional = price * order.quantity
             notional = (
                 ceiling(raw_notional, order.currency)
@@ -298,7 +307,8 @@ class PaperBroker:
                 reference_price=reference,
                 price=price,
                 commission=commission,
-                slippage_cost=abs(price - reference) * order.quantity,
+                slippage_cost=reference * order.costs.slippage * order.quantity,
+                spread_cost=reference * order.costs.spread / 2 * order.quantity,
                 rounding_cost=abs(notional - raw_notional),
                 notional=notional,
                 realized_pnl=(
@@ -312,7 +322,7 @@ class PaperBroker:
                     if order.side == "SELL"
                     else ZERO
                 ),
-                price_at=opened,
+                price_at=observed if intrabar_stop else opened,
                 observed_at=observed,
                 price_fetched_at=bar.fetched_at,
                 processed_at=as_of,
@@ -320,6 +330,25 @@ class PaperBroker:
             )
             instruments = [p.instrument for p in account.positions.values() if p.quantity]
             marks = known_marks(instruments, data, at, mode)
+            if mode == "historical":
+                # At a historical open, contemporaneous opens also mark OTHER holdings.
+                # This avoids reusing stale Friday closes for Monday risk checks.
+                for held_instrument in instruments:
+                    for held_bar in data.get(held_instrument.symbol, []):
+                        span = window(held_bar)
+                        if (
+                            span
+                            and span[0] == at
+                            and span[1] <= as_of
+                            and span[1] <= held_bar.fetched_at <= as_of
+                        ):
+                            marks[held_instrument.symbol] = Mark(
+                                symbol=held_instrument.symbol,
+                                currency=held_instrument.currency,
+                                price=Decimal(str(held_bar.open)),
+                                available_at=at,
+                                price_at=at,
+                            )
             marks[order.symbol] = Mark(
                 symbol=order.symbol,
                 currency=order.currency,

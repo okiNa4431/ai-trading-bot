@@ -36,7 +36,8 @@ def estimate(
     rules: TradingRules,
     at: datetime,
 ) -> tuple[Account, Decimal, Decimal]:
-    price = mark.price * (1 + rules.slippage if side == "BUY" else 1 - rules.slippage)
+    friction = rules.slippage + rules.spread / 2
+    price = mark.price * (1 + friction if side == "BUY" else 1 - friction)
     raw = price * quantity
     notional = (
         ceiling(raw, instrument.currency) if side == "BUY" else money(raw, instrument.currency)
@@ -61,7 +62,8 @@ def estimate(
         reference_price=mark.price,
         price=price,
         commission=fee,
-        slippage_cost=abs(price - mark.price) * quantity,
+        slippage_cost=mark.price * rules.slippage * quantity,
+        spread_cost=mark.price * rules.spread / 2 * quantity,
         rounding_cost=abs(notional - raw),
         notional=notional,
         realized_pnl=notional - fee - basis if side == "SELL" else ZERO,

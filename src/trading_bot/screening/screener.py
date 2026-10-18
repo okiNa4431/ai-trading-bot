@@ -16,6 +16,9 @@ logger = logging.getLogger(__name__)
 def score(
     features: Features, instrument: Instrument, as_of: datetime, settings: ScreeningSettings
 ) -> tuple[float, dict[str, float]]:
+    if features.hourly_observed_at is None:
+        raise ValueError("legacy screening requires an hourly observation")
+
     def clip(value: float) -> float:
         return max(-1, min(1, value))
 

@@ -34,6 +34,31 @@ def expire(op):
         )
 
 
+def test_swing_stop_and_spread_restore_without_schema_change(operation):
+    from decimal import Decimal
+
+    from trading_bot.config import Instrument
+    from trading_bot.portfolio.models import TradingRules
+
+    op = operation
+    assert op.claim("swing-research-fixture", {})
+    broker = PaperBroker(op.repository, TradingRules(spread=Decimal("0.0004")))
+    at = datetime(2026, 10, 14, tzinfo=UTC)
+    broker.initialize(at)
+    instrument = Instrument(symbol="S0000", market="US", currency="USD", display_name="Synthetic")
+    order = broker.place_order(instrument, "SELL", 1, at, "protected-stop", stop_price=Decimal(40))
+    # No holdings: rejection is required, but the new contract must round-trip unchanged.
+    assert order.status == "REJECTED"
+    restored = PaperBroker(SupabaseRepository(op.api, op.account, test=True)).get_order(
+        order.order_id
+    )
+    assert restored == order and restored.stop_price == 40
+    assert restored.costs.spread == Decimal("0.0004")
+    expire(op)
+    with pytest.raises(psycopg.Error):
+        broker.place_order(instrument, "BUY", 1, at, "expired-swing-writer")
+
+
 def test_fenced_initialization_legacy_bypass_and_expired_writes(operation):
     op = operation
     assert op.claim("runner-1", {})

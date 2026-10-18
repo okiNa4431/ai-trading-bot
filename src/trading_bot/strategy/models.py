@@ -52,6 +52,7 @@ class DecisionContext(Contract):
     fx: FXRate | None
     rules: TradingRules
     pending_orders: list[Order]
+    holding_sessions: dict[str, int] = Field(default_factory=dict)
 
 
 class ActionDecision(Contract):
@@ -59,6 +60,7 @@ class ActionDecision(Contract):
     action: Literal["BUY", "SELL", "HOLD"]
     target_weight: float = Field(ge=0, le=0.10, strict=True)
     reason: str = Field(min_length=1, max_length=1000)
+    risk_factors: list[str] = Field(default_factory=list, max_length=10)
 
 
 class DecisionResult(Contract):

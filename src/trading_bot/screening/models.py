@@ -34,7 +34,7 @@ class ScreeningSettings(Contract):
 
 class Features(Contract):
     symbol: str
-    hourly_return: float
+    hourly_return: float | None
     daily_return: float
     sma5: float
     sma20: float
@@ -45,10 +45,17 @@ class Features(Contract):
     average_turnover20: float
     daily_close: float
     daily_observed_at: datetime
-    hourly_observed_at: datetime
+    hourly_observed_at: datetime | None
     fetched_at: datetime
-    source: Literal["yahoo"] = "yahoo"
+    source: Literal["yahoo", "synthetic", "alpaca"] = "yahoo"
     mark: Mark
+    sma50: float | None = None
+    sma200: float | None = None
+    momentum20: float | None = None
+    momentum60: float | None = None
+    relative_strength: float | None = None
+    gap_return: float | None = None
+    sector: str | None = None
 
 
 class Candidate(Contract):

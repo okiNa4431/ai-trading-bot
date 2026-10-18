@@ -1,6 +1,7 @@
 """Explicit bar-start semantics and exchange calendars; no fabricated weekend fills."""
 
 from datetime import UTC, datetime, timedelta
+from decimal import Decimal
 from functools import lru_cache
 from typing import Literal
 from zoneinfo import ZoneInfo
@@ -72,6 +73,8 @@ def eligible_bar(
         span = window(bar)
         if span is None or bar.volume == 0:
             continue
+        if order.stop_price is not None and Decimal(str(bar.low)) > order.stop_price:
+            continue
         opened, confirmed = span
         if opened <= order.requested_at or confirmed > as_of or bar.fetched_at < confirmed:
             continue
@@ -92,8 +95,6 @@ def known_marks(
     mode: Literal["historical", "paper"],
 ) -> dict[str, Mark]:
     """Only closes of completed bars observable at as_of; future closes never escape."""
-    from decimal import Decimal
-
     marks: dict[str, Mark] = {}
     for instrument in instruments:
         for original in data.get(instrument.symbol, []):

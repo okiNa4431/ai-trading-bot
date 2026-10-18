@@ -20,7 +20,7 @@ class PriceBar(BaseModel):
     volume: float = Field(ge=0)
     currency: Literal["JPY", "USD"]
     interval: Interval
-    source: Literal["yahoo"] = "yahoo"
+    source: Literal["yahoo", "synthetic", "alpaca"] = "yahoo"
     fetched_at: datetime
     adjusted: Literal[False] = False
 

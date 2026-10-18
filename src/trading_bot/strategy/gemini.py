@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import time
+from collections.abc import Callable
 from decimal import Decimal
 from pathlib import Path
 
@@ -36,18 +37,25 @@ class GeminiTradingStrategy:
         repository: DecisionRepository,
         decision_id: str,
         env_file: Path = Path(".env"),
+        *,
+        system_instruction: str = SYSTEM,
+        payload_builder: Callable[[DecisionContext], str] = payload,
     ) -> None:
         self.settings = settings
         self.repository = repository
         self.decision_id = decision_id
         self.env_file = env_file
         self.last_response: str | None = None
+        self.system_instruction = system_instruction
+        self.payload_builder = payload_builder
 
     def decide(self, context: DecisionContext) -> DecisionResult:
         schema = response_schema(context)
-        text = payload(context)
+        text = self.payload_builder(context)
         # UTF-8 bytes + schema/system + headroom: deliberately conservative token equivalent.
-        estimated = len((SYSTEM + text + json.dumps(schema)).encode("utf-8")) + 1024
+        estimated = (
+            len((self.system_instruction + text + json.dumps(schema)).encode("utf-8")) + 1024
+        )
         if estimated > self.settings.max_input_tokens_equivalent:
             raise ValueError("AI input exceeds conservative token-equivalent byte budget")
         load_dotenv(self.env_file, override=False)
@@ -74,7 +82,7 @@ class GeminiTradingStrategy:
                         model=self.settings.model,
                         contents=text,
                         config=types.GenerateContentConfig(
-                            system_instruction=SYSTEM,
+                            system_instruction=self.system_instruction,
                             response_mime_type="application/json",
                             response_json_schema=schema,
                             max_output_tokens=self.settings.max_output_tokens,

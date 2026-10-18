@@ -32,6 +32,7 @@ class Contract(BaseModel):
 
 class TradingRules(Contract):
     slippage: Decimal = Field(default=Decimal("0.001"), ge=0, lt=1)
+    spread: Decimal = Field(default=ZERO, ge=0, lt=1)
     commission_rate: Decimal = Field(default=ZERO, ge=0, lt=1)
     commission_jpy: Decimal = Field(default=ZERO, ge=0)
     commission_usd: Decimal = Field(default=ZERO, ge=0)
@@ -42,6 +43,12 @@ class TradingRules(Contract):
     max_fx_age_seconds: int = Field(default=3600, gt=0)
     max_price_age_seconds: int = Field(default=86400, gt=0)
     lot_sizes: dict[str, int] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def valid_friction(self) -> "TradingRules":
+        if self.slippage + self.spread / 2 >= 1:
+            raise ValueError("combined slippage and half-spread must be below one")
+        return self
 
     @field_validator("lot_sizes")
     @classmethod
@@ -114,12 +121,22 @@ class Order(Contract):
     currency: Currency
     side: Side
     quantity: int = Field(gt=0, strict=True)
-    order_type: Literal["MARKET"] = "MARKET"
+    order_type: Literal["MARKET", "STOP"] = "MARKET"
+    stop_price: Decimal | None = Field(default=None, gt=0)
     requested_at: datetime
     status: Status = "PENDING"
     reason: str | None = None
     costs: TradingRules
     _timestamp = field_validator("requested_at")(utc)
+
+    @model_validator(mode="after")
+    def valid_stop(self) -> "Order":
+        if self.order_type == "STOP":
+            if self.side != "SELL" or self.stop_price is None:
+                raise ValueError("protective STOP requires SELL and a stop price")
+        elif self.stop_price is not None:
+            raise ValueError("MARKET cannot carry a stop price")
+        return self
 
 
 class Execution(Contract):
@@ -133,6 +150,7 @@ class Execution(Contract):
     price: Decimal
     commission: Decimal
     slippage_cost: Decimal
+    spread_cost: Decimal = ZERO
     rounding_cost: Decimal
     notional: Decimal
     realized_pnl: Decimal

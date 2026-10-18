@@ -1,0 +1,17 @@
+# Offline research configuration only; not connected to Phase 5 live/test workflows.
+enabled: false
+legacy_hourly_enabled: false
+universe_size: 2000
+stage_one: 50
+stage_two: 15
+sector_limit: 3
+min_price: 5
+min_turnover: 1000000
+max_volatility: 0.8
+drawdown_trigger: 0.05
+market_trigger: 0.03
+atr_multiple: 2
+min_holding_sessions: 5
+expected_holding_sessions: 20
+monitor_response: freeze
+daily_only: false
