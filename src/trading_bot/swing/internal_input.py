@@ -47,7 +47,10 @@ def build_draft(context: DecisionContext, settings: AISettings) -> DraftInput:
         output_token_budget=settings.max_output_tokens,
         paid_equivalent_upper_usd=cost,
     )
-    Draft202012Validator(DraftInput.model_json_schema()).validate(draft.model_dump(mode="json"))
+    try:
+        Draft202012Validator(DraftInput.model_json_schema()).validate(draft.model_dump(mode="json"))
+    except Exception:
+        raise ValueError("internal draft schema rejected; no external send") from None
     return draft
 
 

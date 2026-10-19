@@ -36,10 +36,10 @@ def observed_fixture(day=201):
         bars[raw.securities[0].instrument.symbol][i].model_copy(
             update={
                 "symbol": "SPY",
-                "open": 100 + i,
-                "close": 100 + i,
-                "high": 101 + i,
-                "low": 99 + i,
+                "open": 100 + i * 0.02,
+                "close": 100 + i * 0.02,
+                "high": 101 + i * 0.02,
+                "low": 99 + i * 0.02,
             }
         )
         for i in range(205)
@@ -58,6 +58,13 @@ def observed_fixture(day=201):
         DailyBatch(bars, dates, complete_response=True),
         reference,
         fx,
-        ActionCoverage(since=raw.opens_at[0], through=at, observed_at=at, events=[]),
+        ActionCoverage(
+            source="synthetic fixture, not an API response",
+            verified=True,
+            since=raw.opens_at[0],
+            through=at,
+            observed_at=at,
+            events=[],
+        ),
     )
     return data, at

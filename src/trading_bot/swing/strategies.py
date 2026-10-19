@@ -146,7 +146,7 @@ class RuleSwingStrategy:
                     action=action,
                     target_weight=min(target, 0.10),
                     reason=f"{self.kind}: causal swing proposal; no mandatory age exit",
-                    risk_factors=["gap", "corporate_action", "synthetic research"],
+                    risk_factors=["gap", "corporate_action", "paper trading"],
                 )
             )
         return validate_result(

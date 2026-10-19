@@ -66,7 +66,7 @@ begin
   then raise exception 'invalid research observation'; end if;
   select payload into old from bot_research_private.observations
    where account_id=p_account and observation_id=b->>'id';
-  if found and (old-'fetched_at')<>(b->'payload'-'fetched_at') then
+  if found and (old-'fetched_at')<>((b->'payload')-'fetched_at') then
    raise exception 'research observation identity conflict';
   end if;
   insert into bot_research_private.observations values(p_account,b->>'id',b->'payload')

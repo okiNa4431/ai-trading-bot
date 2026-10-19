@@ -381,9 +381,7 @@ class PaperBroker:
             self.cash_entry(tx, order_id, order.currency, delta, updated, order.side, at)
             tx.put("valuations", valuation.valuation_id, valuation)
             tx.save_account(updated)
-            logger.info(
-                "order FILLED order_id=%s currency=%s price=%s", order_id, order.currency, price
-            )
+            logger.info("order FILLED order_id=%s", order_id)
             return order
 
     def value(self, marks: dict[str, Mark], fx: FXRate | None, as_of: datetime) -> Valuation:

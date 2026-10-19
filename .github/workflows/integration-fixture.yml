@@ -1,0 +1,24 @@
+name: Private swing integration fixture (manual only)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: private-integration-fixture
+  cancel-in-progress: false
+jobs:
+  fixture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.13.1'
+          enable-cache: false
+      - run: uv python install 3.12
+      - run: uv sync --locked
+      - name: Synthetic fixture only; no Secrets, live API, database or artifacts
+        run: uv run pytest tests/test_ai_boundary.py tests/test_observed_bridge.py tests/test_observed_integration.py -v

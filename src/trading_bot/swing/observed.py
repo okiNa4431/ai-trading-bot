@@ -5,6 +5,8 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 
 import numpy as np
+import pandas_market_calendars as mcal
+from pydantic import Field
 
 from trading_bot.alpaca import NY, DailyBatch, confirmed_at
 from trading_bot.alpaca_research import ResearchProvider
@@ -20,6 +22,8 @@ from trading_bot.swing.screening import screen_daily
 
 
 class ActionCoverage(Contract):
+    source: str = Field(default="unverified", min_length=1)
+    verified: bool = False
     since: datetime
     through: datetime
     observed_at: datetime
@@ -72,7 +76,10 @@ class ObservedDailyData(SwingData):
         for symbol, bars in rows.items():
             indexed = {}
             for raw in bars:
-                b = PriceBar.model_validate(raw.model_dump())
+                try:
+                    b = PriceBar.model_validate(raw.model_dump())
+                except ValueError:
+                    raise ValueError("invalid observed OHLCV contract") from None
                 day = b.timestamp.astimezone(NY).date()
                 if b.source != "alpaca" or b.interval != "1d" or b.market != "US":
                     raise ValueError("raw US Alpaca daily observations required")
@@ -156,11 +163,19 @@ class ObservedDailyData(SwingData):
         if any(s.metadata_at > at for s in self.securities):
             raise ValueError("future universe metadata cannot be used")
         end = self.daily_index(at)
+        recent = mcal.get_calendar("NYSE").schedule(at.date() - timedelta(days=10), at.date())
+        expected_latest = max(
+            (d.date() for d in recent.index if confirmed_at(d.date()) <= at), default=None
+        )
+        if end < 0 or self.closes_at[end].astimezone(NY).date() != expected_latest:
+            raise ValueError("latest completed session is missing or delayed")
         if end < 200 or any(k > at for k in self.available[end - 200 : end + 1]):
             raise ValueError("insufficient point-in-time observed history")
         coverage = self.actions
         if not (
-            utc(coverage.since) <= self.opens_at[end - 200]
+            coverage.verified
+            and coverage.source != "unverified"
+            and utc(coverage.since) <= self.opens_at[end - 200]
             and utc(coverage.through) >= at
             and utc(coverage.observed_at) <= at
             and at - utc(coverage.observed_at) <= timedelta(hours=1)

@@ -4,6 +4,8 @@ Geminiが日本株・米国株を仮想売買するポートフォリオと、�
 
 ## Phase 5.5：実市場データ取得は停止中
 
+2026-10-19：[実市場統合・外部AI送信直前までの報告](docs/integration-report.md)と[追加SQLの影響・手順](docs/research-migration.md)を参照してください。観測時刻付きscreening→内部JSON→rule/mock→仮想注文／後続約定→私的CAS保存を接続しました。実Alpaca・本番migration／書込・実AI・cronは未起動。実SDK transportも停止し、合成SDK mockだけを許可します。既存口座と公開Webは変更しません。
+
 Phase 6の[読取専用Workflow・契約確認・初回実行手順](docs/phase6-readonly.md)を準備しました。`alpaca-readonly.yml` はmain・手動・最大20銘柄・一時メモリ処理のみです。アカウント適用契約と初回実行許可が未確認のため、専用設定も `live_enabled: false` のままです。実通信Workflowは今回起動しません。
 
 Alpaca Basicの[接続準備・利用条件・Secrets登録手順](docs/alpaca-preparation.md)を追加しました。日足IEX Providerは実通信ゲートで停止中です。`uv run python scripts/alpaca_mock_probe.py` と手動 `alpaca-mock.yml` は、秘密キー不要のモックHTTPだけで20→100→500→2,000銘柄を検証します。キーの登録は実通信の有効化ではありません。

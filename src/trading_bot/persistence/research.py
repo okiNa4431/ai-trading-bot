@@ -31,6 +31,7 @@ class ResearchMemory:
         records = {(r["kind"], r["key"]): r for r in self.state["records"]}
         records.update(tx.writes)
         self.state = {
+            **self.state,
             "account": tx.value.model_dump(mode="json") if tx.value else None,
             "records": list(records.values()),
         }
@@ -67,9 +68,15 @@ class PrivateResearchStore:
         self.check()
         observations = {}
         for bar in bars:
-            payload = PriceBar.model_validate(bar.model_dump()).model_dump(mode="json")
+            try:
+                payload = PriceBar.model_validate(bar.model_dump()).model_dump(mode="json")
+            except ValueError:
+                raise ValueError("invalid private observation contract") from None
             identity = digest({k: v for k, v in payload.items() if k != "fetched_at"})
             observations[identity] = dict(id=identity, payload=payload)
+        if observations:
+            # Pin exact content vintages, including A -> B -> A price revisions.
+            result = {**result, "observation_ids": list(observations)}
         return dict(
             self.api.rpc(
                 "bot_research_commit",
