@@ -64,6 +64,8 @@ class DailyBatch:
     requests: int = 0
     pages: int = 0
     retries: int = 0
+    duplicate_rows: int = 0
+    invalid_rows: int = 0
     excluded_unconfirmed: int = 0
     feed: str = "iex"
     adjustment: str = "raw"
@@ -258,6 +260,7 @@ class AlpacaDailyProvider:
                                 if local.time() != day_time() or not start <= stamp <= end:
                                     raise ValueError("unexpected bar timestamp")
                                 if (symbol, stamp) in seen:
+                                    report.duplicate_rows += 1
                                     raise ValueError("duplicate timestamp")
                                 seen.add((symbol, stamp))
                                 values = {
@@ -283,6 +286,7 @@ class AlpacaDailyProvider:
                                     **values,
                                 )
                             except (KeyError, ValueError, TypeError, OverflowError):
+                                report.invalid_rows += 1
                                 raise DataError(
                                     "Alpaca invalid or duplicate OHLCV/timestamp"
                                 ) from None
