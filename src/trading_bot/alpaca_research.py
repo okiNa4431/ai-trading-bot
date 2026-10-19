@@ -58,6 +58,7 @@ def authorize(policy: ResearchPolicy, approval: str, environment: Mapping[str, s
         "GITHUB_REPOSITORY": "okiNa4431/ai-trading-bot",
         "RUNNER_ENVIRONMENT": "github-hosted",
         "ALPACA_RESEARCH_ENVIRONMENT": "alpaca-research",
+        "ALPACA_MARKET_DATA_LIVE_ENABLED": "true",
     }
     if not policy.live_enabled or not policy.contract_reference.strip():
         raise MarketAccessDisabled("Phase 6 contract confirmation and reviewed activation pending")
@@ -188,6 +189,8 @@ def run_probe(policy: ResearchPolicy, provider: ResearchProvider) -> dict[str, o
     begin = time.perf_counter()
     first = provider.fetch_many(instruments, start, end).require_complete()
     second = provider.fetch_many(instruments, start, end).require_complete()
+    if first.excluded_unconfirmed or second.excluded_unconfirmed:
+        raise DataError("Phase 6 unconfirmed observations; stop")
     if any(
         abs(b.close / a.close - 1) > 0.35
         for bars in second.bars.values()
@@ -220,6 +223,8 @@ def run_probe(policy: ResearchPolicy, provider: ResearchProvider) -> dict[str, o
         feed="iex",
         adjustment="raw",
         requests=len(provider.guard.events),
+        pages=first.pages + second.pages,
+        retries=first.retries + second.retries,
         http_status_counts=dict(Counter(str(e["status"]) for e in provider.guard.events)),
         http_response_seconds=[e["seconds"] for e in provider.guard.events],
         total_seconds=round(time.perf_counter() - begin, 3),
@@ -261,6 +266,8 @@ def main() -> int:
                     status="STOPPED",
                     reason="authorization_or_data_quality_failure",
                     requests=len(events),
+                    last_pass_pages=batch.pages if batch else 0,
+                    last_pass_retries=batch.retries if batch else 0,
                     http_status_counts=dict(Counter(str(e["status"]) for e in events)),
                     received_rows=sum(map(len, batch.bars.values())) if batch else 0,
                     incomplete_symbols=len(batch.missing) if batch else None,

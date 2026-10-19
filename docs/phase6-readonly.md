@@ -1,5 +1,7 @@
 # Phase 6：Alpaca実市場の読取専用検証準備
 
+追記：専用経路の承認状態と初回操作は[Phase 7手順](phase7-readonly.md)を参照。以下はPhase 6時点の記録です。
+
 確認日：2026-10-18 JST。実装とモック検証のみ。**実Alpaca Workflowは未実行・実API通信0回**。Supabase・paper-live・API履歴・公開Webのデータを変更していない。
 
 ## 現在の承認状態

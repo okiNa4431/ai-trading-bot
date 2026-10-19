@@ -1,6 +1,6 @@
-# Activation requires a separate reviewed change after the owner's contract confirmation.
-live_enabled: false
-contract_reference: ''
+# Dedicated transient read-only research only; independent Environment approval is required.
+live_enabled: true
+contract_reference: 'Alpaca support #376491; owner-confirmed personal noncommercial IEX read-only research'
 sessions: 221
 symbols:
   - AAPL

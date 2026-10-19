@@ -30,6 +30,7 @@ ENV = dict(
     GITHUB_REPOSITORY="okiNa4431/ai-trading-bot",
     RUNNER_ENVIRONMENT="github-hosted",
     ALPACA_RESEARCH_ENVIRONMENT="alpaca-research",
+    ALPACA_MARKET_DATA_LIVE_ENABLED="true",
     ALPACA_API_KEY_ID="never-log-key",
     ALPACA_API_SECRET_KEY="never-log-secret",
 )
@@ -170,19 +171,82 @@ def test_missing_secret_stops_before_transport(monkeypatch):
         ResearchProvider(policy(), APPROVAL, ENV | {"ALPACA_API_SECRET_KEY": ""})
 
 
+@pytest.mark.parametrize("value", [None, "", "false", "TRUE", "1", " true", "true "])
+def test_second_gate_stops_before_transport(value, monkeypatch):
+    monkeypatch.setattr(httpx, "HTTPTransport", lambda **_: pytest.fail("network transport"))
+    environment = dict(ENV)
+    environment.pop("ALPACA_MARKET_DATA_LIVE_ENABLED")
+    if value is not None:
+        environment["ALPACA_MARKET_DATA_LIVE_ENABLED"] = value
+    with pytest.raises(MarketAccessDisabled):
+        ResearchProvider(policy(), APPROVAL, environment)
+
+
+def test_retry_and_page_aggregate_counts():
+    calls = 0
+
+    def handler(r):
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            return httpx.Response(429, headers={"Retry-After": "0"})
+        return response(r)
+
+    p = make_provider(handler)
+    try:
+        result = run_probe(policy(), p)
+        assert result["requests"] == 3
+        assert result["pages"] == 2 and result["retries"] == 1
+        assert result["http_status_counts"] == {"429": 1, "200": 2}
+    finally:
+        p.close()
+
+
+@pytest.mark.parametrize("kind", ["duplicate", "invalid", "paging", "unconfirmed"])
+def test_probe_rejects_incomplete_or_invalid_observations(kind):
+    def handler(r):
+        payload = response(r).json()
+        if kind == "duplicate":
+            payload["bars"]["AAPL"].append(payload["bars"]["AAPL"][0])
+        elif kind == "invalid":
+            payload["bars"]["AAPL"][0]["h"] = -1
+        elif kind == "paging":
+            payload["next_page_token"] = "repeated-token"
+        return httpx.Response(200, json=payload)
+
+    p = make_provider(handler)
+    if kind == "unconfirmed":
+        original = p.fetch_many
+
+        def fetch(*args):
+            batch = original(*args)
+            batch.excluded_unconfirmed = 1
+            return batch
+
+        p.fetch_many = fetch
+    try:
+        with pytest.raises(DataError):
+            run_probe(policy(), p)
+        assert len(p.guard.events) <= 2
+    finally:
+        p.close()
+
+
 @pytest.mark.parametrize("symbols", [["AAPL"] * 21, ["AAPL", "AAPL"], [], ["7203.T"]])
 def test_bad_policy(symbols):
     with pytest.raises(ValueError):
         ResearchPolicy(symbols=symbols)
 
 
-def test_shipping_policy_is_disabled_and_old_gate_unchanged():
+def test_shipping_policy_requires_second_gate_and_old_gate_unchanged():
     p = ResearchPolicy.model_validate(
         yaml.safe_load(Path("config/alpaca-readonly.yaml").read_text())
     )
-    assert not p.live_enabled and not p.contract_reference and len(p.symbols) == 20
+    assert p.live_enabled and "#376491" in p.contract_reference and len(p.symbols) == 20
+    assert p.sessions == 221
+    authorize(p, APPROVAL, ENV)
     with pytest.raises(MarketAccessDisabled):
-        authorize(p, APPROVAL, ENV)
+        authorize(p, APPROVAL, ENV | {"ALPACA_MARKET_DATA_LIVE_ENABLED": ""})
     with pytest.raises(MarketAccessDisabled):
         require_live_market_access()
     with pytest.raises(MarketAccessDisabled):
@@ -200,6 +264,7 @@ def test_twenty_symbols_two_pass_transient_aggregate():
     try:
         result = run_probe(policy().model_copy(update={"symbols": list(p.allowed_symbols)}), p)
         assert result["received_rows_per_pass"] == 4420 and result["requests"] == 2
+        assert result["pages"] == 2 and result["retries"] == 0
         assert result["repeat_revisions"] == 0 and result["strategy_ready"] is False
         encoded = json.dumps(result)
         assert "never-log" not in encoded and '"close"' not in encoded and '"AAPL"' not in encoded
@@ -255,6 +320,12 @@ def test_workflow_has_no_untrusted_shell_or_data_export():
         assert "upload-artifact" not in step.get("uses", "")
     assert "SUPABASE" not in raw and "GEMINI" not in raw
     assert "enable-cache: false" in raw
+    execution = job["steps"][-1]["env"]
+    assert execution["ALPACA_MARKET_DATA_LIVE_ENABLED"] == (
+        "${{ vars.ALPACA_MARKET_DATA_LIVE_ENABLED }}"
+    )
+    assert "env" not in workflow and "env" not in job
+    assert all("secrets." not in str(step) for step in job["steps"][:-1])
 
 
 def test_total_request_budget_and_redirect_never_followed():

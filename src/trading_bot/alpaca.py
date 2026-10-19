@@ -62,6 +62,8 @@ class DailyBatch:
     expected_sessions: tuple[date, ...]
     missing: dict[str, tuple[date, ...]] = field(default_factory=dict)
     requests: int = 0
+    pages: int = 0
+    retries: int = 0
     excluded_unconfirmed: int = 0
     feed: str = "iex"
     adjustment: str = "raw"
@@ -169,6 +171,7 @@ class AlpacaDailyProvider:
                 raise DataError("Alpaca request budget exhausted")
             self.pacer.wait()
             report.requests += 1
+            report.retries += int(attempt > 0)
             try:
                 response = self.client.get("/v2/stocks/bars", params=params)
             except httpx.TransportError:
@@ -239,6 +242,7 @@ class AlpacaDailyProvider:
                 tokens: set[str] = set()
                 for _ in range(self.max_pages):
                     payload = self._request(params, report)
+                    report.pages += 1
                     rows = payload.get("bars")
                     if not isinstance(rows, dict) or any(s not in batch for s in rows):
                         raise DataError("Alpaca invalid symbols/bars response")
