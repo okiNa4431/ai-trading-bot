@@ -1,5 +1,7 @@
 # AI vs オルカン — AI Trading Bot
 
+Phase 8.5：[100証券のID・履歴統合と確認状況](docs/phase85-identities.md)。100ID・101別名を登録し、未確認の証拠や未対応企業行動がある場合は新しい読取専用Workflowを通信前に停止します。実市場での100証券成功を意味しません。
+
 Phase 8：[100銘柄の読取専用検証手順](docs/phase8-readonly-100.md)。20銘柄と別の手動Workflow・承認を使用します。市場データはメモリだけで処理し、実通信はユーザーが起動します。
 
 Phase 7：[初回20銘柄読取の設定・手順](docs/phase7-readonly.md)。専用コード許可のみ有効化し、Environment変数と手動承認を別途必須にしました。実読取Workflowはユーザーだけが起動します。一般取得・実AI・DB書込・定期実行は引き続き停止中です。

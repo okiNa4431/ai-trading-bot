@@ -21,7 +21,7 @@ class TickerAssignment(BaseModel):
     security_id: str
     ticker: str
     market: Literal["US"] = "US"
-    exchange: Literal["NYSE"] = "NYSE"
+    exchange: Literal["NYSE", "NASDAQ"] | None = "NYSE"
     currency: Literal["USD"] = "USD"
     provider: Literal["alpaca"] = "alpaca"
     valid_from: date
@@ -59,6 +59,7 @@ class SecurityRegistry(BaseModel):
             if (
                 item.security_id not in self.security_ids
                 or not item.identity_confirmed
+                or item.exchange is None
                 or not item.evidence
                 or (item.valid_to and item.valid_from >= item.valid_to)
             ):
@@ -167,7 +168,9 @@ def validate_window(registry: SecurityRegistry, days: set[date]) -> None:
                 raise DataError("uncovered or ambiguous security interval")
 
 
-def identify_batch(registry: SecurityRegistry, batch: DailyBatch) -> list[IdentifiedObservation]:
+def identify_batch(
+    registry: SecurityRegistry, batch: DailyBatch, *, diagnostics: dict[str, int] | None = None
+) -> list[IdentifiedObservation]:
     registry = SecurityRegistry.model_validate(registry.model_dump())
     if not batch.complete_response or batch.excluded_unconfirmed or not batch.expected_sessions:
         raise DataError("identity validation requires completed confirmed response")
@@ -180,9 +183,13 @@ def identify_batch(registry: SecurityRegistry, batch: DailyBatch) -> list[Identi
             raise DataError("unsupported corporate action; stop")
     seen = set()
     result = []
+    if diagnostics is not None:
+        diagnostics["identified_rows"] = 0
     for ticker, bars in batch.bars.items():
         for bar in bars:
             if ticker != bar.symbol:
+                if diagnostics is not None:
+                    diagnostics["invalid_rows"] = diagnostics.get("invalid_rows", 0) + 1
                 raise DataError("response ticker provenance mismatch")
             day = bar.timestamp.astimezone(NY).date()
             matches = [
@@ -196,12 +203,21 @@ def identify_batch(registry: SecurityRegistry, batch: DailyBatch) -> list[Identi
                 and (a.valid_to is None or day < a.valid_to)
             ]
             if len(matches) != 1 or day not in expected:
+                if diagnostics is not None:
+                    diagnostics["invalid_rows"] = diagnostics.get("invalid_rows", 0) + 1
                 raise DataError("unmapped or out-of-period observation")
             key = (matches[0].security_id, day)
             if key in seen:
+                if diagnostics is not None:
+                    diagnostics["duplicate_rows"] = diagnostics.get("duplicate_rows", 0) + 1
                 raise DataError("duplicate security observation")
             seen.add(key)
             result.append(IdentifiedObservation(matches[0].security_id, bar))
-    if seen != {(sid, day) for sid in registry.security_ids for day in expected}:
+            if diagnostics is not None:
+                diagnostics["identified_rows"] = len(result)
+    wanted = {(sid, day) for sid in registry.security_ids for day in expected}
+    if diagnostics is not None:
+        diagnostics["missing_rows"] = len(wanted - seen)
+    if seen != wanted:
         raise DataError("incomplete security coverage; stop")
     return sorted(result, key=lambda o: (o.security_id, o.raw.timestamp))

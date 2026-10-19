@@ -1,0 +1,4341 @@
+# Evidence-gated catalog. UNKNOWN entries deliberately block all live HTTP.
+schema_version: 1
+selection_reference: config/alpaca-readonly-100.yaml; current fixed research sample,
+  not a historical investable universe
+reviews:
+- security_id: sec-000002
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000003
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000004
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000005
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000006
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000007
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000008
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000009
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000010
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000011
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000012
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000013
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000014
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000015
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000016
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000017
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000018
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000019
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000020
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000021
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000022
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000023
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000024
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000025
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000026
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000027
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000028
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000029
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000030
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000031
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000032
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000033
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000034
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000035
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000036
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000037
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000038
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000039
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000040
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000041
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000042
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000043
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000044
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000045
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000046
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000047
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000048
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000049
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000050
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000051
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000052
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000053
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000054
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000055
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000056
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000057
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000058
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000059
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000060
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000061
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000062
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000063
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000064
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000065
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000066
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000067
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000001
+  identity:
+    status: CONFIRMED
+    sources:
+    - https://www.marsh.com/en/corp/about/news/marsh-mclennan-to-change-nyse-symbol-to-mrsh.html
+    checked_on: 2026-10-20
+    coverage_start: 2025-12-01
+    coverage_end: 2026-10-16
+    note: Issuer-confirmed NYSE common-stock/CUSIP continuity at the 2026-01-14 ticker
+      boundary; bounded research review.
+  ticker_periods:
+    status: CONFIRMED
+    sources:
+    - https://www.marsh.com/en/corp/about/news/marsh-mclennan-to-change-nyse-symbol-to-mrsh.html
+    checked_on: 2026-10-20
+    coverage_start: 2025-12-01
+    coverage_end: 2026-10-16
+    note: Issuer-confirmed NYSE common-stock/CUSIP continuity at the 2026-01-14 ticker
+      boundary; bounded research review.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: CONFIRMED
+    sources:
+    - https://github.com/okiNa4431/ai-trading-bot/actions/runs/39277179081
+    checked_on: 2026-10-20
+    coverage_start: 2025-12-01
+    coverage_end: 2026-10-16
+    note: 'Real single-security probe: 221 rows/pass, two passes, HTTP 200 x2, zero
+      retries. Window derived from execution time and the reviewed probe calendar
+      logic; not a corporate-action audit.'
+- security_id: sec-000069
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000070
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000071
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000072
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000073
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000074
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000075
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000076
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000077
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000078
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000079
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000080
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000081
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000082
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000083
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000084
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000085
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000086
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000087
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000088
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000089
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000090
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000091
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000092
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000093
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources:
+    - https://www.honeywell.com/us/en/news/press-releases/2026/06/honeywell-technologies-launches-independent-pure-play-automation-company-following-honeywell-aerospace-spin-off
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Issuer published a 2026-06-29 reverse split and aerospace spin-off. These
+      unsupported events are recorded, not adjusted. Full event-period review remains
+      UNKNOWN.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000094
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000095
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000096
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000097
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000098
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000099
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000100
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+- security_id: sec-000101
+  identity:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  ticker_periods:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  corporate_actions:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+  observed_history:
+    status: UNKNOWN
+    sources: []
+    checked_on: null
+    coverage_start: null
+    coverage_end: null
+    note: Unverified; selection in the fixed sample is not identity, listing-period,
+      or corporate-action evidence.
+assignments:
+- security_id: sec-000002
+  ticker: AAPL
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000003
+  ticker: MSFT
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000004
+  ticker: AMZN
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000005
+  ticker: GOOGL
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000006
+  ticker: META
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000007
+  ticker: NVDA
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000008
+  ticker: JPM
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000009
+  ticker: V
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000010
+  ticker: MA
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000011
+  ticker: WMT
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000012
+  ticker: COST
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000013
+  ticker: HD
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000014
+  ticker: PG
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000015
+  ticker: KO
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000016
+  ticker: PEP
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000017
+  ticker: JNJ
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000018
+  ticker: UNH
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000019
+  ticker: XOM
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000020
+  ticker: CVX
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000021
+  ticker: CAT
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000022
+  ticker: ADBE
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000023
+  ticker: CRM
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000024
+  ticker: ORCL
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000025
+  ticker: CSCO
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000026
+  ticker: IBM
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000027
+  ticker: ACN
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000028
+  ticker: NOW
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000029
+  ticker: INTU
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000030
+  ticker: AMD
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000031
+  ticker: QCOM
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000032
+  ticker: TXN
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000033
+  ticker: AVGO
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000034
+  ticker: AMAT
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000035
+  ticker: LRCX
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000036
+  ticker: KLAC
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000037
+  ticker: ADI
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000038
+  ticker: MU
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000039
+  ticker: INTC
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000040
+  ticker: PANW
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000041
+  ticker: SNPS
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000042
+  ticker: CDNS
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000043
+  ticker: ANET
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000044
+  ticker: CRWD
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000045
+  ticker: NFLX
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000046
+  ticker: TSLA
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000047
+  ticker: UBER
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000048
+  ticker: BKNG
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000049
+  ticker: ABNB
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000050
+  ticker: DIS
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000051
+  ticker: CMCSA
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000052
+  ticker: T
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000053
+  ticker: VZ
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000054
+  ticker: TMUS
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000055
+  ticker: BAC
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000056
+  ticker: WFC
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000057
+  ticker: C
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000058
+  ticker: GS
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000059
+  ticker: MS
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000060
+  ticker: SCHW
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000061
+  ticker: BLK
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000062
+  ticker: SPGI
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000063
+  ticker: CME
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000064
+  ticker: ICE
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000065
+  ticker: AXP
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000066
+  ticker: PGR
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000067
+  ticker: CB
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000001
+  ticker: MMC
+  market: US
+  exchange: NYSE
+  currency: USD
+  provider: alpaca
+  valid_from: '2025-12-01'
+  valid_to: '2026-01-14'
+  evidence: https://www.marsh.com/en/corp/about/news/marsh-mclennan-to-change-nyse-symbol-to-mrsh.html
+  identity_confirmed: true
+- security_id: sec-000001
+  ticker: MRSH
+  market: US
+  exchange: NYSE
+  currency: USD
+  provider: alpaca
+  valid_from: '2026-01-14'
+  valid_to: null
+  evidence: https://www.marsh.com/en/corp/about/news/marsh-mclennan-to-change-nyse-symbol-to-mrsh.html
+  identity_confirmed: true
+- security_id: sec-000069
+  ticker: AON
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000070
+  ticker: LLY
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000071
+  ticker: ABBV
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000072
+  ticker: MRK
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000073
+  ticker: ABT
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000074
+  ticker: TMO
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000075
+  ticker: DHR
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000076
+  ticker: AMGN
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000077
+  ticker: GILD
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000078
+  ticker: ISRG
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000079
+  ticker: SYK
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000080
+  ticker: MDT
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000081
+  ticker: BMY
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000082
+  ticker: MCD
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000083
+  ticker: SBUX
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000084
+  ticker: NKE
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000085
+  ticker: LOW
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000086
+  ticker: TJX
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000087
+  ticker: TGT
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000088
+  ticker: CL
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000089
+  ticker: KMB
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000090
+  ticker: MDLZ
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000091
+  ticker: MO
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000092
+  ticker: GE
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000093
+  ticker: HON
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000094
+  ticker: UNP
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000095
+  ticker: UPS
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000096
+  ticker: RTX
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000097
+  ticker: LMT
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000098
+  ticker: DE
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000099
+  ticker: COP
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000100
+  ticker: DUK
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+- security_id: sec-000101
+  ticker: NEE
+  market: US
+  exchange: null
+  currency: USD
+  provider: alpaca
+  valid_from: 2025-12-01
+  valid_to: null
+  evidence: config/alpaca-readonly-100.yaml (selection only; UNVERIFIED)
+  identity_confirmed: false
+events:
+- security_id: sec-000001
+  kind: ticker_change
+  effective_date: '2026-01-14'
+  evidence: https://www.marsh.com/en/corp/about/news/marsh-mclennan-to-change-nyse-symbol-to-mrsh.html
+  old_ticker: MMC
+  new_ticker: MRSH
+- security_id: sec-000093
+  kind: split
+  effective_date: 2026-06-29
+  evidence: https://www.honeywell.com/us/en/news/press-releases/2026/06/honeywell-technologies-launches-independent-pure-play-automation-company-following-honeywell-aerospace-spin-off
+  old_ticker: null
+  new_ticker: null
+- security_id: sec-000093
+  kind: spinoff
+  effective_date: 2026-06-29
+  evidence: https://www.honeywell.com/us/en/news/press-releases/2026/06/honeywell-technologies-launches-independent-pure-play-automation-company-following-honeywell-aerospace-spin-off
+  old_ticker: null
+  new_ticker: null
