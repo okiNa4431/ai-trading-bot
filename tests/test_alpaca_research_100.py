@@ -212,14 +212,21 @@ def test_quality_failure_is_aggregate_only(policy100, pages, kind, monkeypatch, 
     assert "never-log" not in output and '"AAPL"' not in output and '"close"' not in output
     if kind == "missing":
         assert result["missing_rows"] == 1 and result["successful_symbols"] == 99
+        assert result["checks"]["completeness"] == ["FAILED", "NOT_RUN"]
+        assert result["checks"]["repeat_consistency"] == "NOT_RUN"
+        assert result["repeat_revisions"] is None
     if kind == "duplicate":
         assert result["duplicate_rows"] == 1
     if kind == "ohlcv":
         assert result["invalid_rows"] == 1
     if kind == "revision":
         assert result["repeat_revisions"] == 1
+        assert result["checks"]["repeat_consistency"] == "FAILED"
+        assert result["checks"]["discontinuity"] == "PASSED"
     if kind == "jump":
         assert result["discontinuities"] > 0
+        assert result["checks"]["discontinuity"] == "FAILED"
+        assert result["checks"]["repeat_consistency"] == "NOT_RUN"
 
 
 @pytest.mark.parametrize("status", [401, 403, 429, 503, 0])

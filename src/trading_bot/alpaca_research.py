@@ -27,6 +27,7 @@ from trading_bot.alpaca import (
 from trading_bot.config import Instrument
 from trading_bot.data_access import MarketAccessDisabled
 from trading_bot.provider import DataError
+from trading_bot.research_diagnostics import missing_diagnostics, new_checks
 from trading_bot.research_universe import validate_research_symbols
 
 APPROVAL = "READ_ONLY_20_NO_STORAGE"
@@ -176,7 +177,8 @@ class ResearchProvider(AlpacaDailyProvider):
         self.session_count = policy.sessions
         self.last_batch: DailyBatch | None = None
         self.total_pages = self.total_retries = 0
-        self.quality = dict(repeat_revisions=0, discontinuities=0)
+        self.quality: dict[str, int | None] = dict(repeat_revisions=None, discontinuities=None)
+        self.checks = new_checks()
 
     def fetch_many(
         self,
@@ -220,10 +222,24 @@ def run_probe(policy: ResearchPolicy, provider: ResearchProvider) -> dict[str, o
         Instrument(symbol=s, market="US", currency="USD", display_name=s) for s in policy.symbols
     ]
     begin = time.perf_counter()
-    first = provider.fetch_many(instruments, start, end).require_complete()
-    second = provider.fetch_many(instruments, start, end).require_complete()
+    paging = ["NOT_RUN", "NOT_RUN"]
+    completeness = ["NOT_RUN", "NOT_RUN"]
+    provider.checks.update(paging=paging, completeness=completeness)
+
+    def checked_fetch(index: int) -> DailyBatch:
+        paging[index] = "FAILED"
+        batch = provider.fetch_many(instruments, start, end)
+        paging[index] = "PASSED"
+        completeness[index] = "FAILED"
+        batch.require_complete()
+        completeness[index] = "PASSED"
+        return batch
+
+    first = checked_fetch(0)
+    second = checked_fetch(1)
     if first.excluded_unconfirmed or second.excluded_unconfirmed:
         raise DataError("Phase 6 unconfirmed observations; stop")
+    provider.checks["discontinuity"] = "FAILED"
     provider.quality["discontinuities"] = sum(
         abs(b.close / a.close - 1) > 0.35
         for bars in second.bars.values()
@@ -231,7 +247,9 @@ def run_probe(policy: ResearchPolicy, provider: ResearchProvider) -> dict[str, o
     )
     if provider.quality["discontinuities"]:
         raise DataError("Phase 6 discontinuity; corporate-action review required")
+    provider.checks["discontinuity"] = "PASSED"
     # Compare only market observations, never fetched_at (which must advance).
+    provider.checks["repeat_consistency"] = "FAILED"
     revisions = sum(
         a.model_dump(exclude={"fetched_at"}) != b.model_dump(exclude={"fetched_at"})
         for s in policy.symbols
@@ -240,6 +258,7 @@ def run_probe(policy: ResearchPolicy, provider: ResearchProvider) -> dict[str, o
     provider.quality["repeat_revisions"] = revisions
     if revisions:
         raise DataError("Phase 6 repeated observations changed; manual review required")
+    provider.checks["repeat_consistency"] = "PASSED"
     rows = sum(map(len, first.bars.values()))
     stamps = [b.fetched_at for bars in second.bars.values() for b in bars]
     if any(t < at or t > provider.now().astimezone(UTC) for t in stamps):
@@ -282,6 +301,8 @@ def run_probe(policy: ResearchPolicy, provider: ResearchProvider) -> dict[str, o
         zero_volume_rows=sum(b.volume == 0 for bars in second.bars.values() for b in bars),
         low_iex_volume_rows=sum(b.volume < 100 for bars in second.bars.values() for b in bars),
         excluded_unconfirmed=first.excluded_unconfirmed + second.excluded_unconfirmed,
+        checks=provider.checks,
+        **missing_diagnostics(second),
     )
 
 
@@ -339,6 +360,8 @@ def main(*, profile: Literal[20, 100] = 20) -> int:
                     duplicate_rows=batch.duplicate_rows if batch else 0,
                     invalid_rows=batch.invalid_rows if batch else 0,
                     complete=False,
+                    checks=provider.checks if provider else new_checks(),
+                    **missing_diagnostics(batch),
                     **(provider.quality if provider else {}),
                 )
             )
