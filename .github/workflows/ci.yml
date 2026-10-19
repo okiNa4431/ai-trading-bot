@@ -25,7 +25,7 @@ jobs:
           version: '0.13.1'
       - run: uv python install 3.12
       - run: uv sync --locked
-      - run: uv run pytest tests/test_postgres.py tests/test_operations_pg.py -v
+      - run: uv run pytest tests/test_postgres.py tests/test_operations_pg.py tests/test_research_pg.py -v
         env:
           TEST_DATABASE_URL: postgresql://postgres:local-ci-only@127.0.0.1:5432/phase4_test
   checks:
