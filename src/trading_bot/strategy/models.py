@@ -44,6 +44,7 @@ class AISettings(Contract):
 
 
 class DecisionContext(Contract):
+    data_origin: Literal["synthetic", "market", "unknown"] = "unknown"
     as_of: datetime
     market: Market
     screening: ScreeningResult

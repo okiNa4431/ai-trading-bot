@@ -7,10 +7,11 @@ import time
 from collections.abc import Callable
 from decimal import Decimal
 from pathlib import Path
+from unittest.mock import Mock
 
 import httpx
 from dotenv import load_dotenv
-from google import genai
+from google import genai  # noqa: F401 -- retained as the synthetic SDK test patch namespace
 from google.genai import types
 
 from trading_bot.persistence.decision_repository import DecisionRepository
@@ -40,6 +41,7 @@ class GeminiTradingStrategy:
         *,
         system_instruction: str = SYSTEM,
         payload_builder: Callable[[DecisionContext], str] = payload,
+        offline_sdk_factory: Mock | None = None,
     ) -> None:
         self.settings = settings
         self.repository = repository
@@ -48,8 +50,16 @@ class GeminiTradingStrategy:
         self.last_response: str | None = None
         self.system_instruction = system_instruction
         self.payload_builder = payload_builder
+        self.offline_sdk_factory = offline_sdk_factory
 
     def decide(self, context: DecisionContext) -> DecisionResult:
+        if context.data_origin != "synthetic" or any(
+            c.features is not None and c.features.source == "alpaca"
+            for c in context.screening.candidates
+        ):
+            raise ValueError("external AI blocked for market-derived or unknown inputs")
+        if not isinstance(self.offline_sdk_factory, Mock):
+            raise ValueError("real Gemini transport disabled; synthetic offline SDK mock only")
         schema = response_schema(context)
         text = self.payload_builder(context)
         # UTF-8 bytes + schema/system + headroom: deliberately conservative token equivalent.
@@ -65,7 +75,7 @@ class GeminiTradingStrategy:
         for name in ("google_genai", "google.genai", "httpx", "httpcore"):
             logging.getLogger(name).setLevel(logging.CRITICAL)
         # Pin the public Developer API; do not inherit Vertex/endpoint env overrides.
-        client = genai.Client(
+        client = self.offline_sdk_factory(
             api_key=key,
             vertexai=False,
             http_options=types.HttpOptions(
@@ -74,6 +84,8 @@ class GeminiTradingStrategy:
                 retry_options=types.HttpRetryOptions(attempts=1),
             ),
         )
+        if not isinstance(client, Mock):
+            raise ValueError("offline SDK factory must return a mock client")
         try:
             for attempt in range(self.settings.retries + 1):
                 usage = self.repository.reserve(self.decision_id, self.settings)

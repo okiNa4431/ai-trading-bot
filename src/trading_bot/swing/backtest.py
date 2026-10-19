@@ -149,6 +149,7 @@ def context_at(
         rules=broker.rules,
         pending_orders=pending,
         holding_sessions=ages,
+        data_origin="synthetic" if data.rights.kind == "synthetic" else "market",
     ), marks
 
 

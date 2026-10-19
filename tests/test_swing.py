@@ -146,7 +146,11 @@ def test_sdk_mock_gemini_and_rules_use_existing_broker(tmp_path, monkeypatch, da
     class PerDecision:
         def decide(self, context):
             delegate = GeminiTradingStrategy(
-                ai_settings(), ledger, context.as_of.isoformat(), env_file=tmp_path / "absent.env"
+                ai_settings(),
+                ledger,
+                context.as_of.isoformat(),
+                env_file=tmp_path / "absent.env",
+                offline_sdk_factory=Mock(return_value=client),
             )
             return SwingGeminiStrategy(delegate, DataRights(external_ai=True), True).decide(context)
 

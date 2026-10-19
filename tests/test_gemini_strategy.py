@@ -8,6 +8,7 @@ from google.genai import errors
 
 from tests.ai_helpers import NOW, ai_settings, environment
 from trading_bot.persistence.decision_repository import DecisionRepository
+from trading_bot.strategy import gemini as sdk_module
 from trading_bot.strategy.gemini import GeminiTradingStrategy
 from trading_bot.strategy.mock import MockTradingStrategy
 
@@ -16,9 +17,14 @@ from trading_bot.strategy.mock import MockTradingStrategy
 def setup_ai(tmp_path, monkeypatch):
     engine = environment(tmp_path)
     context, _ = engine.context("JP", NOW, None)
+    context = context.model_copy(update={"data_origin": "synthetic"})
     monkeypatch.setenv("GEMINI_API_KEY", "fake-test-secret")
     strategy = GeminiTradingStrategy(
-        ai_settings(), engine.decisions, "sdk-test", tmp_path / "absent.env"
+        ai_settings(),
+        engine.decisions,
+        "sdk-test",
+        tmp_path / "absent.env",
+        offline_sdk_factory=Mock(side_effect=lambda **kwargs: sdk_module.genai.Client(**kwargs)),
     )
     return strategy, context, engine
 

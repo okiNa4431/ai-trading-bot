@@ -254,6 +254,16 @@ def test_order_time_is_actual_registration_after_ai_latency(tmp_path):
 
 def test_engine_gemini_tokens_and_invalid_response_are_persisted(tmp_path, monkeypatch):
     from tests.test_gemini_strategy import response
+    from trading_bot.strategy.gemini import GeminiTradingStrategy
+
+    class OfflineSDK(GeminiTradingStrategy):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs, offline_sdk_factory=Mock(return_value=client))
+
+        def decide(self, context):
+            return super().decide(context.model_copy(update={"data_origin": "synthetic"}))
+
+    monkeypatch.setattr("trading_bot.orchestration.engine.GeminiTradingStrategy", OfflineSDK)
 
     engine = environment(tmp_path)
     context, _ = engine.context("JP", NOW, None)
