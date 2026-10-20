@@ -1,5 +1,7 @@
 # AI vs オルカン — AI Trading Bot
 
+[Phase 11 合成データ専用MVP](docs/phase11-synthetic-mvp.md)：証券別品質・隔離と翌営業日の仮想約定を検証します。`uv run python scripts/synthetic_mvp.py` でAPIキーなしに実行できます。実市場の運用実績ではなく、実データの売買許可も追加しません。
+
 [読取品質診断と戦略承認の分離](docs/readonly-quality-boundary.md)：UNKNOWNを保持する別の手動診断経路を追加。診断結果は集計専用型で返し、AI・注文・約定・保存へは渡せません。既存の厳格な証券ID承認条件は維持します。
 
 [Phase 9 不連続診断](docs/phase9-discontinuities.md)：専用承認に限り、不連続を品質違反のまま保持して再取得比較します。企業行動との日付一致は原因候補であり、戦略承認ではありません。

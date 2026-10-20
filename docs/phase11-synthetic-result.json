@@ -1,0 +1,73 @@
+{
+  "annual_trade_count": null,
+  "annualized_return": null,
+  "average_holding_sessions": null,
+  "batch_status": "PASSED",
+  "benchmark_name": "SYNTHETIC full-population 80% buy-and-hold index / 20% JPY cash",
+  "benchmark_return": 0.10782840901197255,
+  "cash_ratio": "1",
+  "closed_trades": 41,
+  "completed_valuation_sessions": 161,
+  "costs_jpy": 21539.83252803315,
+  "cumulative_return": 0.018049494,
+  "current_assets_jpy": 1018049.494,
+  "data_kind": "synthetic",
+  "evaluation_sessions": 161,
+  "excess_return": -0.08977891501197255,
+  "fills": 82,
+  "final_balances": {
+    "JPY": "200000",
+    "USD": "5516.18"
+  },
+  "held_positions": 0,
+  "initial_jpy": 1000000,
+  "last_valid_valuation_at": "2024-11-14T21:01:00+00:00",
+  "limitations": "short samples are descriptive, not evidence of profitability",
+  "market_strategy_approved": false,
+  "max_drawdown": -0.05775091377425334,
+  "pending_orders": 0,
+  "profit_factor": 1.0719241142313387,
+  "profit_factor_undefined_no_losses": false,
+  "public_dashboard_updated": false,
+  "purpose": "synthetic_mvp_only",
+  "quality": {
+    "as_of": "2024-11-14T21:01:00+00:00",
+    "data_kind": "synthetic",
+    "population": 100,
+    "reasons": {
+      "corporate_action_unknown": 1,
+      "identity_unknown": 1,
+      "prior_quarantine_requires_review": 1,
+      "unsupported_corporate_action": 1
+    },
+    "states": {
+      "ELIGIBLE": 97,
+      "QUARANTINED": 1,
+      "UNKNOWN": 2
+    }
+  },
+  "real_api_requests": 0,
+  "realized_pnl": {
+    "JPY": "0",
+    "USD": "46.69"
+  },
+  "rejected_orders": 0,
+  "requested_evaluation_sessions": 161,
+  "requested_population": 100,
+  "risk_exit_counts": {
+    "max_holding_sessions": 37,
+    "stop_loss": 4,
+    "trend_breakout": 41
+  },
+  "sampling": "SYNTHETIC session-close equity; no intraday max-drawdown claim",
+  "selection_bias": "fixed synthetic population; excluded members remain in audit and benchmark",
+  "sharpe_zero_risk_free": 0.40277842070298303,
+  "sortino_zero_risk_free": 0.43615895054480736,
+  "status": "COMPLETE",
+  "stop_reason": null,
+  "total_pnl_jpy": 18049.493999999948,
+  "trade_count": 82,
+  "volatility_annualized": 0.0770619573972634,
+  "win_rate": 0.5121951219512195,
+  "worst_crash_session_return": null
+}
