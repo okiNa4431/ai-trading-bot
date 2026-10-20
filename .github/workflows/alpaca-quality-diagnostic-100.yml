@@ -1,0 +1,40 @@
+name: Alpaca 100-security alias quality diagnostic (manual)
+on:
+  workflow_dispatch:
+    inputs:
+      approval:
+        description: 'After contract confirmation only: type READ_ONLY_100_DIAGNOSTIC_NO_STORAGE'
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: alpaca-readonly-main
+  cancel-in-progress: false
+jobs:
+  validate:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: alpaca-research
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.13.1'
+          enable-cache: false
+      - run: uv python install 3.12
+      - run: uv sync --locked
+      - name: Approved GET-only transient validation; aggregate output only
+        run: uv run python scripts/alpaca_quality_diagnostic_100.py
+        env:
+          ALPACA_100_DIAGNOSTIC_LIVE_ENABLED: ${{ vars.ALPACA_100_DIAGNOSTIC_LIVE_ENABLED }}
+          ALPACA_RESEARCH_ENVIRONMENT: alpaca-research
+          ALPACA_MARKET_DATA_LIVE_ENABLED: ${{ vars.ALPACA_MARKET_DATA_LIVE_ENABLED }}
+          ALPACA_READONLY_APPROVAL: ${{ inputs.approval }}
+          ALPACA_API_KEY_ID: ${{ secrets.ALPACA_API_KEY_ID }}
+          ALPACA_API_SECRET_KEY: ${{ secrets.ALPACA_API_SECRET_KEY }}
+          PYTHONDONTWRITEBYTECODE: '1'
+# No artifact, cache save, market-data file, database, Gemini, or order step.

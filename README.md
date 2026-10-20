@@ -1,5 +1,7 @@
 # AI vs オルカン — AI Trading Bot
 
+[読取品質診断と戦略承認の分離](docs/readonly-quality-boundary.md)：UNKNOWNを保持する別の手動診断経路を追加。診断結果は集計専用型で返し、AI・注文・約定・保存へは渡せません。既存の厳格な証券ID承認条件は維持します。
+
 Phase 8.5：[100証券のID・履歴統合と確認状況](docs/phase85-identities.md)。100ID・101別名を登録し、未確認の証拠や未対応企業行動がある場合は新しい読取専用Workflowを通信前に停止します。実市場での100証券成功を意味しません。
 
 Phase 8：[100銘柄の読取専用検証手順](docs/phase8-readonly-100.md)。20銘柄と別の手動Workflow・承認を使用します。市場データはメモリだけで処理し、実通信はユーザーが起動します。

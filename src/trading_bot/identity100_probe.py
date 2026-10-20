@@ -105,8 +105,8 @@ def authorize(approval: str, env: Mapping[str, str]) -> None:
         raise MarketAccessDisabled("separate 100-security approval required")
 
 
-class _ReviewedProvider(AlpacaDailyProvider):
-    """Internal setup used only after approval and catalog evidence checks."""
+class _TransientDailyProvider(AlpacaDailyProvider):
+    """Internal setup; the caller must enforce its mode-specific approval and evidence gates."""
 
     def __init__(
         self,
@@ -176,7 +176,7 @@ def run(
             raise ValueError("only offline MockTransport allowed")
         aliases = tuple(a.ticker for a in registry.assignments)
         guard = IdentityBatchTransport(mock or httpx.HTTPTransport(retries=0), aliases)
-        provider = _ReviewedProvider(key, secret, guard, now, mock is not None)
+        provider = _TransientDailyProvider(key, secret, guard, now, mock is not None)
         result["data_kind"] = provider.data_kind
         start, end = (datetime.combine(d, datetime.min.time(), NY) for d in (days[0], days[-1]))
         instruments = [
