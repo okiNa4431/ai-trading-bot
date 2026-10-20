@@ -14,8 +14,10 @@ from trading_bot.operations import Operation
 from trading_bot.persistence.supabase_repository import SupabaseRepository
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def phase5_uri():
+    # Additive DDL belongs to module setup, not every UUID-isolated account test.
+    # Reapplying it during test writes can deadlock with PostgreSQL auto-ANALYZE.
     return postgres_uri.__wrapped__()
 
 
