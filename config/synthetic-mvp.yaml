@@ -1,0 +1,16 @@
+# SYNTHETIC ONLY. Independent of config/swing.yaml and every market workflow.
+symbols: 100
+sessions: 221
+seed: 551
+fast_sma: 20
+slow_sma: 60
+breakout_sessions: 20
+stop_loss: 0.08
+trailing_stop: 0.12
+max_holding_sessions: 30
+target_weight: 0.09
+max_positions: 8
+review_fixtures: true
+rules:
+  slippage: 0.001
+  commission_usd: 1
