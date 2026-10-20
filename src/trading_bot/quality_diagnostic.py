@@ -14,6 +14,7 @@ import httpx
 from trading_bot.alpaca import NY, AlpacaBatchError, DailyBatch, aware
 from trading_bot.alpaca_research import WORKFLOW_REF
 from trading_bot.config import Instrument
+from trading_bot.corporate_review import public_research_candidates
 from trading_bot.data_access import MarketAccessDisabled, ReadOnlyQualityReport
 from trading_bot.identity100_probe import (
     IdentityBatchTransport,
@@ -26,6 +27,10 @@ from trading_bot.security_identity import SecurityRegistry
 
 APPROVAL = "READ_ONLY_100_DIAGNOSTIC_NO_STORAGE"
 WORKFLOW = WORKFLOW_REF.replace("alpaca-readonly.yml", "alpaca-quality-diagnostic-100.yml")
+CONTINUATION_APPROVAL = "READ_ONLY_100_DISCONTINUITIES_NO_STORAGE"
+CONTINUATION_WORKFLOW = WORKFLOW_REF.replace(
+    "alpaca-readonly.yml", "alpaca-discontinuities-100.yml"
+)
 
 
 def diagnostic_scope(
@@ -64,10 +69,18 @@ def diagnostic_scope(
     return scopes
 
 
-def inspect_aliases(batch: DailyBatch, scopes: dict[str, set[date]], stats: dict[str, int]) -> None:
+def inspect_aliases(
+    batch: DailyBatch,
+    scopes: dict[str, set[date]],
+    stats: dict[str, int],
+    *,
+    catalog: IdentityCatalog | None = None,
+    continue_discontinuities: bool = False,
+) -> None:
     if not batch.complete_response or batch.excluded_unconfirmed or set(batch.bars) != set(scopes):
         raise DataError("incomplete or unexpected diagnostic response")
     missing = duplicates = invalid = discontinuities = 0
+    affected = multiple = upward = downward = near = aligned = 0
     for alias, bars in batch.bars.items():
         found = set()
         for bar in bars:
@@ -76,16 +89,47 @@ def inspect_aliases(batch: DailyBatch, scopes: dict[str, set[date]], stats: dict
             duplicates += int(day in found)
             found.add(day)
         missing += len(scopes[alias] - found)
-        discontinuities += sum(
-            abs(b.close / a.close - 1) > 0.35 for a, b in zip(bars[:-1], bars[1:], strict=True)
+        hits = 0
+        # An assignment here selects public event candidates only, never resolves raw identity.
+        sids = (
+            {a.security_id for a in catalog.assignments if a.ticker == alias} if catalog else set()
         )
+        events = [e for e in catalog.events if e.security_id in sids] if catalog else []
+        event_days = [e.effective_date for e in events]
+        event_days.extend(
+            c.effective_from
+            for c in public_research_candidates()
+            if c.ticker_hint == alias and c.effective_from is not None
+        )
+        for left, right in zip(bars[:-1], bars[1:], strict=True):
+            change = right.close / left.close - 1
+            if abs(change) <= 0.35:
+                continue
+            hits += 1
+            upward += int(change > 0)
+            downward += int(change < 0)
+            before, after = (b.timestamp.astimezone(NY).date() for b in (left, right))
+            # Count observations, not events: split + spinoff on one day is one match.
+            near += int(any(abs((day - after).days) <= 3 for day in event_days))
+            aligned += int(any(before < day <= after for day in event_days))
+        discontinuities += hits
+        affected += int(hits > 0)
+        multiple += max(0, hits - 1)
     stats.update(
         missing_rows=missing,
         duplicate_rows=duplicates,
         invalid_rows=invalid,
         discontinuities=discontinuities,
+        discontinuity_count=discontinuities,
+        discontinuity_symbol_count=affected,
+        upward_discontinuity_count=upward,
+        downward_discontinuity_count=downward,
+        additional_same_symbol_discontinuities=multiple,
+        known_event_window_matches=near,
+        published_event_boundary_matches=aligned,
+        unexplained_discontinuities=discontinuities - aligned,
     )
-    if missing or duplicates or invalid or discontinuities:
+    if missing or duplicates or invalid or (discontinuities and not continue_discontinuities):
         raise DataError("alias quality failure; no repair or event adjustment")
 
 
@@ -96,6 +140,7 @@ def run(
     catalog: IdentityCatalog | None = None,
     mock: httpx.MockTransport | None = None,
     now: Callable[[], datetime] = lambda: datetime.now(UTC),
+    continue_discontinuities: bool = False,
 ) -> tuple[int, ReadOnlyQualityReport]:
     started = time.perf_counter()
     checks: dict[str, object] = dict(
@@ -134,14 +179,17 @@ def run(
             GITHUB_ACTIONS="true",
             GITHUB_EVENT_NAME="workflow_dispatch",
             GITHUB_REF="refs/heads/main",
-            GITHUB_WORKFLOW_REF=WORKFLOW,
+            GITHUB_WORKFLOW_REF=CONTINUATION_WORKFLOW if continue_discontinuities else WORKFLOW,
             GITHUB_REPOSITORY="okiNa4431/ai-trading-bot",
             RUNNER_ENVIRONMENT="github-hosted",
             ALPACA_RESEARCH_ENVIRONMENT="alpaca-research",
             ALPACA_MARKET_DATA_LIVE_ENABLED="true",
             ALPACA_100_DIAGNOSTIC_LIVE_ENABLED="true",
         )
-        if approval != APPROVAL or any(env.get(k) != v for k, v in required.items()):
+        expected_approval = CONTINUATION_APPROVAL if continue_discontinuities else APPROVAL
+        if continue_discontinuities:
+            required["ALPACA_DISCONTINUITIES_LIVE_ENABLED"] = "true"
+        if approval != expected_approval or any(env.get(k) != v for k, v in required.items()):
             raise MarketAccessDisabled("separate read-only diagnostic approval required")
         checks["scope"] = "FAILED"
         catalog = catalog or load_catalog()
@@ -174,6 +222,7 @@ def run(
         ]
         start, end = (datetime.combine(d, datetime.min.time(), NY) for d in (days[0], days[-1]))
         batches = []
+        pass_stats = []
         paging, quality = ["NOT_RUN", "NOT_RUN"], ["NOT_RUN", "NOT_RUN"]
         checks.update(paging=paging, alias_quality=quality)
         for index in range(2):
@@ -192,14 +241,23 @@ def run(
                     retries += last.retries
             paging[index] = "PASSED"
             quality[index] = "FAILED"
-            inspect_aliases(last, scopes, stats)
+            inspect_aliases(
+                last,
+                scopes,
+                stats,
+                catalog=catalog,
+                continue_discontinuities=continue_discontinuities,
+            )
             if any(
                 b.fetched_at < at or b.fetched_at > aware(now())
                 for bars in last.bars.values()
                 for b in bars
             ):
                 raise DataError("invalid diagnostic observation times")
-            quality[index] = "PASSED"
+            quality[index] = "FAILED" if stats["discontinuities"] else "PASSED"
+            pass_stats.append(dict(stats))
+            if continue_discontinuities:
+                result["quality_counts_per_pass"] = pass_stats
             batches.append(last)
         checks["repeat_consistency"] = "FAILED"
         first, second = batches
@@ -213,10 +271,14 @@ def run(
             raise DataError("diagnostic observations changed")
         checks["repeat_consistency"] = "PASSED"
         guard.check_deadline()
+        if any(s["discontinuities"] for s in pass_stats):
+            result["reason"] = "discontinuities_retained_after_repeat_diagnosis"
+            raise DataError("discontinuities remain quality violations")
         result.update(status="DIAGNOSTIC_PASSED", diagnostic_complete=True)
         code = 0
     except Exception:
-        result.update(status="STOPPED", reason="authorization_scope_or_alias_quality_failure")
+        result.update(status="STOPPED")
+        result.setdefault("reason", "authorization_scope_or_alias_quality_failure")
         code = 1
     finally:
         result.update(stats)
@@ -249,11 +311,15 @@ def run(
     return code, ReadOnlyQualityReport(json.dumps(result, sort_keys=True))
 
 
-def main() -> int:
+def main(*, continue_discontinuities: bool = False) -> int:
     previous = logging.root.manager.disable
     logging.disable(logging.CRITICAL)
     try:
-        code, report = run(os.environ.get("ALPACA_READONLY_APPROVAL", ""), os.environ)
+        code, report = run(
+            os.environ.get("ALPACA_READONLY_APPROVAL", ""),
+            os.environ,
+            continue_discontinuities=continue_discontinuities,
+        )
         print(report.aggregate_json)
         return code
     finally:

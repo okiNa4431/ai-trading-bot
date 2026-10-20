@@ -1,6 +1,6 @@
 """Untrusted/offline event candidates. No discovery API, registry promotion or adjustment."""
 
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
@@ -18,6 +18,7 @@ class CorporateActionCandidate(BaseModel):
     effective_from: date | None = None
     effective_to: date | None = None
     published_at: datetime | None = None
+    published_on: date | None = None  # Date-only publication evidence; never invent a time.
     observed_at: datetime
     review_status: Literal["UNKNOWN"] = "UNKNOWN"
 
@@ -43,3 +44,18 @@ class CorporateActionCandidate(BaseModel):
         if self.published_at and self.published_at > self.observed_at:
             raise ValueError("publication cannot be observed before publication time")
         return self
+
+
+def public_research_candidates() -> tuple[CorporateActionCandidate, ...]:
+    """Public source candidates only; no identity clearance or automated adjustment."""
+    return (
+        CorporateActionCandidate(
+            kind="split",
+            ticker_hint="NOW",
+            provider="issuer",
+            evidence_reference="https://www.sec.gov/Archives/edgar/data/1373715/000137371525000321/now-20251205.htm",
+            published_on=date(2025, 12, 5),
+            effective_from=date(2025, 12, 18),
+            observed_at=datetime.now(UTC),
+        ),
+    )
