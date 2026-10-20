@@ -12,6 +12,7 @@ from trading_bot.alpaca import NY, DailyBatch, confirmed_at
 from trading_bot.alpaca_research import ResearchProvider
 from trading_bot.broker.execution import session
 from trading_bot.config import Instrument
+from trading_bot.data_access import reject_diagnostic
 from trading_bot.models import PriceBar
 from trading_bot.portfolio.models import Contract, FXRate, Mark, TradingRules, utc
 from trading_bot.portfolio.valuation import validate_fx
@@ -60,6 +61,7 @@ class ObservedDailyData(SwingData):
         fx: list[FXRate],
         actions: ActionCoverage,
     ) -> None:
+        reject_diagnostic(prices)
         prices.require_complete()
         if len(securities) < 20 or len(securities) > 2000:
             raise ValueError("observed universe requires 20-2000 reviewed securities")

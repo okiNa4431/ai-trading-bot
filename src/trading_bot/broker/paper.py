@@ -8,6 +8,7 @@ from uuid import uuid4
 
 from trading_bot.broker.execution import eligible_bar, known_marks, window
 from trading_bot.config import Instrument
+from trading_bot.data_access import reject_diagnostic
 from trading_bot.models import PriceBar
 from trading_bot.persistence.sqlite_repository import PortfolioRepository, Session
 from trading_bot.portfolio.ledger import apply_execution
@@ -99,6 +100,7 @@ class PaperBroker:
         *,
         stop_price: Decimal | None = None,
     ) -> Order:
+        reject_diagnostic(instrument)
         order = Order(
             order_id=order_id or str(uuid4()),
             symbol=instrument.symbol,
@@ -245,6 +247,7 @@ class PaperBroker:
         as_of: datetime,
         mode: Literal["historical", "paper"] = "historical",
     ) -> Order:
+        reject_diagnostic((data, fx))
         as_of = utc(as_of)
         if mode not in ("historical", "paper"):
             raise ValueError("unknown execution mode")
@@ -385,6 +388,7 @@ class PaperBroker:
             return order
 
     def value(self, marks: dict[str, Mark], fx: FXRate | None, as_of: datetime) -> Valuation:
+        reject_diagnostic((marks, fx))
         with self.repository.transaction() as tx:
             account = tx.account()
             if utc(as_of) < (account.last_event_at or account.created_at):

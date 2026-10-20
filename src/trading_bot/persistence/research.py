@@ -8,6 +8,7 @@ from contextlib import contextmanager
 from copy import deepcopy
 from typing import Any
 
+from trading_bot.data_access import reject_diagnostic
 from trading_bot.models import PriceBar
 from trading_bot.persistence.supabase_repository import BufferedSession, SupabaseAPI
 
@@ -65,6 +66,7 @@ class PrivateResearchStore:
         state: dict[str, Any],
         result: dict[str, Any],
     ) -> dict[str, Any]:
+        reject_diagnostic((request, bars, state, result))
         self.check()
         observations = {}
         for bar in bars:

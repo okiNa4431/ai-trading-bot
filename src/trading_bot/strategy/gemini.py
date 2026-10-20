@@ -14,6 +14,7 @@ from dotenv import load_dotenv
 from google import genai  # noqa: F401 -- retained as the synthetic SDK test patch namespace
 from google.genai import types
 
+from trading_bot.data_access import reject_diagnostic
 from trading_bot.persistence.decision_repository import DecisionRepository
 from trading_bot.strategy.models import AISettings, DecisionContext, DecisionResult, validate_result
 from trading_bot.strategy.prompt import SYSTEM, payload, response_schema
@@ -53,6 +54,7 @@ class GeminiTradingStrategy:
         self.offline_sdk_factory = offline_sdk_factory
 
     def decide(self, context: DecisionContext) -> DecisionResult:
+        reject_diagnostic(context)
         if context.data_origin != "synthetic" or any(
             c.features is not None and c.features.source == "alpaca"
             for c in context.screening.candidates
