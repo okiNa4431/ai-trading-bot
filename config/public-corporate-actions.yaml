@@ -1,0 +1,146 @@
+schema_version: 1
+scope_note: Partial public research catalog; not exhaustive for 100 securities; no
+  provider application clearance.
+events:
+- event_id: now-2025-split
+  revision: 1
+  issuer: ServiceNow, Inc.
+  share_class: common stock
+  ticker_hint: NOW
+  kind: split
+  provider: public_primary_sources
+  evidence_reference: https://newsroom.servicenow.com/press-releases/details/2025/ServiceNow-Shareholders-Approve-5-for-1-Stock-Split/default.aspx
+  additional_sources:
+  - https://www.sec.gov/Archives/edgar/data/1373715/000137371525000321/now-20251205.htm
+  published_on: '2025-12-05'
+  legal_effective_on: '2025-12-17'
+  effective_from: '2025-12-18'
+  ratio_new: 5
+  ratio_old: 1
+  official_terms: Five new shares per old share; legal and trading dates differ.
+  observed_at: '2026-10-20T14:19:18.221809+00:00'
+  review_status: UNKNOWN
+  evidence_status: PUBLIC_SOURCE_REVIEWED
+  provider_application: UNKNOWN
+- event_id: hon-2026-spinoff
+  revision: 1
+  issuer: Honeywell
+  share_class: common stock
+  ticker_hint: HON
+  kind: spinoff
+  provider: public_primary_sources
+  evidence_reference: https://www.honeywell.com/us/en/news/press-releases/2026/06/honeywell-technologies-launches-independent-pure-play-automation-company-following-honeywell-aerospace-spin-off
+  additional_sources: []
+  published_on: '2026-06-29'
+  legal_effective_on: '2026-06-29'
+  effective_from: '2026-06-29'
+  ratio_new: 1
+  ratio_old: 2
+  official_terms: One HONA share per two pre-distribution HON shares. Allocation and
+    provider application UNKNOWN.
+  observed_at: '2026-10-20T14:19:18.221809+00:00'
+  review_status: UNKNOWN
+  evidence_status: PUBLIC_SOURCE_REVIEWED
+  provider_application: UNKNOWN
+- event_id: hon-2026-reverse
+  revision: 1
+  issuer: Honeywell
+  share_class: common stock
+  ticker_hint: HON
+  kind: reverse_split
+  provider: public_primary_sources
+  evidence_reference: https://www.honeywell.com/us/en/news/press-releases/2026/06/honeywell-technologies-launches-independent-pure-play-automation-company-following-honeywell-aerospace-spin-off
+  additional_sources:
+  - https://investor.honeywell.com/reverse-stock-split
+  published_on: '2026-06-29'
+  legal_effective_on: '2026-06-29'
+  effective_from: '2026-06-29'
+  ratio_new: 1
+  ratio_old: 2
+  official_terms: One remaining HON share per two old HON shares, following spinoff.
+  observed_at: '2026-10-20T14:19:18.221809+00:00'
+  review_status: UNKNOWN
+  evidence_status: PUBLIC_SOURCE_REVIEWED
+  provider_application: UNKNOWN
+- event_id: bkng-2026-split
+  revision: 1
+  issuer: Booking Holdings Inc.
+  share_class: common stock
+  ticker_hint: BKNG
+  kind: split
+  provider: public_primary_sources
+  evidence_reference: https://www.bookingholdings.com/wp-content/uploads/2026/02/Q4-25-BKNG-Earnings-Release.pdf
+  additional_sources:
+  - https://infomemo.theocc.com/infomemos?number=58460
+  - https://www.sec.gov/Archives/edgar/data/1075531/000107553126000024/q1-26bkngearningsrelease.htm
+  published_on: '2026-02-18'
+  legal_effective_on: '2026-04-02'
+  effective_from: '2026-04-06'
+  ratio_new: 25
+  ratio_old: 1
+  official_terms: 25 new shares per old share. OCC ex-distribution date April 6; company
+    effective date April 2.
+  observed_at: '2026-10-20T14:19:18.221809+00:00'
+  review_status: UNKNOWN
+  evidence_status: PUBLIC_SOURCE_REVIEWED
+  provider_application: UNKNOWN
+- event_id: cmcsa-2026-spinoff
+  revision: 1
+  issuer: Comcast Corporation
+  share_class: Class A common stock
+  ticker_hint: CMCSA
+  kind: spinoff
+  provider: public_primary_sources
+  evidence_reference: https://www.cmcsa.com/news-releases/news-release-details/comcast-announces-completion-separation-versant-media-group-inc
+  additional_sources:
+  - https://classic.nasdaqtrader.com/TraderNews.aspx?id=ECA2025-683
+  published_on: '2026-01-05'
+  legal_effective_on: '2026-01-02'
+  effective_from: '2026-01-05'
+  ratio_new: 1
+  ratio_old: 25
+  official_terms: One Versant Class A share per 25 Comcast Class A shares; ex-date
+    January 5. Class B not mapped.
+  observed_at: '2026-10-20T14:19:18.221809+00:00'
+  review_status: UNKNOWN
+  evidence_status: PUBLIC_SOURCE_REVIEWED
+  provider_application: UNKNOWN
+- event_id: marsh-2026-ticker
+  revision: 1
+  issuer: Marsh & McLennan Companies
+  share_class: common stock
+  ticker_hint: MMC
+  kind: ticker_change
+  provider: public_primary_sources
+  evidence_reference: https://www.marsh.com/en/corp/about/news/marsh-mclennan-to-change-nyse-symbol-to-mrsh.html
+  additional_sources: []
+  published_on: '2025-12-29'
+  legal_effective_on: '2026-01-14'
+  effective_from: '2026-01-14'
+  ratio_new: null
+  ratio_old: null
+  official_terms: MMC to MRSH; legal name and CUSIP unchanged; not a split.
+  observed_at: '2026-10-20T14:19:18.221809+00:00'
+  review_status: UNKNOWN
+  evidence_status: PUBLIC_SOURCE_REVIEWED
+  provider_application: UNKNOWN
+- event_id: bkng-2026-q1-dividend
+  revision: 1
+  issuer: Booking Holdings Inc.
+  share_class: common stock
+  ticker_hint: BKNG
+  kind: dividend
+  provider: public_primary_sources
+  evidence_reference: https://www.bookingholdings.com/wp-content/uploads/2026/02/Q4-25-BKNG-Earnings-Release.pdf
+  additional_sources: []
+  published_on: '2026-02-18'
+  legal_effective_on: null
+  effective_from: null
+  ratio_new: null
+  ratio_old: null
+  official_terms: USD 10.50 per share, payable March 31, record March 6; ex-date UNKNOWN.
+    No guessed boundary.
+  observed_at: '2026-10-20T14:19:18.221809+00:00'
+  review_status: UNKNOWN
+  evidence_status: PUBLIC_SOURCE_REVIEWED
+  provider_application: UNKNOWN
