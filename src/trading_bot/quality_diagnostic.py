@@ -14,7 +14,14 @@ import httpx
 from trading_bot.alpaca import NY, AlpacaBatchError, DailyBatch, aware
 from trading_bot.alpaca_research import WORKFLOW_REF
 from trading_bot.config import Instrument
-from trading_bot.corporate_review import public_research_candidates
+from trading_bot.corporate_review import (
+    CorporateActionCandidate,
+    PublicActionCatalog,
+    count_boundary,
+    load_public_actions,
+    new_event_counts,
+    public_research_candidates,
+)
 from trading_bot.data_access import MarketAccessDisabled, ReadOnlyQualityReport
 from trading_bot.identity100_probe import (
     IdentityBatchTransport,
@@ -31,6 +38,8 @@ CONTINUATION_APPROVAL = "READ_ONLY_100_DISCONTINUITIES_NO_STORAGE"
 CONTINUATION_WORKFLOW = WORKFLOW_REF.replace(
     "alpaca-readonly.yml", "alpaca-discontinuities-100.yml"
 )
+EVENT_APPROVAL = "READ_ONLY_100_EVENT_CANDIDATES_NO_STORAGE"
+EVENT_WORKFLOW = WORKFLOW_REF.replace("alpaca-readonly.yml", "alpaca-events-100.yml")
 
 
 def diagnostic_scope(
@@ -76,11 +85,14 @@ def inspect_aliases(
     *,
     catalog: IdentityCatalog | None = None,
     continue_discontinuities: bool = False,
+    public_events: tuple[CorporateActionCandidate, ...] | None = None,
 ) -> None:
     if not batch.complete_response or batch.excluded_unconfirmed or set(batch.bars) != set(scopes):
         raise DataError("incomplete or unexpected diagnostic response")
     missing = duplicates = invalid = discontinuities = 0
     affected = multiple = upward = downward = near = aligned = 0
+    event_counts = new_event_counts()
+    boundaries = []
     for alias, bars in batch.bars.items():
         found = set()
         for bar in bars:
@@ -112,6 +124,8 @@ def inspect_aliases(
             # Count observations, not events: split + spinoff on one day is one match.
             near += int(any(abs((day - after).days) <= 3 for day in event_days))
             aligned += int(any(before < day <= after for day in event_days))
+            if public_events is not None:
+                boundaries.append((alias, before, after))
         discontinuities += hits
         affected += int(hits > 0)
         multiple += max(0, hits - 1)
@@ -131,6 +145,10 @@ def inspect_aliases(
     )
     if missing or duplicates or invalid or (discontinuities and not continue_discontinuities):
         raise DataError("alias quality failure; no repair or event adjustment")
+    if public_events is not None:
+        for alias, before, after in boundaries:
+            count_boundary(public_events, alias, before, after, event_counts)
+        stats.update(event_counts)
 
 
 def run(
@@ -141,7 +159,11 @@ def run(
     mock: httpx.MockTransport | None = None,
     now: Callable[[], datetime] = lambda: datetime.now(UTC),
     continue_discontinuities: bool = False,
+    event_matching: bool = False,
+    public_catalog: PublicActionCatalog | None = None,
 ) -> tuple[int, ReadOnlyQualityReport]:
+    if event_matching:
+        continue_discontinuities = True
     started = time.perf_counter()
     checks: dict[str, object] = dict(
         scope="NOT_RUN",
@@ -173,6 +195,8 @@ def run(
     guard = None
     last = None
     stats: dict[str, int] = {}
+    public_events = None
+    classification = ["NOT_RUN", "NOT_RUN"]
     pages = retries = 0
     try:
         required = dict(
@@ -189,6 +213,12 @@ def run(
         expected_approval = CONTINUATION_APPROVAL if continue_discontinuities else APPROVAL
         if continue_discontinuities:
             required["ALPACA_DISCONTINUITIES_LIVE_ENABLED"] = "true"
+        if event_matching:
+            required.update(
+                GITHUB_WORKFLOW_REF=EVENT_WORKFLOW,
+                ALPACA_EVENT_CANDIDATES_LIVE_ENABLED="true",
+            )
+            expected_approval = EVENT_APPROVAL
         if approval != expected_approval or any(env.get(k) != v for k, v in required.items()):
             raise MarketAccessDisabled("separate read-only diagnostic approval required")
         checks["scope"] = "FAILED"
@@ -196,6 +226,22 @@ def run(
         at = aware(now())
         days = session_window(at)
         scopes = diagnostic_scope(catalog, days, at.astimezone(ZoneInfo("Asia/Tokyo")).date())
+        if event_matching:
+            checks["public_catalog"] = "FAILED"
+            checks["event_classification"] = classification
+            public_catalog = PublicActionCatalog.model_validate(
+                (public_catalog or load_public_actions()).model_dump()
+            )
+            public_events = public_catalog.active(at)
+            result.update(
+                public_catalog_events=len(public_events),
+                public_catalog_incomplete_boundaries=sum(
+                    e.effective_from is None for e in public_events
+                ),
+                public_catalog_exhaustive=False,
+                automatic_verification_enabled=False,
+            )
+            checks["public_catalog"] = "PASSED"
         result.update(
             catalog.summary(set(days)),
             expected_alias_rows=sum(map(len, scopes.values())),
@@ -247,6 +293,7 @@ def run(
                 stats,
                 catalog=catalog,
                 continue_discontinuities=continue_discontinuities,
+                public_events=public_events,
             )
             if any(
                 b.fetched_at < at or b.fetched_at > aware(now())
@@ -255,6 +302,8 @@ def run(
             ):
                 raise DataError("invalid diagnostic observation times")
             quality[index] = "FAILED" if stats["discontinuities"] else "PASSED"
+            if event_matching:
+                classification[index] = "PASSED"
             pass_stats.append(dict(stats))
             if continue_discontinuities:
                 result["quality_counts_per_pass"] = pass_stats
@@ -311,7 +360,7 @@ def run(
     return code, ReadOnlyQualityReport(json.dumps(result, sort_keys=True))
 
 
-def main(*, continue_discontinuities: bool = False) -> int:
+def main(*, continue_discontinuities: bool = False, event_matching: bool = False) -> int:
     previous = logging.root.manager.disable
     logging.disable(logging.CRITICAL)
     try:
@@ -319,6 +368,7 @@ def main(*, continue_discontinuities: bool = False) -> int:
             os.environ.get("ALPACA_READONLY_APPROVAL", ""),
             os.environ,
             continue_discontinuities=continue_discontinuities,
+            event_matching=event_matching,
         )
         print(report.aggregate_json)
         return code

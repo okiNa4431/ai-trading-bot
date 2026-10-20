@@ -389,3 +389,5 @@ gh workflow run paper-cycle.yml -f mode=fixture -f market=JP -f fixture_step=1
 `paper-reconcile.yml` は初期状態では読取照合だけです。復旧mutationはRepository Variable `PHASE5_RECOVERY_APPROVED=true` と、required reviewersを設定した `phase5-recovery` Environmentを管理者が構成した後に限ります。初期状態では有効化していません。`apply_review=true`、対象run_id、調査理由を指定し、resume=falseで停止、resume=trueで調査済みの試行をSKIPPEDとして閉じて将来の別slotを許可します。古い試行を再送/再約定する操作ではなく、共有API枠も返却しません。
 
 Supabase障害・期限切れ・通信結果不明は別DBへfallbackせず停止。未解決試行は新しいIDでも再実行できません。企業行動は検出して停止する段階であり、分割調整や配当入金の自動会計は行いません。オルカン初回適用NAV待ち・未許諾データの非公開を維持します。
+
+[Phase 10 公開企業行動候補](docs/phase10-event-candidates.md)：公開資料の版管理とメモリ内の種別別候補照合。原因を自動確定せず、実市場データを外部へ送信しません。
