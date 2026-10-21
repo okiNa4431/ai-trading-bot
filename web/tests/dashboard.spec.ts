@@ -9,6 +9,7 @@ for(const width of [360,390,768,1440]){
   await page.setViewportSize({width,height:900})
   await page.route('**/runtime-config.json',r=>r.fulfill({json:{url:'',key:''}}))
   await page.goto('./')
+ await page.getByRole('button',{name:'過去の技術検証ダッシュボードを開く',exact:true}).click()
   await expect(page.getByText('まだ運用開始前',{exact:true})).toBeVisible()
   await expect(page.getByText('公開データを準備しています。架空の運用成績は表示しません。')).toBeVisible()
   for(const [label,message] of [['保有銘柄','保有銘柄はありません。'],['売買履歴','まだ約定した取引はありません。'],['AI判断','まだ保存された判断はありません。']]){
@@ -29,6 +30,7 @@ test('public projection only, same-day missing NAV stays blank, chart table acce
   await r.fulfill({json:[{document}]})
  })
  await page.goto('./')
+ await page.getByRole('button',{name:'過去の技術検証ダッシュボードを開く',exact:true}).click()
  await expect(page.locator('.metric-value').first()).toHaveText('￥1,000,000')
  await expect(page.locator('.metric-value').nth(1)).toHaveText('—')
  await expect(page.getByRole('img',{name:'AIとオルカンの累積リターン'})).toBeVisible()
@@ -43,6 +45,7 @@ test('refresh failure preserves last successful update and values',async({page})
  let calls=0
  await page.route('https://public-example.invalid/**',r=>++calls===1?r.fulfill({json:[{document}]}):r.fulfill({status:503,body:'private internal error'}))
  await page.goto('./')
+ await page.getByRole('button',{name:'過去の技術検証ダッシュボードを開く',exact:true}).click()
  await expect(page.locator('.metric-value').first()).toHaveText('￥1,000,000')
  await page.getByRole('button',{name:/最新データに更新/}).click()
  await expect(page.getByRole('alert')).toContainText('最後に取得した情報')
@@ -53,6 +56,7 @@ test('malformed public values fail safely without invented results',async({page}
  await page.route('**/runtime-config.json',r=>r.fulfill({json:{url:'https://public-example.invalid',key:'sb_publishable_test'}}))
  await page.route('https://public-example.invalid/**',r=>r.fulfill({json:[{document:{...document,series:[{at:'broken',bot_jpy:'NaN'}]}}]}))
  await page.goto('./')
+ await page.getByRole('button',{name:'過去の技術検証ダッシュボードを開く',exact:true}).click()
  await expect(page.getByRole('alert')).toBeVisible()
  await expect(page.locator('.metric-value').first()).toHaveText('—')
 })
@@ -62,6 +66,7 @@ test('AI text is rendered as text, no script execution or fabricated fills',asyn
   items:[{symbol:'TEST.T',action:'HOLD',reason:'<img src=x onerror=alert(1)>',skipped:'HOLD: no order'}]}]}
  await page.route('https://public-example.invalid/**',r=>r.fulfill({json:[{document:history}]}))
  await page.goto('./')
+ await page.getByRole('button',{name:'過去の技術検証ダッシュボードを開く',exact:true}).click()
  await page.getByRole('button',{name:'AI判断',exact:true}).click()
  await expect(page.getByText('<img src=x onerror=alert(1)>',{exact:true})).toBeVisible()
  expect(await page.locator('.decision-item img').count()).toBe(0)
@@ -72,6 +77,7 @@ test('invalid holding currency is rejected before rendering financial values',as
  await page.route('https://public-example.invalid/**',r=>r.fulfill({json:[{document:{...document,
   holdings:[{symbol:'TEST',name:'invalid',currency:'secret-not-a-currency',quantity:1,average_cost:'1',market_value_jpy:'1',unrealized_pnl:'0',ratio:'.1',at:document.updated_at}]}}]}))
  await page.goto('./')
+ await page.getByRole('button',{name:'過去の技術検証ダッシュボードを開く',exact:true}).click()
  await expect(page.getByRole('alert')).toBeVisible()
  await page.getByRole('button',{name:'保有銘柄',exact:true}).click()
  await expect(page.getByText('保有銘柄はありません。',{exact:true})).toBeVisible()

@@ -1,73 +1,33 @@
-import React from 'react'
+import React, { useState } from 'react'
 import ReactDOM from 'react-dom/client'
 import './style.css'
 import './dashboard.css'
+import './japan.css'
 import { Dashboard } from './dashboard'
+import demo from './japan-demo.json'
 
 const repository = 'https://github.com/okiNa4431/ai-trading-bot'
-
-function SymbolMark() {
-  return <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-    <circle cx="16" cy="16" r="12" stroke="currentColor" strokeWidth="1.3" />
-    <ellipse cx="16" cy="16" rx="5" ry="12" stroke="currentColor" strokeWidth="1.3" />
-    <path d="M4 16h24M7 8.5h18M7 23.5h18" stroke="currentColor" strokeWidth="1.1" />
-  </svg>
-}
-
+const yen = (v: string) => new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY', maximumFractionDigits: 0 }).format(Number(v))
+const pct = (v: string) => `${(Number(v) * 100).toFixed(2)}%`
 function App() {
+  const [legacy, setLegacy] = useState(false)
+  const [synthetic, setSynthetic] = useState(false)
+  const points = (field: 'ai_jpy' | 'nav_jpy') => demo.daily.map((d, i) => `${20 + i / (demo.daily.length - 1) * 760},${170 - (Number(d[field]) / 1000000 - 1) * 650}`).join(' ')
   return <div className="site">
     <a className="skip" href="#main">本文へ移動</a>
-    <header className="flex items-center justify-between gap-4">
-      <a className="brand flex items-center gap-3" href="#"><SymbolMark /><span>AI <span className="muted">vs</span> オルカン</span></a>
-      <a className="repo-link" href={repository} target="_blank" rel="noreferrer">GitHub <span aria-hidden="true">↗</span></a>
-    </header>
-
+    <header className="flex items-center justify-between gap-4"><a className="brand" href="#">AI <span className="muted">vs</span> オルカン</a><a className="repo-link" href={repository} target="_blank" rel="noreferrer">GitHub ↗</a></header>
     <main id="main">
-      <Dashboard />
       <section className="hero" aria-labelledby="title">
-        <div className="hero-copy">
-          <p className="eyebrow"><span className="status-dot" /> OPEN INVESTMENT EXPERIMENT</p>
-          <h1 id="title">同じ100万円。<br />ふたつの<span className="accent">運用思想。</span></h1>
-          <p className="intro">AIは、世界をまるごと持つ投資にどう挑むのか。<br className="desktop-break" />日本株・米国株の仮想売買と、オルカンへの一括投資。<br className="desktop-break" />同じ出発点から、その過程を公開する実験です。</p>
-          <div className="hero-actions flex flex-wrap items-center gap-5">
-            <a className="primary" href="#experiment">実験の設計を見る <span aria-hidden="true">↓</span></a>
-            <span className="preparing"><span className="status-dot" /> 仮想運用プロジェクト</span>
-          </div>
-        </div>
-        <aside className="experiment-card" aria-label="実験の現在地">
-          <div className="flex items-center justify-between"><span className="eyebrow">EXPERIMENT 001</span><span className="phase-badge">PHASE 04</span></div>
-          <p className="card-label">共通の初期仮想資金</p>
-          <p className="capital"><span>¥</span>1,000,000</p>
-          <div className="comparison">
-            <div><span className="strategy-number">01 / ACTIVE</span><h2>AI</h2><p>日本株・米国株を選ぶ</p><span className="strategy-note">Gemini · AI判断モデル</span></div>
-            <span className="versus">vs</span>
-            <div><span className="strategy-number">02 / PASSIVE</span><h2>オルカン</h2><p>全世界株式を持つ</p><span className="strategy-note">一括投資 · 実基準価額で比較</span></div>
-          </div>
-          <p className="card-footnote">このWebは仮想運用の公開記録です。<br />実資金を使った運用ではありません。</p>
-        </aside>
+        <div className="hero-copy"><p className="eyebrow"><span className="status-dot" /> JAPAN / PAPER TRADING RESEARCH</p><h1 id="title">同じ100万円。<br />日本株AIと、<br /><span className="accent">世界を持つ投資。</span></h1><p className="intro">Geminiで企業を選び、ルールで売買する。<br />日本株の仮想運用と、オルカンの一括保有を<br className="desktop-break" />同じ円建て資金から比較する研究です。</p><div className="hero-actions flex flex-wrap items-center gap-5"><a className="primary" href="#experiment">実験の設計を見る ↓</a><span className="preparing">仮想運用プロジェクト</span></div></div>
+        <aside className="experiment-card" aria-label="実験の現在地"><div className="flex items-center justify-between"><span className="eyebrow">CURRENT STAGE</span><span className="phase-badge">JP-0 / JP-1</span></div><p className="card-label">それぞれの初期仮想資金</p><p className="capital"><span>¥</span>1,000,000</p><div className="comparison"><div><span className="strategy-number">A / ACTIVE</span><h2>日本株AI</h2><p>財務評価 × ルール売買</p><span className="strategy-note">Gemini · 現在はmock</span></div><span className="versus">vs</span><div><span className="strategy-number">D / PASSIVE</span><h2>オルカン</h2><p>全世界株式の一括保有</p><span className="strategy-note">実NAV比較は準備中</span></div></div><p className="card-footnote">実資金を使った運用ではありません。<br />実API・定期運用はまだ開始していません。</p></aside>
       </section>
-
-      <section className="principles" id="experiment" aria-labelledby="design-title">
-        <div className="section-heading"><p className="eyebrow">THE DESIGN</p><h2 id="design-title">判断より先に、<br className="mobile-break" />検証できる仕組みを。</h2><p>実資金を使わず、ルールと記録を積み上げる。</p></div>
-        <div className="principle-grid">
-          <article><span className="index">01</span><h3>日米、ふたつの市場</h3><p>日本株と米国株が対象。円とドルを分けて管理し、為替交換や取引コストも記録します。</p><span className="detail">JPY / USD</span></article>
-          <article><span className="index">02</span><h3>仮想口座で確かめる</h3><p>現物株のみ、空売り・レバレッジなし。1銘柄10%、株式全体80%を買い注文の上限にします。</p><span className="detail">PAPER TRADING ONLY</span></article>
-          <article><span className="index">03</span><h3>過程までオープンに</h3><p>データ取得から売買のルールまで、コードを公開。結果だけでなく、その前提も検証できる実験へ。</p><a className="detail text-link" href={repository} target="_blank" rel="noreferrer">VIEW REPOSITORY ↗</a></article>
-        </div>
-      </section>
-
-      <section className="roadmap" aria-labelledby="roadmap-title">
-        <div><p className="eyebrow">WORK IN PROGRESS</p><h2 id="roadmap-title">いまは、土台をつくる段階。</h2><p className="muted">実装済みの範囲と、これからを分けて公開します。</p></div>
-        <ol>
-          <li><span className="step">01</span><div><span className="step-state">実装・検証済み</span><h3>市場データ基盤</h3><p>日米株価の取得・検証・保存</p></div><span className="done" aria-label="完了">✓</span></li>
-          <li><span className="step">02</span><div><span className="step-state">実装・検証済み</span><h3>仮想口座と売買エンジン</h3><p>残高・約定・損益・リスクの管理</p></div><span className="done" aria-label="完了">✓</span></li>
-          <li><span className="step">03</span><div><span className="step-state">実装・検証済み</span><h3>AI判断エンジン</h3><p>定量スクリーニング・構造化判断・注文計画</p></div><span className="done">✓</span></li><li className="current"><span className="step">04</span><div><span className="step-state">現在の開発フェーズ</span><h3>運用の永続化と比較</h3><p>継続運用・オルカン比較・結果の公開</p></div></li>
-        </ol>
-      </section>
-      <section className="closing"><SymbolMark /><p>結論を急がず、実験を重ねる。</p><a href={repository} target="_blank" rel="noreferrer">GitHubで開発を追う ↗</a></section>
-    </main>
-    <footer><span>AI vs オルカン <span className="muted">/ OPEN EXPERIMENT</span></span><p>仮想売買の開発実験です。投資助言・運用成績の保証は行いません。</p></footer>
+      <section className="dashboard jp-live" aria-label="日本株実運用の準備状況"><div className="dash-top"><div><p className="eyebrow">LIVE COMPARISON / NOT STARTED</p><h2>実運用比較は、準備中。</h2><p className="muted">実市場データによる売買実績はありません。</p></div><span className="phase-badge">準備中</span></div><div className="metric-grid">{['AI総資産・累積リターン', 'オルカン評価額・リターン', '超過リターン・最大DD', '保有銘柄・売買回数'].map(label => <article className="metric" key={label}><h3>{label}</h3><p className="jp-placeholder">準備中</p></article>)}</div><p className="muted">比較チャート・運用開始日・最終更新：準備中。未公開の実NAVや旧口座の値を、この比較には使いません。</p></section>
+      <section className="principles" id="experiment" aria-labelledby="design-title"><div className="section-heading"><p className="eyebrow">THE DESIGN</p><h2 id="design-title">企業を選ぶ判断と、<br />売買のルールを分ける。</h2><p>数量・約定価格はAIが決めません。確定済みの情報から注文し、後続の営業日で約定します。</p></div><div className="jp-flow" aria-label="将来の日本株システム構成"><article><span className="index">01 / FINANCIALS</span><h3>EDINET DB → Gemini</h3><p>成長性・収益性・財務健全性・リスクを構造化。現在は合成財務とmockのみ。</p></article><span className="jp-arrow" aria-hidden="true">→</span><article><span className="index">02 / EXECUTION</span><h3>J-Quants → 仮想売買</h3><p>株価・営業日と、損切り・保有期間・100株単位の決定論的ルール。実接続は未開始。</p></article><span className="jp-arrow" aria-hidden="true">→</span><article><span className="index">03 / COMPARISON</span><h3>オルカンと円建て比較</h3><p>独立した100万円口座。適用NAV日と公表時刻を守り、コストを含めて比較。</p></article></div><p className="jp-note">A：mock選定＋ルール売買 / B：定量選定＋同じ売買 / C：AI選定＋定期リバランス / D：オルカン保有。B・Cの比較は今後の実装です。</p></section>
+      <section className="jp-demo" aria-label="合成データの比較デモ"><p className="eyebrow">SYNTHETIC / MOCK ONLY</p><h2>まず、架空の相場で確かめる。</h2><p>以下はすべて <strong>SYNTHETIC</strong>。架空の日本株20証券・合成財務・合成NAVによる動作検証です。実際のオルカンの値動きや、Geminiの投資能力を示すものではありません。</p><button className="primary" aria-expanded={synthetic} onClick={() => setSynthetic(!synthetic)}>SYNTHETIC比較デモ{synthetic ? 'を閉じる' : 'を見る'}</button>{synthetic && <div className="jp-demo-result"><p className="jp-synthetic-label">SYNTHETIC · 合成データ / Gemini mock / 実API通信0回</p><div className="metric-grid">{[['mock選定＋ルール', yen(demo.current_assets_jpy), pct(demo.cumulative_return)], ['合成NAV保有', yen(demo.benchmark_jpy), pct(demo.benchmark_return)], ['比較差分', pct(demo.excess_return), '同一期間・初期資金100万円'], ['最大DD / 約定', pct(demo.maximum_drawdown), `${demo.trade_count}件 / 100株単位`]].map(([label, value, note]) => <article className="metric" key={label}><h3>{label}</h3><p className="jp-demo-value">{value}</p><p>{note}</p></article>)}</div><svg className="jp-chart" viewBox="0 0 800 240" role="img" aria-label="SYNTHETIC mock戦略と合成NAVの比較"><line x1="20" y1="170" x2="780" y2="170" stroke="#b7c5bf" strokeDasharray="5 5"/><polyline points={points('ai_jpy')} fill="none" stroke="#17634b" strokeWidth="3"/><polyline points={points('nav_jpy')} fill="none" stroke="#b38134" strokeWidth="3"/></svg><p>緑：mock戦略 / 黄：合成NAV。横軸は検証営業日の順序、破線は初期100万円。</p><details><summary>SYNTHETICの評価額を表で確認</summary><div className="jp-table"><table><thead><tr><th>評価日時 UTC</th><th>mock戦略 JPY</th><th>合成NAV JPY</th></tr></thead><tbody>{demo.daily.map(d => <tr key={d.at}><td>{d.at}</td><td>{yen(d.ai_jpy)}</td><td>{yen(d.nav_jpy)}</td></tr>)}</tbody></table></div></details><p>現金比率 {pct(demo.cash_ratio)} · 保有 {demo.holdings}証券 · 勝率 {demo.win_rate ? pct(demo.win_rate) : '未算出'} · 手数料 {yen(demo.commission_jpy)}。合成NAV購入適用日 {demo.nav_application_date}。模擬契約であり、実投信の取引条件ではありません。</p></div>}</section>
+      <section className="roadmap" aria-labelledby="roadmap-title"><div><p className="eyebrow">JAPAN ROADMAP</p><h2 id="roadmap-title">現在地と、次の条件。</h2><p className="muted">合成検証と実市場での稼働を分けて進めます。</p><p className="jp-note">最新の合成試行：20架空証券・221営業日。日本株の実取得・Gemini送信は未開始。</p></div><ol>{[['JP-0','設計・公開ページ','完了：日本株研究へ方針更新'],['JP-1','合成データMVP','実装：mock選定・翌営業日約定・合成NAV'],['JP-2','J-Quants Free読取','未開始：仕様・権利・遅延と接続承認'],['JP-3','EDINET DB財務','未開始：出所・公表時刻・改訂・利用条件'],['JP-4','Gemini財務評価','未開始：転送許可・無料枠・別承認'],['JP-5','実データ仮想比較','未開始：企業行動・実NAV・公平な評価'],['JP-6','日次継続運用','未開始：監視・復旧・定期起動の別承認']].map(([step,title,state]) => <li key={step}><span className="step">{step}</span><div><span className="step-state">{state}</span><h3>{title}</h3></div></li>)}</ol></section>
+      <section className="jp-restrictions"><h2>データ利用の確認が、次の入口。</h2><p>月額0円を優先。EDINET DB・J-Quants・Geminiの無料仕様、保存・第三者送信・公開権利は別々に確認します。未確認の用途は有効化しません。企業行動や履歴が不明な証券は安全停止します。</p><a href={`${repository}/blob/main/docs/japan-roadmap.md`}>設計と承認条件を読む ↗</a></section>
+      <section className="jp-legacy"><p className="eyebrow">PREVIOUS RESEARCH / US FOUNDATION</p><h2>米国株研究は、技術基盤として保存。</h2><p>Alpacaの読取検証・証券ID・品質診断を実施してきました。実市場の仮想売買利益を示すものではありません。既存口座の記録は日本株の成績へ合算しません。</p><button className="refresh" aria-expanded={legacy} onClick={() => setLegacy(!legacy)}>過去の技術検証ダッシュボード{legacy ? 'を閉じる' : 'を開く'}</button>{legacy && <><p className="jp-note">過去の技術検証記録。日本株版の実運用比較ではありません。</p><Dashboard /></>}</section>
+    </main><footer><span>AI vs オルカン / JAPAN RESEARCH</span><p>仮想売買の開発実験です。実資金の運用は行いません。</p></footer>
   </div>
 }
-
 ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><App /></React.StrictMode>)
