@@ -1,4 +1,23 @@
-# AI vs オルカン — AI Trading Bot
+# AI vs オルカン — 日本株AI仮想運用研究
+
+日本株の財務評価・銘柄選定をGemini、売買タイミング・数量・約定をPythonの決定論的ルールで扱い、独立した初期資金100万円ずつでオルカン一括保有と比較する研究です。月額0円を優先します。
+
+現在は **JP-0 / JP-1：合成データ検証**。実J-Quants・EDINET DB・Gemini通信、定期運用は開始しません。米国株のコードと厳格なAlpaca診断は過去の技術基盤として維持します。
+
+- [日本株の設計・ロードマップと承認条件](docs/japan-roadmap.md)
+- [JP-1の実行・結果・制限](docs/japan-synthetic-mvp.md)
+- [公開ページ](https://okina4431.github.io/ai-trading-bot/)：実運用の準備中表示とSYNTHETIC比較デモを分離
+
+```powershell
+uv sync --locked
+uv run python scripts/japan_synthetic.py
+```
+
+APIキー不要。一時的な新規JPY口座・架空日本株20証券・合成財務・Gemini mock・合成NAVのみを使用し、実行後に一時DBを削除します。実際のオルカンの基準価額や、AI能力・実市場の運用実績ではありません。既存Supabase・paper-live・API履歴は変更しません。
+
+以下は従来の米国株・日米基盤の開発記録です。古い段階の設定説明は現在の接続許可を意味しません。日本株の今後の実装は上記ロードマップを基準にします。
+
+## 過去の技術基盤・開発記録
 
 [Phase 11 合成データ専用MVP](docs/phase11-synthetic-mvp.md)：証券別品質・隔離と翌営業日の仮想約定を検証します。`uv run python scripts/synthetic_mvp.py` でAPIキーなしに実行できます。実市場の運用実績ではなく、実データの売買許可も追加しません。
 
