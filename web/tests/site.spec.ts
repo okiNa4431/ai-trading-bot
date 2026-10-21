@@ -11,7 +11,7 @@ for (const width of [360, 390, 768, 1440]) {
     await expect(page.getByText('仮想運用プロジェクト', { exact: true })).toBeVisible()
     await expect(page.getByText('実資金を使った運用ではありません。')).toBeVisible()
     await expect(page.getByText('Gemini · 現在はmock')).toBeVisible()
-    await expect(page.getByText('JP-2 / 読取準備', { exact: true })).toBeVisible()
+    await expect(page.getByText('JP-3 / 財務基盤', { exact: true })).toBeVisible()
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
     await page.getByRole('link', { name: '実験の設計を見る' }).click()
     await expect(page).toHaveURL(/#experiment$/)
