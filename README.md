@@ -2,8 +2,9 @@
 
 日本株の財務評価・銘柄選定をGemini、売買タイミング・数量・約定をPythonの決定論的ルールで扱い、独立した初期資金100万円ずつでオルカン一括保有と比較する研究です。月額0円を優先します。
 
-現在は **JP-0 / JP-1：合成データ検証**。実J-Quants・EDINET DB・Gemini通信、定期運用は開始しません。米国株のコードと厳格なAlpaca診断は過去の技術基盤として維持します。
+現在は **JP-0 / JP-1完了、JP-2読取Provider実装・実データ検証待ち**。実J-Quants・EDINET DB・Gemini通信、定期運用は開始しません。米国株のコードと厳格なAlpaca診断は過去の技術基盤として維持します。
 
+- [J-Quants Free公式仕様・利用条件](docs/jquants-free-review.md) / [読取20証券の準備・ゲート・操作](docs/jquants-readonly.md)
 - [日本株の設計・ロードマップと承認条件](docs/japan-roadmap.md)
 - [JP-1の実行・結果・制限](docs/japan-synthetic-mvp.md)
 - [公開ページ](https://okina4431.github.io/ai-trading-bot/)：実運用の準備中表示とSYNTHETIC比較デモを分離
