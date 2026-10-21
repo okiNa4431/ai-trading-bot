@@ -7,6 +7,8 @@ for (const width of [360, 1440]) {
     page.on('request', r => { if (!r.url().startsWith('http://127.0.0.1')) external.push(r.url()) })
     await page.goto('./')
     await expect(page.getByRole('heading', { level: 1 })).toContainText('日本株AI')
+    await expect(page.locator('.roadmap')).toContainText('実装済み／実データ検証待ち：通信ゲートは無効')
+    await expect(page.locator('.roadmap')).toContainText('完了：mock選定')
     const live = page.getByRole('region', { name: '日本株実運用の準備状況' })
     await expect(live).toContainText('実市場データによる売買実績はありません。')
     await expect(live.locator('.jp-placeholder')).toHaveCount(4)
