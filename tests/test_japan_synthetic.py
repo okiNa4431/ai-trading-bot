@@ -52,7 +52,9 @@ def test_generated_scope_calendar_and_financial_json(data, settings):
         assert "quantity" not in score.model_dump()
 
 
-@pytest.mark.parametrize("change", ["source", "currency", "identity", "calendar", "nav", "real"])
+@pytest.mark.parametrize(
+    "change", ["source", "currency", "identity", "calendar", "nav", "real", "ordering"]
+)
 def test_unsafe_input_rejected(data, settings, change):
     s = data.instruments[0].symbol
     if change == "source":
@@ -73,6 +75,10 @@ def test_unsafe_input_rejected(data, settings, change):
         altered = replace(data, opens=(data.opens[0] + timedelta(days=1),) + data.opens[1:])
     elif change == "nav":
         altered = replace(data, navs=data.navs[1:])
+    elif change == "ordering":
+        bars = list(data.rows[s])
+        bars[59], bars[80] = bars[80], bars[59]
+        altered = replace(data, rows={**data.rows, s: tuple(bars)})
     else:
         altered = replace(data, data_kind="MARKET")
     with pytest.raises(ValueError):

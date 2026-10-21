@@ -5,6 +5,7 @@ import logging
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
 from decimal import ROUND_DOWN, Decimal
+from itertools import pairwise
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Literal
@@ -194,6 +195,9 @@ def validate_scope(data: JapanFixture, settings: JapanSettings) -> None:
     for instrument in data.instruments:
         if instrument.market != "JP" or instrument.currency != "JPY":
             raise ValueError("JP/JPY fixture required")
+        ordered = data.rows[instrument.symbol]
+        if any(a.timestamp > b.timestamp for a, b in pairwise(ordered)):
+            raise ValueError("out-of-order observations prohibited")
         for bar in data.rows[instrument.symbol]:
             if (
                 bar.source != "synthetic"
@@ -413,7 +417,7 @@ def replay(
                 index = next(i for i, ins in enumerate(data.instruments) if ins.symbol == symbol)
                 if not held and data.financials[index].security_id not in selected:
                     continue
-                history = data.rows[symbol][: day + 1]
+                history = [b for b in data.rows[symbol] if b.timestamp <= data.opens[day]]
                 peaks[symbol] = max(peaks.get(symbol, 0), history[-1].close) if held else 0
                 action, reason = signal(
                     [b.close for b in history],
