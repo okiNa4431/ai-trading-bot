@@ -10,7 +10,7 @@ from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from functools import lru_cache
 from pathlib import Path
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 from zoneinfo import ZoneInfo
 
 import httpx
@@ -21,6 +21,9 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from trading_bot.broker.execution import session
 from trading_bot.data_access import DiagnosticOnly, MarketAccessDisabled, ReadOnlyQualityReport
 from trading_bot.portfolio.models import utc
+
+if TYPE_CHECKING:
+    from trading_bot.jquants_local import LocalProbePolicy
 
 APPROVAL = "READ_ONLY_JQUANTS_20_NO_STORAGE"
 ENDPOINT = "https://api.jquants.com/v2/equities/bars/daily"
@@ -134,16 +137,19 @@ def authorize(policy: JQuantsPolicy, approval: str, env: Mapping[str, str], at: 
         "JQUANTS_MARKET_DATA_LIVE_ENABLED": "true",
         "JQUANTS_TERMS_CONFIRMED": "true",
     }
-    key = env.get("JQUANTS_API_KEY", "")
     if (
         not policy.live_enabled
         or approval != APPROVAL
         or any(env.get(k) != v for k, v in required.items())
-        or not key.strip()
-        or key != key.strip()
-        or any(ord(c) < 33 or ord(c) > 126 for c in key)
     ):
         raise MarketAccessDisabled("JQUANTS_READONLY_APPROVAL_REQUIRED")
+    return require_api_key(env)
+
+
+def require_api_key(env: Mapping[str, str]) -> str:
+    key = env.get("JQUANTS_API_KEY", "")
+    if not key.strip() or key != key.strip() or any(ord(c) < 33 or ord(c) > 126 for c in key):
+        raise MarketAccessDisabled("JQUANTS_API_KEY_REQUIRED")
     return key
 
 
@@ -360,7 +366,7 @@ def observation(
 
 
 class JQuantsProvider:
-    """Only this workflow gate can construct the live client. Output is aggregate-only."""
+    """Reviewed workflow or Windows-local authorization; one shared diagnostic engine."""
 
     def __init__(
         self,
@@ -368,12 +374,18 @@ class JQuantsProvider:
         approval: str,
         env: Mapping[str, str],
         *,
+        local_policy: "LocalProbePolicy | None" = None,
         transport: httpx.BaseTransport | None = None,
         clock: Callable[[], float] = time.monotonic,
         sleep: Callable[[float], None] = time.sleep,
         now: Callable[[], datetime] = lambda: datetime.now(UTC),
     ):
-        key = authorize(policy, approval, env, now())
+        if local_policy is None:
+            key = authorize(policy, approval, env, now())
+        else:
+            from trading_bot.jquants_local import authorize_local
+
+            key = authorize_local(policy, local_policy, approval, env, now())
         self.policy, self.now = policy, now
         self.guard = Guard(
             transport if transport is not None else httpx.HTTPTransport(retries=0),

@@ -1,0 +1,6 @@
+# Preparation only: enabling requires reviewed code change and separate owner approval.
+local_live_enabled: false
+scope_sha256: e308e2f77fe27d4bae1870dddd94ab2962a3c682b106a2dda1de45001c7fce84
+reviewed_at: 2026-10-21
+review_valid_until: 2026-11-20
+approval_reference: docs/jquants-local-probe.md
