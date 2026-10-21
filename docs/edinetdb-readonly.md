@@ -23,7 +23,7 @@ FinancialStatementは会計期間、実績/予想、連結/単体、会計基準
 
 `known_at`は情報の利用可能性検査であって売買承認ではない。`select_as_of`は取得・公表・改訂時刻が判断以前に確認できる版だけを選び、訂正前の観測を保持する。同一版の内容衝突、訂正の分岐・循環・証拠不足は拒否またはUNKNOWN。2026年に初取得した系列を2025年の観測へ流用しない。過去版を復元できなければ過去AI成績検証は未承認。将来の判断ログを保存する段階では、別承認のもと、取得時点の不変スナップショット・採用版・候補選定時刻を記録する。
 
-FinancialStatementは既存DiagnosticOnly型とpurposeを持ち、実財務のオブジェクト・入れ子・辞書化後もAI/注文/約定/評価/PrivateResearchStoreから拒否する。合成専用入力はsynthetic ID・出所・証拠・版・時刻・許可を検証する。合成スキーマJSONを実Geminiへ送信する機能も追加しない。
+FinancialStatementと個別指標・内部派生値のFinancialValueは既存DiagnosticOnly型とpurposeを持ち、オブジェクト・入れ子・辞書化後もAI/注文/約定/評価/PrivateResearchStoreから拒否する。企業・出所・期間の重複が不整合な成長率も計算しない。合成専用入力はsynthetic ID・出所・証拠・版・時刻・許可を検証する。合成スキーマJSONを実Geminiへ送信する機能も追加しない。
 
 ## 登録と次の承認
 

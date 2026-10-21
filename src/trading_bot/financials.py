@@ -128,9 +128,10 @@ Metric = Literal[
 ]
 
 
-class FinancialValue(Contract):
+class FinancialValue(Contract, DiagnosticOnly):
+    purpose: Literal["diagnostic_only"] = "diagnostic_only"
     metric: Metric
-    value: Decimal | None
+    value: Decimal | None = Field(repr=False)
     unit: Literal[
         "CURRENCY", "THOUSAND_CURRENCY", "MILLION_CURRENCY", "FRACTION", "PERCENT", "UNKNOWN"
     ]
@@ -312,6 +313,10 @@ def revenue_growth(
 ) -> FinancialValue | None:
     if current.issuer_id != previous.issuer_id:
         raise FinancialStop("ISSUER_MISMATCH")
+    if current.source != previous.source or current.data_kind != previous.data_kind:
+        raise FinancialStop("FINANCIAL_PROVENANCE_MISMATCH")
+    if previous.period.end >= current.period.start:
+        raise FinancialStop("OVERLAPPING_ACCOUNTING_PERIODS")
     if (
         current.standard,
         current.basis,

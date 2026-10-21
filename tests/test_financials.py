@@ -127,6 +127,13 @@ def test_auth_quota_and_other_status_fail_closed(status):
         with pytest.raises(FinancialStop) as error:
             client.fetch("synthetic:issuer:01")
         assert client.requests == 1
+        assert str(error.value) == (
+            "FIXTURE_AUTH_STOP"
+            if status in (401, 403)
+            else "FIXTURE_DAILY_QUOTA_STOP"
+            if status == 429
+            else "FIXTURE_RESPONSE_STOP"
+        )
         assert "private-response" not in str(error.value)
     finally:
         client.close()
@@ -365,7 +372,8 @@ def test_live_adapter_and_diagnose_never_construct_http(monkeypatch, capsys):
 
 
 @pytest.mark.parametrize("serialized", [True, False])
-def test_actual_ai_broker_and_storage_refuse_financial_diagnostics(serialized):
+@pytest.mark.parametrize("extracted", [True, False])
+def test_actual_ai_broker_and_storage_refuse_financial_diagnostics(serialized, extracted):
     from unittest.mock import Mock
 
     from trading_bot.broker.paper import PaperBroker
@@ -379,7 +387,8 @@ def test_actual_ai_broker_and_storage_refuse_financial_diagnostics(serialized):
         version_evidence="UNKNOWN",
         usage_permission="PRIVATE_READ_ONLY",
     )
-    value = row.model_dump() if serialized else row
+    item = row.metric("revenue") if extracted else row
+    value = item.model_dump() if serialized else item
     repository, factory = Mock(), Mock()
     strategy = GeminiTradingStrategy(Mock(), repository, "denied", offline_sdk_factory=factory)
     with pytest.raises(MarketAccessDisabled, match="diagnostic-only"):
@@ -437,3 +446,15 @@ def test_real_observations_cannot_be_loaded_by_fixture_transport():
             client.fetch(real.issuer_id)
     finally:
         client.close()
+
+
+def test_overlapping_periods_and_derived_data_cannot_escape_diagnostic_type():
+    current = statement(period=dict(start=date(2024, 1, 1), end=END, kind="ANNUAL"))
+    previous = statement(period=dict(start=date(2023, 1, 1), end=date(2024, 3, 31), kind="ANNUAL"))
+    with pytest.raises(FinancialStop, match="OVERLAPPING_ACCOUNTING_PERIODS"):
+        revenue_growth(current, previous)
+    previous = statement(period=dict(start=date(2023, 4, 1), end=date(2024, 3, 31), kind="ANNUAL"))
+    result = revenue_growth(statement(), previous)
+    for value in (result, result.model_dump()):
+        with pytest.raises(MarketAccessDisabled):
+            reject_diagnostic(value)

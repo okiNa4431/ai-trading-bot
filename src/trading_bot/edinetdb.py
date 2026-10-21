@@ -106,6 +106,8 @@ class FixtureFinancialProvider:
                 if self.clock() - self.started >= 120:
                     raise FinancialStop("FIXTURE_QUOTA_OR_DEADLINE")
                 return value
+            except FinancialStop:
+                raise
             except httpx.TransportError:
                 if attempt == 2:
                     raise FinancialStop("FIXTURE_RETRY_EXHAUSTED") from None
