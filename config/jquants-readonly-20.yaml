@@ -1,0 +1,32 @@
+# JP-2 reviewed scope. Real calls remain disabled pending separate owner approval.
+live_enabled: false
+plan: Free
+from_date: 2025-01-06
+to_date: 2025-12-30
+reviewed_at: 2026-10-21
+review_valid_until: 2026-11-20
+contract_reference: docs/jquants-free-review.md
+listing_source: https://www.jpx.co.jp/markets/statistics-equities/misc/tvdivq0000001vg2-att/data_j.xlsx
+listing_as_of: 2026-09-30
+listing_sha256: a26fdf4420cb6a152a1811ce0c6e293e642c8a99f1cc2ad9c47a5d55f2722c82
+securities:
+  - {security_id: jp-research-001, code: '7203', name: トヨタ自動車}
+  - {security_id: jp-research-002, code: '6758', name: ソニーグループ}
+  - {security_id: jp-research-003, code: '8306', name: 三菱UFJフィナンシャル・グループ}
+  - {security_id: jp-research-004, code: '9984', name: ソフトバンクグループ}
+  - {security_id: jp-research-005, code: '6501', name: 日立製作所}
+  - {security_id: jp-research-006, code: '6861', name: キーエンス}
+  - {security_id: jp-research-007, code: '8035', name: 東京エレクトロン}
+  - {security_id: jp-research-008, code: '7974', name: 任天堂}
+  - {security_id: jp-research-009, code: '9432', name: NTT}
+  - {security_id: jp-research-010, code: '8058', name: 三菱商事}
+  - {security_id: jp-research-011, code: '4063', name: 信越化学工業}
+  - {security_id: jp-research-012, code: '4502', name: 武田薬品工業}
+  - {security_id: jp-research-013, code: '6098', name: リクルートホールディングス}
+  - {security_id: jp-research-014, code: '6367', name: ダイキン工業}
+  - {security_id: jp-research-015, code: '6902', name: デンソー}
+  - {security_id: jp-research-016, code: '6981', name: 村田製作所}
+  - {security_id: jp-research-017, code: '7267', name: 本田技研工業}
+  - {security_id: jp-research-018, code: '8316', name: 三井住友フィナンシャルグループ}
+  - {security_id: jp-research-019, code: '8766', name: 東京海上ホールディングス}
+  - {security_id: jp-research-020, code: '9433', name: KDDI}

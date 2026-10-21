@@ -8,8 +8,12 @@ class MarketAccessDisabled(ValueError):
     pass
 
 
+class DiagnosticOnly:
+    """Marker for private observations as well as aggregate diagnostic reports."""
+
+
 @dataclass(frozen=True)
-class ReadOnlyQualityReport:
+class ReadOnlyQualityReport(DiagnosticOnly):
     """Aggregate-only diagnostic result. No bars, strategy context or conversion API."""
 
     aggregate_json: str = field(repr=False)
@@ -19,7 +23,7 @@ class ReadOnlyQualityReport:
 
 
 def reject_diagnostic(value: object) -> None:
-    if isinstance(value, ReadOnlyQualityReport) or (
+    if isinstance(value, DiagnosticOnly) or (
         isinstance(value, dict) and value.get("purpose") == "diagnostic_only"
     ):
         raise MarketAccessDisabled(
