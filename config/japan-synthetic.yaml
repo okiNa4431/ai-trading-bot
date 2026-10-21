@@ -1,0 +1,8 @@
+data_kind: SYNTHETIC
+symbols: 20
+sessions: 221
+seed: 2101
+selection_count: 10
+rules:
+  commission_jpy: '55'
+  slippage: '0.001'
