@@ -2,7 +2,9 @@
 
 日本株の財務評価・銘柄選定をGemini、売買タイミング・数量・約定をPythonの決定論的ルールで扱い、独立した初期資金100万円ずつでオルカン一括保有と比較する研究です。月額0円を優先します。
 
-現在は **JP-0 / JP-1完了、JP-2読取Provider実装・実データ検証待ち**。実J-Quants・EDINET DB・Gemini通信、定期運用は開始しません。米国株のコードと厳格なAlpaca診断は過去の技術基盤として維持します。
+現在は **JP-0 / JP-1完了、JP-2実データ読取成功・戦略投入未承認、JP-3財務モデル・合成Provider実装**。JP-2はユーザー報告の読取結果で、品質判定FAILED・ELIGIBLE 0のままです。実財務API・Gemini・実データ売買・保存・定期運用は開始しません。米国株の厳格な診断と既存口座は維持します。
+
+- [JP-3無料財務データ比較・利用条件](docs/edinetdb-free-review.md) / [オフライン診断・時刻と版の設計](docs/edinetdb-readonly.md)。`uv run python scripts/edinetdb_local_probe.py --diagnose` はキー・通信不要。実EDINET DBアダプタは未実装です。
 
 - [J-Quants Free公式仕様・利用条件](docs/jquants-free-review.md) / [読取20証券の準備・ゲート・操作](docs/jquants-readonly.md)
 - [JP-2.1 Windowsローカル読取準備](docs/jquants-local-probe.md)：独立した承認・多重起動防止。実通信は追加承認待ちで停止中。
