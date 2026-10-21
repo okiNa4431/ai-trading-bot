@@ -3,6 +3,7 @@
 import json
 import subprocess
 import sys
+import warnings
 from datetime import date, timedelta
 from unittest.mock import Mock
 
@@ -258,3 +259,111 @@ def test_windows_other_process_cannot_start():
         assert result.returncode == 0 and result.stdout.strip() == "BLOCKED"
     result = subprocess.run([sys.executable, "-c", child], **options)
     assert result.returncode == 0 and result.stdout.strip() == "ACQUIRED"
+
+
+@pytest.mark.parametrize("interactive", [True, False])
+def test_diagnose_never_prompts_or_constructs_provider(scope, monkeypatch, capsys, interactive):
+    policy, permission, env = scope
+    monkeypatch.setattr(local, "load_policy", lambda: policy)
+    monkeypatch.setattr(local, "load_local_policy", lambda: permission)
+    monkeypatch.setattr(local, "datetime", Mock(now=lambda zone: AT))
+    monkeypatch.setattr(local.os, "environ", env)
+    monkeypatch.setattr(local, "interactive_console", lambda: interactive)
+    api = Mock()
+    api.CreateMutexW.return_value = 42
+    api.GetLastError.return_value = 0
+    monkeypatch.setattr(local, "_kernel32", lambda: api)
+    monkeypatch.setattr(local, "JQuantsProvider", lambda *a, **kw: pytest.fail("provider"))
+    monkeypatch.setattr(local.getpass, "getpass", lambda *a: pytest.fail("prompt"))
+    monkeypatch.setattr(httpx, "HTTPTransport", lambda **kw: pytest.fail("transport"))
+    assert local.main(["--diagnose"]) == (0 if interactive else 1)
+    output = capsys.readouterr().out
+    report = json.loads(output)
+    assert report["requests"] == 0
+    assert report["network"] == report["provider"] == report["prompt"] == "NOT_RUN"
+    assert report["preflight"]["LOCAL_INTERACTIVE_REQUIRED"] == (
+        "PASSED" if interactive else "FAILED"
+    )
+    assert KEY not in output and "700123" not in output
+    api.CloseHandle.assert_called_once_with(42)
+
+
+@pytest.mark.parametrize(
+    "code",
+    [
+        "LOCAL_FREE_PLAN_REQUIRED",
+        "LOCAL_API_KEY_REQUIRED",
+        "LOCAL_INTERACTIVE_REQUIRED",
+        "LOCAL_ENABLE_FLAG_REQUIRED",
+    ],
+)
+def test_preflight_fixed_reason(scope, monkeypatch, code):
+    policy, permission, env = scope
+    if code == "LOCAL_FREE_PLAN_REQUIRED":
+        env["JQUANTS_PLAN"] = "not-secret-output"
+    elif code == "LOCAL_API_KEY_REQUIRED":
+        env.pop("JQUANTS_API_KEY")
+    elif code == "LOCAL_INTERACTIVE_REQUIRED":
+        monkeypatch.setattr(local, "interactive_console", lambda: False)
+    else:
+        env.pop("JQUANTS_LOCAL_LIVE_ENABLED")
+    with pytest.raises(local.LocalGateError) as error:
+        local.preflight_local(policy, permission, env, AT)
+    assert error.value.code == code
+
+
+def test_mutex_access_denied_fixed_code(monkeypatch):
+    api = Mock()
+    api.CreateMutexW.return_value = None
+    api.GetLastError.return_value = 5
+    monkeypatch.setattr(local, "is_windows", lambda: True)
+    monkeypatch.setattr(local, "_kernel32", lambda: api)
+    with pytest.raises(local.LocalGateError) as error:
+        with local.WindowsProbeMutex():
+            pytest.fail("lock entered")
+    assert error.value.code == "LOCAL_MUTEX_ACCESS_DENIED"
+
+
+@pytest.mark.parametrize("stage", ["load", "mutex", "prompt", "provider", "hidden_input"])
+def test_startup_exception_is_sanitized(scope, monkeypatch, capsys, stage):
+    policy, permission, env = scope
+    monkeypatch.setattr(local, "load_policy", lambda: policy)
+    monkeypatch.setattr(local, "load_local_policy", lambda: permission)
+    monkeypatch.setattr(local, "datetime", Mock(now=lambda zone: AT))
+    monkeypatch.setattr(local.os, "environ", env)
+    api = Mock()
+    api.CreateMutexW.return_value = 42
+    api.GetLastError.return_value = 0
+    monkeypatch.setattr(local, "_kernel32", lambda: api)
+    monkeypatch.setattr(local.getpass, "getpass", lambda *a: local.LOCAL_APPROVAL)
+
+    def fail(*a, **kw):
+        raise RuntimeError(KEY + " raw-response-body 700123")
+
+    target = {"load": "load_policy", "mutex": "_kernel32", "provider": "JQuantsProvider"}
+    if stage == "hidden_input":
+
+        def fallback(*args):
+            warnings.warn("synthetic fallback", local.getpass.GetPassWarning, stacklevel=1)
+            pytest.fail("must not reach echoed input")
+
+        monkeypatch.setattr(local.getpass, "getpass", fallback)
+    elif stage == "prompt":
+        monkeypatch.setattr(local.getpass, "getpass", fail)
+    else:
+        monkeypatch.setattr(local, target[stage], fail)
+    assert local.main() == 1
+    output = capsys.readouterr().out
+    report = json.loads(output)
+    assert (
+        report["reason"]
+        == {
+            "load": "LOCAL_CONFIG_LOAD_FAILED",
+            "mutex": "LOCAL_MUTEX_INITIALIZATION_FAILED",
+            "prompt": "LOCAL_APPROVAL_INPUT_FAILED",
+            "provider": "LOCAL_PROVIDER_INITIALIZATION_FAILED",
+            "hidden_input": "LOCAL_HIDDEN_INPUT_UNAVAILABLE",
+        }[stage]
+    )
+    assert report["requests"] == 0
+    assert KEY not in output and "700123" not in output and "raw-response" not in output

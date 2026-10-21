@@ -52,6 +52,34 @@ WindowsのGlobal名前付きmutexで同一PC内のこのプローブを多重起
 
 ## 結果と障害対応
 
+### 通信前だけの診断
+
+承認プロンプトを出さず、Provider・HTTPクライアントを構築せずに検査するコマンドです。キーの追加入力は不要で、設定済みキーの値も出力しません。全項目PASSでも通信へ進みません。
+
+```powershell
+uv run python scripts/jquants_local_probe.py --diagnose
+.\.venv\Scripts\python.exe scripts/jquants_local_probe.py --diagnose
+```
+
+同じVS Code PowerShellで、パイプや入力リダイレクトを付けずに両方を比較します。PowerShellからPythonソースをパイプするとstdinがパイプとなるため、その結果だけで通常の対話実行も不可とは判断できません。`terminal.stdin_tty` が実際の `sys.stdin.isatty()`、`original_stdin` が元のstdinとの同一性です。stdout/stderrのTTY情報とWindows用getpass実装の選択も真偽値だけを表示します。uv経由だけ異なる場合も、ゲートを迂回せず診断結果で調査してください。
+
+`preflight` のキーは固定理由コード、値はPASSED/FAILEDです。FAILEDが一つでもあれば通常実行は禁止です。
+
+- `LOCAL_INTERACTIVE_REQUIRED`: stdinが対話端末ではない。VS Codeの統合ターミナルから実行し、Output/デバッグコンソールやパイプ入力を避ける。
+- `LOCAL_ACCOUNT_IDLE_CONFIRMATION_REQUIRED`: 他の同一アカウント用クライアントを停止し、本人確認が必要。
+- `LOCAL_ENABLE_FLAG_REQUIRED` / `LOCAL_FREE_PLAN_REQUIRED` / `LOCAL_TERMS_CONFIRMATION_REQUIRED`: 同じターミナル内で必要な自己確認が未完了。
+- `LOCAL_API_KEY_REQUIRED`: キーが未設定または形式不正。値を表示せず既存の非表示手順で確認する。
+- `LOCAL_SCOPE_MISMATCH` / `LOCAL_REVIEW_EXPIRED_OR_INVALID` / `LOCAL_FREE_PERIOD_OR_SPEC_REVIEW_INVALID`: 設定・期限・期間の確認が必要。自動変更しない。
+- `LOCAL_CI_FORBIDDEN` / `LOCAL_CLOUD_FLAG_CONFLICT` / `LOCAL_CLOUD_CONFIG_MUST_REMAIN_DISABLED`: 実行環境の混同。CIやクラウド側ゲートの解除で対応しない。
+
+診断モードは事前検査が失敗していても、Windowsであれば同じGlobal mutexを一度取得・解放して権限を調べます。市場データ通信は一切ありません。`mutex_reason=LOCAL_MUTEX_ACCESS_DENIED` は生成権限不足、`LOCAL_PROBE_ALREADY_RUNNING` は競合、`LOCAL_MUTEX_INITIALIZATION_FAILED` は初期化失敗です。Local名前空間への切替や権限ゲートの迂回はしません。最初から管理者実行を要求することもありません。
+
+通常経路のエラーには `stage` と固定 `reason` が付きます。`LOCAL_CONFIG_LOAD_FAILED`、`LOCAL_APPROVAL_INPUT_FAILED`、`LOCAL_PROVIDER_INITIALIZATION_FAILED` で失敗段階を区別します。`LOCAL_HIDDEN_INPUT_UNAVAILABLE` はgetpassが非表示入力を提供できない場合です。Pythonのフォールバック入力は警告を例外にして拒否するため、入力をエコーして続行しません。診断モードではgetpassを実行しないので、実際のキー入力機能の動作を証明するものではありません。
+
+`requests=0`、`network=NOT_RUN`、`prompt=NOT_RUN`、`provider=NOT_RUN` を確認してください。診断PASSは通信許可や戦略承認ではありません。診断結果を共有する場合も、この集計JSONだけにし、環境変数一覧や例外文字列は送らないでください。
+
+根拠: [Python getpass](https://docs.python.org/3.12/library/getpass.html)、[CPython 3.12実装](https://github.com/python/cpython/blob/3.12/Lib/getpass.py)、[uv run公式仕様](https://docs.astral.sh/uv/reference/cli/#uv-run)、[CreateMutexW](https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-createmutexw)。確認日2026-10-21。VS Code端末固有の判定は、利用者が実際に起動するプロセスで確認する必要があります。
+
 標準出力は集計JSONのみです。件数、欠損・重複・不正値、企業行動候補、隔離・UNKNOWN、要求数、HTTPステータス件数、再試行、2回比較、各検査のPASSED/FAILED/NOT_RUNを確認します。個別OHLCV、履歴、内部指紋、レスポンス本文、キーは表示しません。
 
 `READ_ONLY_COMPLETE` でも戦略承認はfalseです。再取得一致は再現性だけを示し、過去の企業行動会計や当時利用可能だったデータの正しさは証明しません。UNKNOWNは未確認のまま保持します。`STOPPED`、認証失敗、欠損、不連続、調整係数の問題では売買へ進まず、集計のみで原因を調査してください。欠損補完、銘柄除外、検査緩和はしません。自動再送はなく、再実行は契約・期間・他クライアント停止を再確認して本人が承認します。Ctrl+C時も集計STOPPEDとなり、通信済み要求は取り消せません。
