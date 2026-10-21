@@ -113,7 +113,10 @@ def authorize_local(
 
 
 def _kernel32() -> Any:
-    api = ctypes.WinDLL("kernel32", use_last_error=True)
+    loader = getattr(ctypes, "WinDLL", None)
+    if loader is None:
+        raise MarketAccessDisabled("WINDOWS_MUTEX_REQUIRED")
+    api = loader("kernel32", use_last_error=True)
     api.CreateMutexW.argtypes = (wintypes.LPVOID, wintypes.BOOL, wintypes.LPCWSTR)
     api.CreateMutexW.restype = wintypes.HANDLE
     api.ReleaseMutex.argtypes = (wintypes.HANDLE,)
