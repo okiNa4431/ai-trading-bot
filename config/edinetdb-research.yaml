@@ -1,0 +1,7 @@
+provider: edinetdb
+plan: Free
+live_enabled: false
+phase: MOCK_INTERFACE_ONLY
+reviewed_at: 2026-10-21
+review_valid_until: 2026-11-20
+review_reference: docs/edinetdb-free-review.md
